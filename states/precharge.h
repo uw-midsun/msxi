@@ -11,6 +11,9 @@
 #ifndef PRECHARGE_H_
 #define PRECHARGE_H_
 
+// 1500mV TODO: get safe voltage of circuit
+#define SAFE_VOLTAGE_THRESHOLD 1500
+
 // Arbitrary event id offset - not necessary, but makes debugging easier.
 #define PRECHARGE_EVENT_OFFSET 100
 

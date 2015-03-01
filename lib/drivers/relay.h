@@ -6,28 +6,21 @@
 
   Relays have two components:
     1) The relay itself (open when pin low, closed when pin high) (required)
-	2a) The status pin used to verify relay state (low when relay open, high when closed) (optional) 
-	2b) Its index (todo: enum?) in the ADC buffer.
+	2) The status pin used to verify relay state (low when relay open, high when closed) (optional)
+		If the status port is 0, it is assumed that the relay does not have a status pin.
 
 */
 #ifndef RELAY_H_
 #define RELAY_H_
 #include "io_map.h"
+#include "mcu_voltage.h"
 #include <stdbool.h>
 
-typedef enum {
-	STATUS_PIN,
-	VOLTAGE_INDEX,
-	NO_STATUS
-} RelayType;
+#define NO_STATUS 0
 
 struct Relay {
 	struct IOMap relay;
-	RelayType type;
-	union {
-		struct IOMap status;
-		int index;
-	};
+	struct IOMap status;
 };
 
 typedef enum {

@@ -6,10 +6,11 @@
 */
 #ifndef IO_MAP_H_
 #define IO_MAP_H_
+#include <stdint.h>
 
 struct IOMap {
-	int port;
-	int pins;
+	uint8_t port;
+	uint16_t pins;
 };
 
 typedef enum {
@@ -38,6 +39,7 @@ void set_io_low(const struct IOMap *map);
 void toggle_io(const struct IOMap *map);
 
 // get_io_state(map) returns the state of the specified pin.
+// requires: map's IO direction has been set to IN.
 IOState get_io_state(const struct IOMap *map);
 
 #endif

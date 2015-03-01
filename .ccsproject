@@ -10,4 +10,5 @@
 	<rts value="libc.a"/>
 	<createSlaveProjects value=""/>
 	<templateProperties value="id=com.ti.mcu.msp430.driverlib.example_11,products=com.ti.mcu.msp430.driverlib,buildProfile=debug,isHybrid=false,"/>
+	<isTargetManual value="false"/>
 </projectOptions>

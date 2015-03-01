@@ -12,6 +12,4 @@ int main() {
 		e = get_next_event();
 		process_event(get_main_sm(), e);
 	}
-
-	system("pause");
 }

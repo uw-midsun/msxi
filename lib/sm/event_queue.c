@@ -13,12 +13,12 @@
 
 #define EVENT_POOL_SIZE 10
 
-static struct EventNode {
+struct EventNode {
 	Event e;
 	struct EventNode *next;
 };
 
-static struct EventQueue {
+struct EventQueue {
 	struct EventNode *first;
 	struct EventNode *last;
 };
@@ -28,9 +28,10 @@ static struct EventQueue event_queue;
 
 // init_event_queue() initializes the event queue and pool.
 void init_event_queue(void) {
-	for (int i = 0; i < EVENT_POOL_SIZE; i++) {
-		node_pool[i].e = NULL_EVENT;
-		node_pool[i].next = NULL;
+	struct EventNode *temp_node;
+	for (temp_node = node_pool; temp_node < node_pool + EVENT_POOL_SIZE; temp_node++) {
+		temp_node->e = NULL_EVENT;
+		temp_node->next = NULL;
 	}
 	event_queue.first = QUEUE_EMPTY;
 	event_queue.last = QUEUE_EMPTY;
@@ -39,13 +40,15 @@ void init_event_queue(void) {
 // get_free_node() returns a pointer to the next free node in the pool.
 // requires: init_event_queue() has been called.
 static struct EventNode *get_free_node(void) {
-	for (int i = 0; i < EVENT_POOL_SIZE; i++) {
-		if (node_pool[i].e == NULL_EVENT) {
-			return &node_pool[i];
+	struct EventNode *temp_node;
+	for (temp_node = node_pool; temp_node < node_pool + EVENT_POOL_SIZE; temp_node++) {
+		if (temp_node->e == NULL_EVENT) {
+			return temp_node;
 		}
 	}
 	// Should never reach here - increase pool if it does.
 	assert(0 && "Event pool is too small!");
+	return NULL;
 }
 
 // release_node(node) releases the specified node by setting it to default values.

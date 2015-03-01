@@ -6,19 +6,28 @@
 
 */
 #include "io_map.h"
+#include "driverlib.h"
 
-void set_io_high(struct IOMap *map) {
-	
+void set_io_dir(const struct IOMap *map, IODirection direction) {
+	if(direction == OUT) {
+		GPIO_setAsOutputPin(map->port, map->pins);
+	} else {
+		GPIO_setAsInputPin(map->port, map->pins);
+	}
 }
 
-void set_io_low(struct IOMap *map) {
-
+void set_io_high(const struct IOMap *map) {
+	GPIO_setOutputHighOnPin(map->port, map->pins);
 }
 
-void toggle_io(struct IOMap *map) {
-
+void set_io_low(const struct IOMap *map) {
+	GPIO_setOutputLowOnPin(map->port, map->pins);
 }
 
-IOState get_io_state(struct IOMap *map) {
-	return HIGH;
+void toggle_io(const struct IOMap *map) {
+	GPIO_toggleOutputOnPin(map->port, map->pins);
+}
+
+IOState get_io_state(const struct IOMap *map) {
+	return (IOState)GPIO_getInputPinValue(map->port, map->pins);
 }

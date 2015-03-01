@@ -11,12 +11,14 @@
 #include "motor_controller.h"
 #include "relay.h"
 
-struct MotorController LEFT_CONTROLLER = { { { 1, 2 }, STATUS_PIN, { 3, 4 } },
-							{ { 5, 6 }, VOLTAGE_INDEX, { 0, 1 } },
-							{ { 9, 10 }, VOLTAGE_INDEX, { 0, 2 } } };
-struct MotorController RIGHT_CONTROLLER = { { { 12, 11 }, STATUS_PIN, { 10, 9 } },
-							{ { 8, 7 }, VOLTAGE_INDEX, { 0, 3 } },
-							{ { 4, 3 }, VOLTAGE_INDEX, { 0, 4 } } };
+struct MotorController LEFT_CONTROLLER = { { { 1, 2 }, { 3, 4 } },
+							{ { 5, 6 }, { 0 } },
+							{ { 9, 10 }, { 0 } },
+							MCU_CHG1, MCU_DCHG1 };
+struct MotorController RIGHT_CONTROLLER = { { { 12, 11 }, { 10, 9 } },
+							{ { 8, 7 }, { 0 } },
+							{ { 4, 3 }, { 0 } },
+							MCU_CHG2, MCU_DCHG2 };
 
 bool begin_precharge(const struct MotorController *controller) {
 	return close_relay(&controller->charge);
@@ -32,4 +34,12 @@ bool begin_discharge(const struct MotorController *controller) {
 
 bool end_discharge(const struct MotorController *controller) {
 	return open_relay(&controller->discharge);
+}
+
+uint16_t get_precharge_voltage(const struct MotorController *controller) {
+	return get_voltage(controller->charge_index);
+}
+
+uint16_t get_discharge_voltage(const struct MotorController *controller) {
+	return get_voltage(controller->discharge_index);
 }

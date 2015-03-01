@@ -9,11 +9,14 @@
 #ifndef MOTOR_CONTROLLER_H_
 #define MOTOR_CONTROLLER_H_
 #include "relay.h"
+#include "mcu_voltage.h"
 
 struct MotorController {
 	struct Relay enable;
 	struct Relay charge;
 	struct Relay discharge;
+	VoltageIndex charge_index;
+	VoltageIndex discharge_index;
 };
 
 extern struct MotorController LEFT_CONTROLLER, RIGHT_CONTROLLER;
@@ -31,5 +34,11 @@ bool begin_discharge(const struct MotorController *controller);
 
 // end_discharge(controller) ends the discharge process.
 bool end_discharge(const struct MotorController *controller);
+
+// get_precharge_voltage(controller) returns the precharge circuit's voltage.
+uint16_t get_precharge_voltage(const struct MotorController *controller);
+
+// get_discharge_voltage(controller) returns the discharge circuit's voltage.
+uint16_t get_discharge_voltage(const struct MotorController *controller);
 
 #endif

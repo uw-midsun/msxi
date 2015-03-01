@@ -228,4 +228,6 @@ FakesAssemblies/
 *.plg
 
 # Visual Studio 6 workspace options file
-*.opt
+*.opt/Debug__opt_for_speed__1
+/Debug__opt_for_speed__2
+/Debug__opt_for_speed__3

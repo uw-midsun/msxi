@@ -26,15 +26,17 @@ static struct TransitionRuleNode rule_pool[TRANSITION_POOL_SIZE] = { 0 };
 // init_sm_framework() prepares the transition rule pool and global event queue.
 void init_sm_framework() {
 	init_event_queue();
-	for (int i = 0; i < TRANSITION_POOL_SIZE; i++) {
-		rule_pool[i].rule.event = NULL_EVENT;
+	struct TransitionRuleNode *temp_node;
+	for (temp_node = rule_pool; temp_node < rule_pool + TRANSITION_POOL_SIZE; temp_node++) {
+		temp_node->rule.event = NULL_EVENT;
 	}
 }
 
 static struct TransitionRuleNode *get_free_rule() {
-	for (int i = 0; i < TRANSITION_POOL_SIZE; i++) {
-		if (rule_pool[i].rule.event == NULL_EVENT) {
-			return &rule_pool[i];
+	struct TransitionRuleNode *temp_node;
+	for (temp_node = rule_pool; temp_node < rule_pool + TRANSITION_POOL_SIZE; temp_node++) {
+		if (temp_node->rule.event == NULL_EVENT) {
+			return temp;
 		}
 	}
 	// Should never reach here - Increase pool if it does.
@@ -54,6 +56,8 @@ static void release_rule(struct TransitionRuleNode *rule_node) {
 //   until it finds a rule that matches the event's id.
 // If the rule's guard is true or does not exist, then it calls the rules's
 //   action with provided data.
+//   Note that actions can either have integer or pointer data.
+//     This is mostly for correctness, since pointers can technically be passed as ints.
 // If nothing matches, then just ignore the event.
 // This means that events will only ever call one action each.
 // If the current state is composite, then events will be processed using its state machine
@@ -65,7 +69,11 @@ void process_event(struct StateMachine *sm, Event e) {
 		struct TransitionRule *rule = &rule_node->rule;
 		if (rule->event == e &&
 			(rule->guard == NO_GUARD || rule->guard())) {
-			rule->action.fn(sm, rule->action.data);
+			if(rule->action.type == POINTER) {
+				rule->action.fn_pointer(sm, rule->action.pointer);
+			} else {
+				rule->action.fn_data(sm, rule->action.data);
+			}
 			return;
 		}
 		rule_node = rule_node->next_rule;
@@ -87,11 +95,11 @@ void add_transition(struct State *state, struct TransitionRule *rule) {
 	state->transitions = rule_node;
 }
 
-void change_state(struct StateMachine *sm, struct State *next_state) {
+void change_state(struct StateMachine *sm, void *next_state) {
 	sm->current_state = next_state;
 	sm->current_state->enter();
 }
 
-void raise_action_event(struct StateMachine *sm, Event e) {
+void raise_action_event(struct StateMachine *sm, uint16_t e) {
 	raise_event(e);
 }

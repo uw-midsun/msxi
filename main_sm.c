@@ -16,18 +16,22 @@ static void complete_init() {
 	raise_event(STARTUP_COMPLETE);
 }
 
-static void raise_error(struct StateMachine *sm, int error) {
+static void raise_error(struct StateMachine *sm, uint16_t error) {
 	printf("error: %d\n", error);
 }
 
 void init_main_sm() {
 	initialize.enter = init_entry;
-	add_transition(&initialize, &(struct TransitionRule) { INIT_COMPLETE, NO_GUARD, { change_state, &precharge_mcs }});
+	add_transition(&initialize, &(struct TransitionRule)
+			{ INIT_COMPLETE, NO_GUARD,
+			{ .fn_pointer = change_state, .pointer = &precharge_mcs, POINTER }});
 
 	precharge_mcs.enter = init_precharge_sm;
 	precharge_mcs.sub_sm = get_precharge_sm();
-	add_transition(&precharge_mcs, &(struct TransitionRule) { PRECHARGE_COMPLETE, NO_GUARD, { change_state, &complete }});
-	add_transition(&precharge_mcs, &(struct TransitionRule) { PRECHARGE_FAIL, NO_GUARD, { raise_error, 1 }});
+	add_transition(&precharge_mcs, &(struct TransitionRule) { PRECHARGE_COMPLETE, NO_GUARD,
+		{ .fn_pointer = change_state, .pointer = &complete, POINTER }});
+	add_transition(&precharge_mcs, &(struct TransitionRule) { PRECHARGE_FAIL, NO_GUARD,
+		{ .fn_data = raise_error, .data = 1, DATA }});
 	
 	complete.enter = complete_init;
 

@@ -12,11 +12,13 @@
 #ifndef EVENT_QUEUE_H_
 #define EVENT_QUEUE_H_
 #include <stdbool.h>
+#include <stdint.h>
+#include <limits.h>
 
-#define NULL_EVENT -1
+#define NULL_EVENT UINT_MAX
 #define QUEUE_EMPTY NULL
 
-typedef int Event;
+typedef uint16_t Event;
 
 // init_event_queue() initializes the event queue.
 void init_event_queue(void);

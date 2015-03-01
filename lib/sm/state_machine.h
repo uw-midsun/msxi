@@ -8,7 +8,18 @@
 	  (i.e. given rule1, rule2, rule3: events will be matched against rule3, then rule2, then rule1.)
     The transition rules support optional guards.
   If a transition rule is called, it calls the appropriate action.
-    Actions are provided with the state machine that called them and pre-defined data (either an integer or a pointer). 
+    Actions are provided with the state machine that called them and pre-defined data (either an integer or a pointer).
+
+  To declare an action:
+    Pointer-based:
+      .fn_pointer = action function,
+      .pointer = pointer as void pointer
+      .type = POINTER
+    Data-based:
+      .fn_data = action function,
+      .data = data as integer,
+      .type = DATA
+  TODO: move into another file?
 
   The recommended process for creating a state machine is to encapsulate each state machine in its own source and header files.
   It should only expose its associated events and pointers to the state machine and its initialization function.
@@ -29,15 +40,27 @@
 #define NO_GUARD NULL
 #define ELSE NULL
 
-typedef void(*StateFunc)();
+typedef void(*EntryFunc)();
 typedef bool(*Guard)();
 
+// Forward declaration for Action's function
+struct StateMachine;
+
+typedef enum {
+	DATA,
+	POINTER
+} ActionType;
+
 struct Action {
-	void(*fn)(struct StateMachine *, int);
 	union {
-		int data;
+		void(*fn_data)(struct StateMachine *, uint16_t);
+		void(*fn_pointer)(struct StateMachine *, void *);
+	};
+	union {
+		uint16_t data;
 		void *pointer;
 	};
+	ActionType type;
 };
 
 struct TransitionRule {
@@ -47,7 +70,7 @@ struct TransitionRule {
 };
 
 struct State {
-	StateFunc enter;
+	EntryFunc enter;
 	struct StateMachine *sub_sm;
 	struct TransitionRuleNode *transitions;
 };
@@ -72,9 +95,9 @@ void add_transition(struct State *state, struct TransitionRule *rule);
 
 // change_state(sm, next_state) changes the current state to the given state,
 //   calling its entry function.
-void change_state(struct StateMachine *sm, struct State *next_state);
+void change_state(struct StateMachine *sm, void *next_state);
 
 // raise_action_event(sm, e) raises the specified event in the global event queue.
-void raise_action_event(struct StateMachine *sm, Event e);
+void raise_action_event(struct StateMachine *sm, uint16_t e);
 
 #endif

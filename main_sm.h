@@ -1,3 +1,10 @@
+/*
+  main_sm.h - Titus Chow
+
+  This is the Startup state machine. It runs the car's startup procedure.
+
+ */
+
 #ifndef MAIN_SM_H_
 #define MAIN_SM_H_
 

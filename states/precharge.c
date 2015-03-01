@@ -27,7 +27,6 @@
 #include "..\lib\sm\state_machine.h"
 #include "precharge.h"
 #include <stdio.h>
-#include <Windows.h>
 
 static struct StateMachine sm = { 0 };
 static struct State precharging_left = { 0 }, left_mc_enabled = { 0 },
@@ -77,40 +76,42 @@ static void right_mc_init() {
 }
 // -- end --
 
-static void wait(struct StateMachine *sm, int seconds) {
+static void wait(struct StateMachine *sm, uint16_t seconds) {
 	printf("Sleeping for %d second(s)...\n", seconds);
-	//Sleep(seconds * 1000);
 	raise_event(PRECHARGE_TIMEOUT);
 }
 
-static bool is_voltage_good() {
-	static int voltage = 0;
-	if (voltage >= 5) {
-		voltage = 0;
-		return true;
-	} else {
-		voltage++;
-		return false;
-	}
+static bool is_left_voltage_good() {
+	return (get_precharge_voltage(&LEFT_CONTROLLER) > SAFE_VOLTAGE_THRESHOLD);
+}
+
+static bool is_right_voltage_good() {
+	return (get_precharge_voltage(&RIGHT_CONTROLLER) > SAFE_VOLTAGE_THRESHOLD);
 }
 
 void init_precharge_sm() {
 	// -- Set up left motor controller precharge --
 	precharging_left.enter = precharge_left_init;
-	add_transition(&precharging_left, &(struct TransitionRule) { PRECHARGE_TIMEOUT, ELSE, { wait, 1 } });
-	add_transition(&precharging_left, &(struct TransitionRule) { PRECHARGE_TIMEOUT, is_voltage_good, { change_state, &left_mc_enabled } });
+	add_transition(&precharging_left, &(struct TransitionRule) { PRECHARGE_TIMEOUT, ELSE,
+		{ .fn_data = wait, .data = 1, DATA } });
+	add_transition(&precharging_left, &(struct TransitionRule) { PRECHARGE_TIMEOUT, is_left_voltage_good,
+		{ .fn_pointer = change_state, .pointer = &left_mc_enabled, POINTER } });
 
 	left_mc_enabled.enter = left_mc_init;
-	add_transition(&left_mc_enabled, &(struct TransitionRule) { MOTOR_CONTROLLER_ENABLED, NO_GUARD, { change_state, &precharging_right } });
+	add_transition(&left_mc_enabled, &(struct TransitionRule) { MOTOR_CONTROLLER_ENABLED, NO_GUARD,
+		{ .fn_pointer = change_state, .pointer = &precharging_right, POINTER } });
 	// -- end --
 
 	// -- Set up right motor controller precharge --
 	precharging_right.enter = precharge_right_init;
-	add_transition(&precharging_right, &(struct TransitionRule) { PRECHARGE_TIMEOUT, ELSE, { wait, 1 } });
-	add_transition(&precharging_right, &(struct TransitionRule) { PRECHARGE_TIMEOUT, is_voltage_good, { change_state, &right_mc_enabled } });
+	add_transition(&precharging_right, &(struct TransitionRule) { PRECHARGE_TIMEOUT, ELSE,
+		{ .fn_data = wait, .data = 1, DATA } });
+	add_transition(&precharging_right, &(struct TransitionRule) { PRECHARGE_TIMEOUT, is_right_voltage_good,
+		{ .fn_pointer = change_state, .pointer = &right_mc_enabled, POINTER } });
 
 	right_mc_enabled.enter = right_mc_init;
-	add_transition(&right_mc_enabled, &(struct TransitionRule) { MOTOR_CONTROLLER_ENABLED, NO_GUARD, { raise_action_event, PRECHARGE_COMPLETE } });
+	add_transition(&right_mc_enabled, &(struct TransitionRule) { MOTOR_CONTROLLER_ENABLED, NO_GUARD,
+		{ .fn_data = raise_action_event, .data = PRECHARGE_COMPLETE, POINTER } });
 	// -- end --
 
 	// Initial state
