@@ -15,10 +15,10 @@
 #include <stdint.h>
 #include <limits.h>
 
-#define NULL_EVENT UINT_MAX
-#define QUEUE_EMPTY NULL
-
 typedef uint16_t Event;
+
+#define NULL_EVENT (Event)UINT_MAX
+#define QUEUE_EMPTY NULL
 
 // init_event_queue() initializes the event queue.
 void init_event_queue(void);

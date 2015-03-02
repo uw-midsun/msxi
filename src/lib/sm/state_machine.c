@@ -36,7 +36,7 @@ static struct TransitionRuleNode *get_free_rule() {
 	struct TransitionRuleNode *temp_node;
 	for (temp_node = rule_pool; temp_node < rule_pool + TRANSITION_POOL_SIZE; temp_node++) {
 		if (temp_node->rule.event == NULL_EVENT) {
-			return temp;
+			return temp_node;
 		}
 	}
 	// Should never reach here - Increase pool if it does.
