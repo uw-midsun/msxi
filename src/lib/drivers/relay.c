@@ -6,6 +6,14 @@
 */
 #include "relay.h"
 
+// init_relay(relay) sets the pin directions for the relay and status pins.
+void init_relay(const struct Relay *relay) {
+	set_io_dir(&relay->relay, OUT);
+	if (relay->status.port != NO_STATUS) {
+		set_io_dir(&relay->status, IN);
+	}
+}
+
 // open_relay(relay) opens the specified relay,
 //   verifying it opened or returning true if unknown.
 bool open_relay(const struct Relay *relay) {

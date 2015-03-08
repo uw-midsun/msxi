@@ -7,17 +7,15 @@ static struct StateMachine main = { 0 };
 static struct State initialize = { 0 }, precharge_mcs = { 0 }, complete = { 0 };
 
 static void init_entry() {
-	printf("Initializing.\n");
 	raise_event(INIT_COMPLETE);
 }
 
 static void complete_init() {
-	printf("Process completed!\n");
 	raise_event(STARTUP_COMPLETE);
 }
 
 static void raise_error(struct StateMachine *sm, uint16_t error) {
-	printf("error: %d\n", error);
+
 }
 
 void init_main_sm() {

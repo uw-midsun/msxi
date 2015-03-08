@@ -5,9 +5,12 @@
   It uses a pool of event nodes to hold events with a constant memory cost.
   Note that the pool size is a hand-tuned variable. It is currently a wild guess.
 
+  Events can be raised from interrupts. There shouldn't be any problems.
+
 */
 
 #include "event_queue.h"
+#include "msp430.h"
 #include <stdlib.h>
 #include <assert.h>
 
@@ -57,8 +60,11 @@ static void release_node(struct EventNode *node) {
 	node->next = NULL;
 }
 
-// raise_event(e) sets e as the queue's last node, using a node in the pool.
-void raise_event(Event e) {
+// unsafe_raise_event(e) sets e as the queue's last node, using a node in the pool.
+//   Note that this is unsafe - Interrupts may cause race conditions.
+// Use this function in ISRs instead of raise_event(e)
+//   so interrupts are not enabled from within the ISR.
+void unsafe_raise_event(Event e) {
 	struct EventNode *event_node = get_free_node();
 	event_node->e = e;
 	event_node->next = QUEUE_EMPTY;
@@ -71,12 +77,22 @@ void raise_event(Event e) {
 	event_queue.last = event_node;
 }
 
+// raise_event(e) sets e as the queue's last node, using a node in the pool.
+//   It disables interrupts to prevent race conditions.
+void raise_event(Event e) {
+	__disable_interrupt();
+	unsafe_raise_event(e);
+	__enable_interrupt();
+}
+
 // get_next_event() sets the 2nd node as the first, returning the first node's event and releasing its node.
 //   If there aren't any events queued, it just returns an empty node.
 Event get_next_event(void) {
 	if (event_queue.first == QUEUE_EMPTY) {
 		return NULL_EVENT;
 	}
+
+	__disable_interrupt();
 	struct EventNode *first_node = event_queue.first;
 	Event event = first_node->e;
 	event_queue.first = first_node->next;
@@ -85,6 +101,7 @@ Event get_next_event(void) {
 	}
 
 	release_node(first_node);
+	__enable_interrupt();
 
 	return event;
 }

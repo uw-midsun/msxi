@@ -12,15 +12,17 @@
  */
 
 #include "driverlib.h"
+#include "io_map.h"
 #include "spi1.h"
 
 #define SPI_CLK 500000; // Desired SPI frequency
 
 volatile uint8_t data;
 
-bool spi1_init(uint8_t reset_port, uint8_t reset_pin) {
+bool spi1_init(struct IOMap reset_pin) {
 	// Set PX.Y for slave reset
-	GPIO_setOutputHighOnPin(reset_port, reset_pin);
+	set_io_dir(&reset_pin, PIN_OUT);
+	set_io_high(&reset_pin);
 
 	// Set secondary fucntion P3.0, 4. 5
 	GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3,
@@ -52,7 +54,7 @@ bool spi1_init(uint8_t reset_port, uint8_t reset_pin) {
 								USCI_A_SPI_RECEIVE_INTERRUPT);
 
 	// Toggle Slave - Active Low
-	GPIO_setOutputLowOnPin(reset_port, reset_pin);
+	set_io_low(&reset_pin);
 
 	__delay_cycles(50); // Wait for slave to initialize
 

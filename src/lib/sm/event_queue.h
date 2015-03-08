@@ -23,6 +23,10 @@ typedef uint16_t Event;
 // init_event_queue() initializes the event queue.
 void init_event_queue(void);
 
+// unsafe_raise_event(e) adds an event to the system event queue unsafely.
+//   That is, interrupts can cause race conditions.
+void unsafe_raise_event(Event e);
+
 // raise_event(e) adds an event to the system event queue.
 // requires: init_event_queue() has been called.
 void raise_event(Event e);

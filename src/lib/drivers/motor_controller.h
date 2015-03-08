@@ -11,15 +11,12 @@
 #include "relay.h"
 #include "mcu_voltage.h"
 
-struct MotorController {
-	struct Relay enable;
-	struct Relay charge;
-	struct Relay discharge;
-	VoltageIndex charge_index;
-	VoltageIndex discharge_index;
-};
+struct MotorController;
 
-extern struct MotorController LEFT_CONTROLLER, RIGHT_CONTROLLER;
+extern struct MotorController *LEFT_MOTORCONTROLLER, *RIGHT_MOTORCONTROLLER;
+
+// init_motor_controllers() prepares the relays and measurement circuits.
+void init_motor_controllers();
 
 // begin_precharge(controller) begins the precharge process.
 bool begin_precharge(const struct MotorController *controller);

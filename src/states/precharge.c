@@ -54,39 +54,35 @@ static void safe_enable_mc(struct MotorController *controller) {
 
 // -- Left precharge --
 static void precharge_left_init() {
-	safe_precharge_motor(&LEFT_CONTROLLER);
-	printf("Closed left precharge relay!n");
+	safe_precharge_motor(LEFT_MOTORCONTROLLER);
 }
 
 static void left_mc_init() {
-	safe_enable_mc(&LEFT_CONTROLLER);
-	printf("Opened left precharge relay & closed left main relay!\n");
+	safe_enable_mc(LEFT_MOTORCONTROLLER);
 }
 // -- end --
 
 // -- Right precharge --
 static void precharge_right_init() {
-	safe_precharge_motor(&RIGHT_CONTROLLER);
-	printf("Closed right precharge relay!\n");
+	safe_precharge_motor(RIGHT_MOTORCONTROLLER);
 }
 
 static void right_mc_init() {
-	safe_enable_mc(&RIGHT_CONTROLLER);
-	printf("Opened right precharge relay & closed right main relay!\n");
+	safe_enable_mc(RIGHT_MOTORCONTROLLER);
 }
 // -- end --
 
 static void wait(struct StateMachine *sm, uint16_t seconds) {
-	printf("Sleeping for %d second(s)...\n", seconds);
+	// TODO: add delay code
 	raise_event(PRECHARGE_TIMEOUT);
 }
 
 static bool is_left_voltage_good() {
-	return (get_precharge_voltage(&LEFT_CONTROLLER) > SAFE_VOLTAGE_THRESHOLD);
+	return (get_precharge_voltage(LEFT_MOTORCONTROLLER) > SAFE_VOLTAGE_THRESHOLD);
 }
 
 static bool is_right_voltage_good() {
-	return (get_precharge_voltage(&RIGHT_CONTROLLER) > SAFE_VOLTAGE_THRESHOLD);
+	return (get_precharge_voltage(RIGHT_MOTORCONTROLLER) > SAFE_VOLTAGE_THRESHOLD);
 }
 
 void init_precharge_sm() {
