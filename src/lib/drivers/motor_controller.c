@@ -8,7 +8,7 @@
 	2) Precharge
 	3) Discharge
 
-  In order to measure the precharge/discharge circuits, EN_MEASURE must be active.
+  In order to measure the precharge/discharge circuits, ENABLE_MEASUREMENT must be active.
 
 */
 #include "motor_controller.h"
@@ -22,15 +22,13 @@ struct MotorController {
 	VoltageIndex discharge_index;
 };
 
-static struct IOMap ENABLE_MEASUREMENT = { 1, 2 };
-
-static struct MotorController left_controller = { { { 1, 2 }, { 3, 4 } },
-							{ { 5, 6 }, { 0 } },
-							{ { 9, 10 }, { 0 } },
+static struct MotorController left_controller = { { *LEFT_MC_RELAY, *LEFT_MC_STATUS },
+							{ *CHG_LEFT_RELAY, NO_STATUS_PIN },
+							{ *DCHG_LEFT_RELAY, NO_STATUS_PIN },
 							MCU_CHG1, MCU_DCHG1 };
-static struct MotorController right_controller = { { { 12, 11 }, { 10, 9 } },
-							{ { 8, 7 }, { 0 } },
-							{ { 4, 3 }, { 0 } },
+static struct MotorController right_controller = { { *RIGHT_MC_RELAY, *RIGHT_MC_STATUS },
+							{ *CHG_RIGHT_RELAY, NO_STATUS_PIN },
+							{ *DCHG_RIGHT_RELAY, NO_STATUS_PIN },
 							MCU_CHG2, MCU_DCHG2 };
 
 struct MotorController *LEFT_MOTORCONTROLLER = &left_controller;
@@ -47,8 +45,8 @@ static void init_mc(const struct MotorController *controller) {
 void init_motor_controllers() {
 	init_mc(LEFT_MOTORCONTROLLER);
 	init_mc(RIGHT_MOTORCONTROLLER);
-	set_io_dir(&ENABLE_MEASUREMENT, OUT);
-	set_io_high(&ENABLE_MEASUREMENT);
+	set_io_dir(ENABLE_MEASUREMENT, PIN_OUT);
+	set_io_high(ENABLE_MEASUREMENT);
 }
 
 bool begin_precharge(const struct MotorController *controller) {

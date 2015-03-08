@@ -13,7 +13,6 @@
 #include "io_map.h"
 
 #define HEARTBEAT_EVENT_ID 1000
-#define PLUTUS_HEARTBEAT (IOMap) { 4, 7 }
 
 typedef enum {
 	HEARTBEAT_BAD = HEARTBEAT_EVENT_ID,

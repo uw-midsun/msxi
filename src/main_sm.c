@@ -7,6 +7,7 @@ static struct StateMachine main = { 0 };
 static struct State initialize = { 0 }, precharge_mcs = { 0 }, complete = { 0 };
 
 static void init_entry() {
+
 	raise_event(INIT_COMPLETE);
 }
 

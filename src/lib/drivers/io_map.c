@@ -9,7 +9,7 @@
 #include "driverlib.h"
 
 void set_io_dir(const struct IOMap *map, IODirection direction) {
-	if(direction == OUT) {
+	if(direction == PIN_OUT) {
 		GPIO_setAsOutputPin(map->port, map->pins);
 	} else {
 		GPIO_setAsInputPin(map->port, map->pins);

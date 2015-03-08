@@ -6,6 +6,7 @@
 */
 #ifndef IO_MAP_H_
 #define IO_MAP_H_
+#include "../../pins.h"
 #include <stdint.h>
 
 struct IOMap {
@@ -19,8 +20,8 @@ typedef enum {
 } IOState;
 
 typedef enum {
-	IN,
-	OUT
+	PIN_IN,
+	PIN_OUT
 } IODirection;
 
 // set_io_dir(map, direction) sets the specified pin(s)' IO direction.

@@ -17,7 +17,7 @@ static struct IOMap pin = { 0 };
 static IOState state = LOW;
 
 void init_heartbeat(const struct IOMap *heartbeat_pin) {
-	set_io_dir(heartbeat_pin, IN);
+	set_io_dir(heartbeat_pin, PIN_IN);
 	pin = *heartbeat_pin;
 
 	// Set up & Start Timer_A0 for Up Mode sourced by SMCLK/64
@@ -51,6 +51,5 @@ __interrupt void TIMER0_A0_ISR(void) {
 		state = new_state;
 		// Enum trickery - should probably change
 		unsafe_raise_event(HEARTBEAT_EVENT_ID + state);
-		GPIO_toggleOutputOnPin( GPIO_PORT_P4, GPIO_PIN7 );
 	}
 }

@@ -17,6 +17,7 @@
 #include <stdbool.h>
 
 #define NO_STATUS 0
+#define NO_STATUS_PIN (struct IOMap) { NO_STATUS, 0 }
 
 struct Relay {
 	struct IOMap relay;

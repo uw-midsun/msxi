@@ -8,9 +8,9 @@
 
 // init_relay(relay) sets the pin directions for the relay and status pins.
 void init_relay(const struct Relay *relay) {
-	set_io_dir(&relay->relay, OUT);
+	set_io_dir(&relay->relay, PIN_OUT);
 	if (relay->status.port != NO_STATUS) {
-		set_io_dir(&relay->status, IN);
+		set_io_dir(&relay->status, PIN_IN);
 	}
 }
 
