@@ -13,7 +13,6 @@
 #ifndef RELAY_H_
 #define RELAY_H_
 #include "io_map.h"
-#include "mcu_voltage.h"
 #include <stdbool.h>
 
 #define NO_STATUS 0

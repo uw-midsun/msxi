@@ -18,8 +18,8 @@
 
 */
 #include "enable_battery.h"
-#include "drivers/heartbeat.h"
 #include "sm/state_machine.h"
+#include "drivers/heartbeat.h"
 #include "drivers/relay.h"
 
 static struct StateMachine sm = { 0 };

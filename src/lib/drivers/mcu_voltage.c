@@ -11,8 +11,9 @@
  *
  */
 
-#include "driverlib.h"
 #include "mcu_voltage.h"
+#include "io_map.h"
+#include "adc12_a.h"
 
 #define ADC_SCALE (3300.0f/4095.0f) //0 to 4095 -> 0 to 3300mV
 
@@ -21,11 +22,8 @@ static volatile uint16_t results[5];
 
 void mcu_voltage_init(void) {
 	// Enable pins as inputs for ADC
-	// TODO: switch to IOMap?
-	GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P7, GPIO_PIN7);
-	GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P6,
-												GPIO_PIN0 + GPIO_PIN1 +
-												GPIO_PIN2 + GPIO_PIN3);
+	set_io_peripheral_dir(POWER_STATUS, PIN_IN);
+	set_io_peripheral_dir(MC_VOLTAGES, PIN_IN);
 
 	// Initialize ADC12_A module
 	// 5 MHz oscillator from UCS

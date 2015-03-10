@@ -8,7 +8,6 @@
 #ifndef DEBUG_LED_H_
 #define DEBUG_LED_H_
 #include "io_map.h"
-#include <stdlib.h>
 
 // All the debug leds are on Port 8.
 #define DEBUG_LEDS { DEBUG_LED_PORT8 }

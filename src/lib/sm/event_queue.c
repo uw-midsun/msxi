@@ -11,7 +11,6 @@
 
 #include "event_queue.h"
 #include "msp430.h"
-#include <stdlib.h>
 #include <assert.h>
 
 #define EVENT_POOL_SIZE 10

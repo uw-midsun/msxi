@@ -11,9 +11,8 @@
 */
 #ifndef EVENT_QUEUE_H_
 #define EVENT_QUEUE_H_
-#include <stdbool.h>
 #include <stdint.h>
-#include <stdlib.h>
+#include <stddef.h>
 #include <limits.h>
 
 typedef uint16_t Event;

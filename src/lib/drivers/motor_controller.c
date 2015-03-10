@@ -13,6 +13,7 @@
 */
 #include "motor_controller.h"
 #include "relay.h"
+#include "mcu_voltage.h"
 
 struct MotorController {
 	struct Relay enable;

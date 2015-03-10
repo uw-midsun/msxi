@@ -8,8 +8,8 @@
 
 #ifndef MOTOR_CONTROLLER_H_
 #define MOTOR_CONTROLLER_H_
-#include "relay.h"
-#include "mcu_voltage.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 struct MotorController;
 

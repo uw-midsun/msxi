@@ -6,13 +6,21 @@
 
 */
 #include "io_map.h"
-#include "driverlib.h"
+#include "gpio.h"
 
 void set_io_dir(const struct IOMap *map, IODirection direction) {
 	if(direction == PIN_OUT) {
 		GPIO_setAsOutputPin(map->port, map->pins);
 	} else {
 		GPIO_setAsInputPin(map->port, map->pins);
+	}
+}
+
+void set_io_peripheral_dir(const struct IOMap *map, IODirection direction) {
+	if(direction == PIN_OUT) {
+		GPIO_setAsPeripheralModuleFunctionOutputPin(map->port, map->pins);
+	} else {
+		GPIO_setAsPeripheralModuleFunctionInputPin(map->port, map->pins);
 	}
 }
 

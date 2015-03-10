@@ -1,5 +1,5 @@
 #include "sm/main_sm.h"
-#include "lib/sm/state_machine.h"
+#include "sm/state_machine.h"
 
 int main() {
 	init_sm_framework();

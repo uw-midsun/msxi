@@ -27,6 +27,9 @@ typedef enum {
 // set_io_dir(map, direction) sets the specified pin(s)' IO direction.
 void set_io_dir(const struct IOMap *map, IODirection direction);
 
+// set_io_peripheral_dir(map) sets the specified pin(s)'s IO direction, enabling their secondary function.
+void set_io_peripheral_dir(const struct IOMap *map, IODirection direction);
+
 // set_io_high(map) sets the specified pin(s) to output high.
 // requires: map's IO direction has been set to OUT.
 void set_io_high(const struct IOMap *map);

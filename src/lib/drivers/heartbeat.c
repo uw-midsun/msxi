@@ -5,10 +5,9 @@
   It is assumed that when the pin is low, the heartbeat is bad.
 
 */
-#include "../sm/event_queue.h"
 #include "heartbeat.h"
-#include "driverlib.h"
-#include <stdbool.h>
+#include "sm/event_queue.h"
+#include "timer_a.h"
 
 // SMCLK: ~1.045 MHz, divided by 64: 16328Hz -> ~1 second
 #define HEARTBEAT_PERIOD 16328

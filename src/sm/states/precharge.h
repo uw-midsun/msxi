@@ -11,8 +11,9 @@
 #ifndef PRECHARGE_H_
 #define PRECHARGE_H_
 
-// 1500mV TODO: get safe voltage of circuit
-#define SAFE_VOLTAGE_THRESHOLD 1500
+// 3100mV -> ~95% of voltage difference (assuming 1:1 ratio between 120V to 3.3V conversion)
+// TODO: get actual safe voltage of circuit
+#define SAFE_VOLTAGE_THRESHOLD 3100
 
 // Arbitrary event id offset - not necessary, but makes debugging easier.
 #define PRECHARGE_EVENT_OFFSET 1200

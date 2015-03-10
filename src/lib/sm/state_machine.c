@@ -5,9 +5,7 @@
 
 */
 #include "state_machine.h"
-#include "transition.h"
-#include <stdio.h>
-#include <assert.h>
+#include <stddef.h>
 
 // init_sm_framework() prepares the transition rule pool and global event queue.
 void init_sm_framework() {

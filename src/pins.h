@@ -46,10 +46,12 @@
 // Allows measurement of precharge/discharge circuits
 #define ENABLE_MEASUREMENT	&(struct IOMap) { GPIO_PORT_P6, GPIO_PIN4 }
 // Remember to modify mcu_voltage's memory buffers if these pins are changed!
-#define CHG_LEFT_VOLTAGE	&(struct IOMap) { GPIO_PORT_P6, GPIO_PIN0 }
+#define MC_VOLTAGES			&(struct IOMap) { GPIO_PORT_P6, GPIO_PIN0 + GPIO_PIN1 + \
+															GPIO_PIN2 + GPIO_PIN3 }
+/*#define CHG_LEFT_VOLTAGE	&(struct IOMap) { GPIO_PORT_P6, GPIO_PIN0 }
 #define DCHG_LEFT_VOLTAGE	&(struct IOMap) { GPIO_PORT_P6, GPIO_PIN1 }
 #define CHG_RIGHT_VOLTAGE	&(struct IOMap) { GPIO_PORT_P6, GPIO_PIN2 }
-#define DCHG_RIGHT_VOLTAGE	&(struct IOMap) { GPIO_PORT_P6, GPIO_PIN3 }
+#define DCHG_RIGHT_VOLTAGE	&(struct IOMap) { GPIO_PORT_P6, GPIO_PIN3 } */
 #define POWER_STATUS		&(struct IOMap) { GPIO_PORT_P7, GPIO_PIN7 }
 
 // Debug LEDs - TODO: rename to more descriptive names

@@ -10,10 +10,8 @@
  * P3.0 -> Clock Out	(UCA0CLK)
  * PX.Y -> Slave Reset
  */
-
-#include "driverlib.h"
-#include "io_map.h"
 #include "spi1.h"
+#include "driverlib.h"
 
 #define SPI_CLK 500000; // Desired SPI frequency
 
