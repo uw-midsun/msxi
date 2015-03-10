@@ -50,6 +50,6 @@ __interrupt void TIMER0_A0_ISR(void) {
 	if(new_state != state) {
 		state = new_state;
 		// Enum trickery - should probably change
-		unsafe_raise_event(HEARTBEAT_EVENT_ID + state);
+		unsafe_raise_event(HEARTBEAT_EVENT_OFFSET + state);
 	}
 }

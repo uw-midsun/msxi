@@ -1,6 +1,5 @@
-#include "main_sm.h"
-#include "lib\sm\state_machine.h"
-//#include <vld.h> // For memory leak testing
+#include "sm/main_sm.h"
+#include "lib/sm/state_machine.h"
 
 int main() {
 	init_sm_framework();
@@ -8,7 +7,7 @@ int main() {
 
 	Event e = NULL_EVENT;
 
-	while (e != STARTUP_COMPLETE) {
+	while (true) {
 		e = get_next_event();
 		process_event(get_main_sm(), e);
 	}

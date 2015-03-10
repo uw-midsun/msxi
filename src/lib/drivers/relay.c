@@ -2,6 +2,7 @@
   relay.c - Titus Chow
 
   This provides relay-related functions.
+  TODO: find out if we need a delay between changing a relay and checking its status pin.
 
 */
 #include "relay.h"

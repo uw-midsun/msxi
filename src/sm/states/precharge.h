@@ -15,7 +15,7 @@
 #define SAFE_VOLTAGE_THRESHOLD 1500
 
 // Arbitrary event id offset - not necessary, but makes debugging easier.
-#define PRECHARGE_EVENT_OFFSET 100
+#define PRECHARGE_EVENT_OFFSET 1200
 
 typedef enum {
 	PRECHARGE_TIMEOUT = PRECHARGE_EVENT_OFFSET,

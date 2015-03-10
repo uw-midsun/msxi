@@ -1,7 +1,7 @@
 /*
   main_sm.h - Titus Chow
 
-  This is the Startup state machine. It runs the car's startup procedure.
+  This is the main state machine.
 
  */
 
@@ -9,9 +9,8 @@
 #define MAIN_SM_H_
 
 typedef enum {
-	INIT_COMPLETE,
-	STARTUP_COMPLETE
-} StartupEvent;
+	KILLSWITCH_ON
+} SystemEvent;
 
 void init_main_sm();
 

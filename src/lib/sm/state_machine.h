@@ -7,27 +7,13 @@
     States also keep track of transition rules that are matched against incoming events in reverse order.
 	  (i.e. given rule1, rule2, rule3: events will be matched against rule3, then rule2, then rule1.)
     The transition rules support optional guards.
-  If a transition rule is called, it calls the appropriate action.
+  If a transition rule is matched, it calls the appropriate action.
     Actions are provided with the state machine that called them and pre-defined data (either an integer or a pointer).
-
-  To declare an action:
-    Pointer-based:
-      .fn_pointer = action function,
-      .pointer = pointer as void pointer
-      .type = POINTER
-    Data-based:
-      .fn_data = action function,
-      .data = data as integer,
-      .type = DATA
-  TODO: move into another file?
 
   The recommended process for creating a state machine is to encapsulate each state machine in its own source and header files.
   It should only expose its associated events and pointers to the state machine and its initialization function.
   
-  To initialize a composite state,
-    Set sub_sm to the internal state machine,
-    Set the entry function to the state machine's initialization function,
-    And add a transition rule to move to the next state on completion.
+  When initializing a composite state, remember to add a transition rule to move to the next state on completion.
   
   Some generic actions are provided, such as changing states and raising events.
 
@@ -35,44 +21,16 @@
 #ifndef STATE_MACHINE_H_
 #define STATE_MACHINE_H_
 #include "event_queue.h"
-#include <stdbool.h>
+#include "transition.h"
 
-#define NO_GUARD NULL
-#define ELSE NULL
+#define NO_ENTRY_FN NULL
 
 typedef void(*EntryFunc)();
-typedef bool(*Guard)();
-
-// Forward declaration for Action's function
-struct StateMachine;
-
-typedef enum {
-	DATA,
-	POINTER
-} ActionType;
-
-struct Action {
-	union {
-		void(*fn_data)(struct StateMachine *, uint16_t);
-		void(*fn_pointer)(struct StateMachine *, void *);
-	};
-	union {
-		uint16_t data;
-		void *pointer;
-	};
-	ActionType type;
-};
-
-struct TransitionRule {
-	Event event;
-	Guard guard;
-	struct Action action;
-};
 
 struct State {
 	EntryFunc enter;
 	struct StateMachine *sub_sm;
-	struct TransitionRuleNode *transitions;
+	struct TransitionRule *transitions;
 };
 
 struct StateMachine {
@@ -82,14 +40,44 @@ struct StateMachine {
 // init_sm_framework() initializes the state machine framework.
 void init_sm_framework();
 
+// init_state(state, entry_fn) initializes the given state, assigning its entry function.
+// requires: state is not NULL.
+void init_state(struct State *state, EntryFunc entry_fn);
+
+// init_composite_state(state, entry_fn, sm) initializes the given state as composite state.
+// requires: sm must be initialized or entry_fn must be sm's initialization function.
+//           state is not NULL.
+void init_composite_state(struct State *state, EntryFunc entry_fn, struct StateMachine *sm);
+
 // process_event(sm, e) processes the given event using the provided state machine.
 // If the current state is composite, then events are processed using its sub-state machine.
 // requires: sm must be initialized and populated.
 void process_event(struct StateMachine *sm, Event e);
 
-// add_transition(state, rule) adds the given rule to the given state.
+// add_transition(state, rule) add a custom transition rule to the given state.
 // requires: init_sm_framework() has been called.
+//           state is not NULL.
 void add_transition(struct State *state, struct TransitionRule *rule);
+
+// add_guarded_state_transition(state, e, guard, next_state) adds a guarded change_state rule to the given state.
+// requires: init_sm_framework() has been called.
+//           state is not NULL.
+void add_guarded_state_transition(struct State *state, Event e, Guard g, struct State *next_state);
+
+// add_state_transition(state, e, guard, next_state) adds a guarded change_state rule to the given state.
+// requires: init_sm_framework() has been called.
+//           state is not NULL.
+void add_state_transition(struct State *state, Event e, struct State *next_state);
+
+// add_guarded_state_transition(state, e, guard, next_state) adds a guarded raise_action_event rule to the given state.
+// requires: init_sm_framework() has been called.
+//           state is not NULL.
+void add_guarded_event_rule(struct State *state, Event e, Guard g, Event event);
+
+// add_state_transition(state, e, guard, next_state) adds a raise_action_event rule to the given state.
+// requires: init_sm_framework() has been called.
+//           state is not NULL.
+void add_event_rule(struct State *state, Event e, Event event);
 
 // Generic actions
 

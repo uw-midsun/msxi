@@ -12,10 +12,11 @@
 #define HEARTBEAT_H_
 #include "io_map.h"
 
-#define HEARTBEAT_EVENT_ID 1000
+// Since this event is independent of the state machines, it must not conflict with any existing events.
+#define HEARTBEAT_EVENT_OFFSET 6000
 
 typedef enum {
-	HEARTBEAT_BAD = HEARTBEAT_EVENT_ID,
+	HEARTBEAT_BAD = HEARTBEAT_EVENT_OFFSET,
 	HEARTBEAT_GOOD
 } HeartbeatEvent;
 
