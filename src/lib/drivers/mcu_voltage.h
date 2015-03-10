@@ -6,6 +6,7 @@
 
 #ifndef MCU_VOLTAGE_H_
 #define MCU_VOLTAGE_H_
+#include <stdint.h>
 
 typedef enum {
 	PWR_STATUS,

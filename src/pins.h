@@ -27,17 +27,18 @@
 #define SOLAR_RELAY			&(struct IOMap) { GPIO_PORT_P4, GPIO_PIN0 }
 #define SOLAR_STATUS		&(struct IOMap) { GPIO_PORT_P4, GPIO_PIN1 }
 
-#define LEFT_MC_RELAY		&(struct IOMap) { GPIO_PORT_P4, GPIO_PIN2 }
-#define LEFT_MC_STATUS		&(struct IOMap) { GPIO_PORT_P4, GPIO_PIN3 }
+// Due to the way motor controllers are declared, these are IOMaps without the compound literal.
+#define LEFT_MC_RELAY		{ GPIO_PORT_P4, GPIO_PIN2 }
+#define LEFT_MC_STATUS		{ GPIO_PORT_P4, GPIO_PIN3 }
 
-#define RIGHT_MC_RELAY		&(struct IOMap) { GPIO_PORT_P4, GPIO_PIN4 }
-#define RIGHT_MC_STATUS		&(struct IOMap) { GPIO_PORT_P4, GPIO_PIN5 }
+#define RIGHT_MC_RELAY		{ GPIO_PORT_P4, GPIO_PIN4 }
+#define RIGHT_MC_STATUS		{ GPIO_PORT_P4, GPIO_PIN5 }
 
-#define CHG_LEFT_RELAY		&(struct IOMap) { GPIO_PORT_P4, GPIO_PIN7 }
-#define DCHG_LEFT_RELAY		&(struct IOMap) { GPIO_PORT_P5, GPIO_PIN4 }
+#define CHG_LEFT_RELAY		{ GPIO_PORT_P4, GPIO_PIN7 }
+#define DCHG_LEFT_RELAY		{ GPIO_PORT_P5, GPIO_PIN4 }
 
-#define CHG_RIGHT_RELAY		&(struct IOMap) { GPIO_PORT_P5, GPIO_PIN5 }
-#define DCHG_RIGHT_RELAY	&(struct IOMap) { GPIO_PORT_P7, GPIO_PIN2 }
+#define CHG_RIGHT_RELAY		{ GPIO_PORT_P5, GPIO_PIN5 }
+#define DCHG_RIGHT_RELAY	{ GPIO_PORT_P7, GPIO_PIN2 }
 
 // Heartbeat
 #define PLUTUS_HEARTBEAT	&(struct IOMap) { GPIO_PORT_P4, GPIO_PIN6 }

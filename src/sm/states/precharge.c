@@ -34,7 +34,7 @@ static struct State precharging_left, left_mc_enabled,
 
 // safe_precharge_motor(controller) begins the precharge process, throwing PRECHARGE_FAIL
 //   if any relays do not change successfully.
-static void safe_precharge_motor(struct MotorController *controller) {
+static void safe_precharge_motor(const struct MotorController *controller) {
 	if (begin_precharge(controller)) {
 		raise_event(PRECHARGE_TIMEOUT);
 	} else {
@@ -44,7 +44,7 @@ static void safe_precharge_motor(struct MotorController *controller) {
 
 // safe_precharge_motor(controller) ends the precharge process, throwing PRECHARGE_FAIL
 //   if any relays do not change successfully.
-static void safe_enable_mc(struct MotorController *controller) {
+static void safe_enable_mc(const struct MotorController *controller) {
 	if (end_precharge(controller)) {
 		raise_event(MOTOR_CONTROLLER_ENABLED);
 	} else {

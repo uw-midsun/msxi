@@ -44,7 +44,7 @@ static void raise_error(struct StateMachine *sm, uint16_t error) {
 	// TODO: Handle errors
 }
 
-void init_main_sm() {
+void init_startup_sm() {
 	init_state(&initialize, init_system);
 	add_state_transition(&initialize, INIT_COMPLETE, &precharge_mcs);
 
@@ -65,6 +65,6 @@ void init_main_sm() {
 	change_state(&main, &initialize);
 }
 
-struct StateMachine *get_main_sm() {
+struct StateMachine *get_startup_sm() {
 	return &main;
 }

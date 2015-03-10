@@ -23,17 +23,17 @@ struct MotorController {
 	VoltageIndex discharge_index;
 };
 
-static struct MotorController left_controller = { { *LEFT_MC_RELAY, *LEFT_MC_STATUS },
-							{ *CHG_LEFT_RELAY, NO_STATUS_PIN },
-							{ *DCHG_LEFT_RELAY, NO_STATUS_PIN },
+static const struct MotorController left_controller = { { LEFT_MC_RELAY, LEFT_MC_STATUS },
+							{ CHG_LEFT_RELAY, NO_STATUS_PIN },
+							{ DCHG_LEFT_RELAY, NO_STATUS_PIN },
 							MCU_CHG1, MCU_DCHG1 };
-static struct MotorController right_controller = { { *RIGHT_MC_RELAY, *RIGHT_MC_STATUS },
-							{ *CHG_RIGHT_RELAY, NO_STATUS_PIN },
-							{ *DCHG_RIGHT_RELAY, NO_STATUS_PIN },
+static const struct MotorController right_controller = { { RIGHT_MC_RELAY, RIGHT_MC_STATUS },
+							{ CHG_RIGHT_RELAY, NO_STATUS_PIN },
+							{ DCHG_RIGHT_RELAY, NO_STATUS_PIN },
 							MCU_CHG2, MCU_DCHG2 };
 
-struct MotorController *LEFT_MOTORCONTROLLER = &left_controller;
-struct MotorController *RIGHT_MOTORCONTROLLER = &right_controller;
+const struct MotorController *LEFT_MOTORCONTROLLER = &left_controller;
+const struct MotorController *RIGHT_MOTORCONTROLLER = &right_controller;
 
 // init_mc(controller) initalizes the relays for the specified controller.
 static void init_mc(const struct MotorController *controller) {

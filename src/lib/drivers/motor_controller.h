@@ -13,7 +13,7 @@
 
 struct MotorController;
 
-extern struct MotorController *LEFT_MOTORCONTROLLER, *RIGHT_MOTORCONTROLLER;
+extern const struct MotorController *LEFT_MOTORCONTROLLER, *RIGHT_MOTORCONTROLLER;
 
 // init_motor_controllers() prepares the relays and measurement circuits.
 void init_motor_controllers();

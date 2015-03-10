@@ -15,7 +15,7 @@
 #include "io_map.h"
 #include "adc12_a.h"
 
-#define ADC_SCALE (3300.0f/4095.0f) //0 to 4095 -> 0 to 3300mV
+#define ADC_SCALE(x) ((x)*3300)/4095 //0 to 4095 -> 0 to 3300mV
 
 // Modified by ADC interrupts
 static volatile uint16_t results[5];
@@ -102,7 +102,7 @@ uint16_t get_voltage(VoltageIndex pin) {
 	// Is this necessary? Interrupt shouldn't be called again.
 	//ADC12_A_disableInterrupt(ADC12_A_BASE, ADC12IE4);
 
-	uint16_t pin_voltage = results[pin]*ADC_SCALE;
+	uint16_t pin_voltage = ADC_SCALE(results[pin]);
 
 	// Reenable interrupts
 	// Do we need to clear interrupts before reenabling?
