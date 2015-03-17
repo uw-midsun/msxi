@@ -1,6 +1,6 @@
 #include "main_sm.h"
 #include "sm/state_machine.h"
-#include "states/startup.h"
+#include "startup/startup.h"
 
 static struct StateMachine sm = { 0 };
 static struct State startup = { 0 };
