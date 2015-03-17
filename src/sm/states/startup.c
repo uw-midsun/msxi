@@ -18,6 +18,8 @@
 #include "precharge.h"
 #include "enable_battery.h"
 
+#define SOLAR_RELAY_CONFIG &(struct Relay) { SOLAR_RELAY, SOLAR_STATUS }
+
 static struct StateMachine main = { 0 };
 static struct State initialize, enable_battery,
 					enable_solar, precharge_mcs,

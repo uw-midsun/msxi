@@ -78,11 +78,11 @@ static void wait(struct StateMachine *sm, uint16_t seconds) {
 }
 
 static bool is_left_voltage_good() {
-	return (get_precharge_voltage(LEFT_MOTORCONTROLLER) > SAFE_VOLTAGE_THRESHOLD);
+	return (get_precharge_voltage(LEFT_MOTORCONTROLLER) > SAFE_PRECHARGE_THRESHOLD);
 }
 
 static bool is_right_voltage_good() {
-	return (get_precharge_voltage(RIGHT_MOTORCONTROLLER) > SAFE_VOLTAGE_THRESHOLD);
+	return (get_precharge_voltage(RIGHT_MOTORCONTROLLER) > SAFE_PRECHARGE_THRESHOLD);
 }
 
 void init_precharge_sm() {

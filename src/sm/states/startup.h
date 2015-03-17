@@ -8,8 +8,6 @@
 #ifndef STARTUP_H_
 #define STARTUP_H_
 
-#define SOLAR_RELAY_CONFIG &(struct Relay) { *SOLAR_RELAY, *SOLAR_STATUS }
-
 #define STARTUP_EVENT_ID 1000
 
 typedef enum {

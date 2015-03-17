@@ -46,8 +46,8 @@ static void init_mc(const struct MotorController *controller) {
 void init_motor_controllers() {
 	init_mc(LEFT_MOTORCONTROLLER);
 	init_mc(RIGHT_MOTORCONTROLLER);
-	set_io_dir(ENABLE_MEASUREMENT, PIN_OUT);
-	set_io_high(ENABLE_MEASUREMENT);
+	set_io_dir(IOMAP(ENABLE_MEASUREMENT), PIN_OUT);
+	set_io_high(IOMAP(ENABLE_MEASUREMENT));
 }
 
 bool begin_precharge(const struct MotorController *controller) {

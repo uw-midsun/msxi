@@ -7,11 +7,11 @@
 #include "debug_led.h"
 
 void init_leds() {
-	struct IOMap *debug_leds[DEBUG_LED_COUNT] = DEBUG_LEDS;
+	struct IOMap debug_leds[DEBUG_LED_COUNT] = DEBUG_LEDS;
 	int i;
 	for(i = 0; i < DEBUG_LED_COUNT; i++) {
-		set_io_low(debug_leds[i]);
-		set_io_dir(debug_leds[i], PIN_OUT);
+		set_io_low(&debug_leds[i]);
+		set_io_dir(&debug_leds[i], PIN_OUT);
 	}
 }
 

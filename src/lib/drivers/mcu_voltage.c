@@ -22,8 +22,8 @@ static volatile uint16_t results[5];
 
 void mcu_voltage_init(void) {
 	// Enable pins as inputs for ADC
-	set_io_peripheral_dir(POWER_STATUS, PIN_IN);
-	set_io_peripheral_dir(MC_VOLTAGES, PIN_IN);
+	set_io_peripheral_dir(IOMAP(POWER_STATUS), PIN_IN);
+	set_io_peripheral_dir(IOMAP(MC_VOLTAGES), PIN_IN);
 
 	// Initialize ADC12_A module
 	// 5 MHz oscillator from UCS
