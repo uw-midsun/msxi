@@ -23,7 +23,8 @@ typedef bool(*Guard)();
 void init_transitions();
 
 // process_transitions(transitions, sm, e) processes all the transition rules in the list, executing the first rule that matches.
-void process_transitions(struct TransitionRule *transitions, struct StateMachine *sm, Event e);
+//   It returns true if a rule was matched, false if not.
+bool process_transitions(struct TransitionRule *transitions, struct StateMachine *sm, Event e);
 
 // make_pointer_rule(e, guard, fn, pointer) returns a pointer-based transition rule.
 struct TransitionRule *make_pointer_rule(Event e, Guard guard, PointerFunc fn, void *pointer);

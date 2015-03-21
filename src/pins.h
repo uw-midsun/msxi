@@ -12,7 +12,7 @@
 #define PINS_H_
 #include "gpio.h"
 
-// Due to what we're doing, we can't wrap map in brackets.
+// Due to how we're using the macros, we can't wrap "map" in brackets.
 // Thus, it's up to the user not to call IOMAP(map) with other arguments.
 #define IOMAP(map)			&(struct IOMap) map
 #define GPIO_PIN_ALL		GPIO_PIN0 + GPIO_PIN1 + GPIO_PIN2 + GPIO_PIN3 + \

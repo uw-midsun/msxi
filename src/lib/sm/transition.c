@@ -57,7 +57,7 @@ void init_transitions() {
 //   checking if the events match and the guard is either true or does not exist.
 // Note that actions can either have integer or pointer data.
 //   This is mostly for correctness, since pointers can technically be passed as ints.
-void process_transitions(struct TransitionRule *transitions, struct StateMachine *sm, Event e) {
+bool process_transitions(struct TransitionRule *transitions, struct StateMachine *sm, Event e) {
 	struct TransitionRule *rule = transitions;
 	while (rule != NULL) {
 		if (rule->event == e &&
@@ -67,10 +67,11 @@ void process_transitions(struct TransitionRule *transitions, struct StateMachine
 			} else {
 				rule->action.fn_data(sm, rule->action.data);
 			}
-			return;
+			return true;
 		}
 		rule = rule->next_rule;
 	}
+	return false;
 }
 
 static struct TransitionRule *get_free_rule() {

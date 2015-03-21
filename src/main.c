@@ -1,9 +1,14 @@
 #include "sm/main_sm.h"
 #include "sm/state_machine.h"
+#include "wdt_a.h"
 
 int main() {
+	WDT_A_hold(WDT_A_BASE);
+
 	init_sm_framework();
 	init_main_sm();
+
+	__enable_interrupt();
 
 	Event e = NULL_EVENT;
 

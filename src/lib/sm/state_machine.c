@@ -37,8 +37,8 @@ void init_composite_state(struct State *state, EntryFunc entry_fn, struct StateM
 //   after its transition rules are checked.
 void process_event(struct StateMachine *sm, Event e) {
 	struct State *current_state = sm->current_state;
-	process_transitions(current_state->transitions, sm, e);
-	if (current_state->sub_sm != NULL) {
+	bool matched = process_transitions(current_state->transitions, sm, e);
+	if (!matched && current_state->sub_sm != NULL) {
 		process_event(current_state->sub_sm, e);
 	}
 }

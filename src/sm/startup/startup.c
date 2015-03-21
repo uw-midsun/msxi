@@ -48,7 +48,7 @@ static void raise_error(struct StateMachine *sm, uint16_t error) {
 
 void init_startup_sm() {
 	init_state(&initialize, init_system);
-	add_state_transition(&initialize, INIT_COMPLETE, &precharge_mcs);
+	add_state_transition(&initialize, INIT_COMPLETE, &enable_battery);
 
 	init_composite_state(&enable_battery, init_battery_sm, get_battery_sm());
 	add_state_transition(&enable_battery, BATTERY_ENABLED, &enable_solar);
