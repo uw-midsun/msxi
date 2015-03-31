@@ -28,9 +28,9 @@
 #include "precharge.h"
 #include <stdio.h>
 
-static struct StateMachine sm = { 0 };
 static struct State precharging_left, left_mc_enabled,
 					precharging_right, right_mc_enabled;
+static struct StateMachine sm = { .default_state = &precharging_left, .init = init_precharge_sm };
 
 // safe_precharge_motor(controller) begins the precharge process, throwing PRECHARGE_FAIL
 //   if any relays do not change successfully.
@@ -103,9 +103,6 @@ void init_precharge_sm() {
 	right_mc_enabled.enter = right_mc_init;
 	add_event_rule(&right_mc_enabled, MOTOR_CONTROLLER_ENABLED, PRECHARGE_COMPLETE);
 	// -- end --
-
-	// Initial state
-	change_state(&sm, &precharging_left);
 }
 
 struct StateMachine *get_precharge_sm() {

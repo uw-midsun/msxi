@@ -28,9 +28,9 @@
 
 #define BATTERY_RELAY_CONFIG &(struct Relay) { BATTERY_RELAY, BATTERY_STATUS }
 
-static struct StateMachine sm = { 0 };
 static struct State init_plutus, plutus_enabled,
 					dcdc_check, battery_enabled;
+static struct StateMachine sm = { .default_state = &init_plutus, .init = init_battery_sm };
 
 // Powers Plutus through the CANBus (12V)
 static void power_plutus() {
@@ -81,9 +81,6 @@ void init_battery_sm() {
 	add_guarded_state_transition(&dcdc_check, BATTERY_TIMEOUT, is_dcdc_good, &battery_enabled);
 
 	init_state(&battery_enabled, init_battery);
-
-	// Initial state
-	change_state(&sm, &init_plutus);
 }
 
 struct StateMachine *get_battery_sm() {

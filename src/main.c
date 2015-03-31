@@ -6,7 +6,7 @@ int main() {
 	WDT_A_hold(WDT_A_BASE);
 
 	init_sm_framework();
-	init_main_sm();
+	init_sm(get_main_sm());
 
 	__enable_interrupt();
 

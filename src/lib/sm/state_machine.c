@@ -13,16 +13,24 @@ void init_sm_framework() {
 	init_transitions();
 }
 
+void init_sm(struct StateMachine *sm) {
+	if(!sm->initialized) {
+		sm->init();
+		sm->initialized = true;
+	}
+	change_state(sm, sm->default_state);
+}
+
 void init_state(struct State *state, EntryFunc entry_fn) {
 	state->enter = entry_fn;
 	state->sub_sm = NULL;
 	state->transitions = NULL;
 }
 
-// init_composite_state(state, entry_fn, sm) initalizes the given state as a composite state
+// init_composite_state(state, sm) initalizes the given state as a composite state
 //   by setting sub_sm to the given state machine.
-void init_composite_state(struct State *state, EntryFunc entry_fn, struct StateMachine *sm) {
-	state->enter = entry_fn;
+void init_composite_state(struct State *state, struct StateMachine *sm) {
+	state->enter = NULL;
 	state->sub_sm = sm;
 	state->transitions = NULL;
 }
@@ -70,9 +78,16 @@ void add_event_rule(struct State *state, Event e, Event event) {
 
 // Default action functions
 
+// change_state(sm, next_state) switches the state machine to the next state.
+//   If the next state is a composite state, it initializes it and switches it to the default state.
 void change_state(struct StateMachine *sm, void *next_state) {
 	sm->current_state = next_state;
-	sm->current_state->enter();
+	if(sm->current_state->sub_sm != NULL) {
+		init_sm(sm->current_state->sub_sm);
+	}
+	if(sm->current_state->enter != NULL) {
+		sm->current_state->enter();
+	}
 }
 
 void raise_action_event(struct StateMachine *sm, uint16_t e) {
