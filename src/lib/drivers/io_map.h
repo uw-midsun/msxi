@@ -6,7 +6,11 @@
 */
 #ifndef IO_MAP_H_
 #define IO_MAP_H_
-#include "../../pins.h"
+#ifdef LAUNCHPAD
+#include "launchpad.h"
+#elif CHAOS
+#include "chaos.h"
+#endif
 #include <stdint.h>
 
 struct IOMap {

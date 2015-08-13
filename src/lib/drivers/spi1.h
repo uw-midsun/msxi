@@ -7,6 +7,7 @@
 #ifndef SPI1_H_
 #define SPI1_H_
 #include "io_map.h"
+#include <stdbool.h>
 
 bool spi1_init(struct IOMap reset_pin);
 void spi1_write(uint8_t byte_out);
