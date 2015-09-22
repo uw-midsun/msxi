@@ -9,30 +9,30 @@
 
 // init_sm_framework() prepares the transition rule pool and global event queue.
 void init_sm_framework() {
-	init_event_queue();
-	init_transitions();
+  init_event_queue();
+  init_transitions();
 }
 
 void init_sm(struct StateMachine *sm) {
-	if(!sm->initialized) {
-		sm->init();
-		sm->initialized = true;
-	}
-	change_state(sm, sm->default_state);
+  if(!sm->initialized) {
+    sm->init();
+    sm->initialized = true;
+  }
+  change_state(sm, sm->default_state);
 }
 
 void init_state(struct State *state, EntryFunc entry_fn) {
-	state->enter = entry_fn;
-	state->sub_sm = NULL;
-	state->transitions = NULL;
+  state->enter = entry_fn;
+  state->sub_sm = NULL;
+  state->transitions = NULL;
 }
 
 // init_composite_state(state, sm) initalizes the given state as a composite state
 //   by setting sub_sm to the given state machine.
 void init_composite_state(struct State *state, struct StateMachine *sm) {
-	state->enter = NULL;
-	state->sub_sm = sm;
-	state->transitions = NULL;
+  state->enter = NULL;
+  state->sub_sm = sm;
+  state->transitions = NULL;
 }
 
 // process_event(sm, e) loops through the current state's transition rules
@@ -44,36 +44,36 @@ void init_composite_state(struct State *state, struct StateMachine *sm) {
 // If the current state is composite, then events will be processed using its state machine
 //   after its transition rules are checked.
 void process_event(struct StateMachine *sm, Event e) {
-	struct State *current_state = sm->current_state;
-	bool matched = process_transitions(current_state->transitions, sm, e);
-	if (!matched && current_state->sub_sm != NULL) {
-		process_event(current_state->sub_sm, e);
-	}
+  struct State *current_state = sm->current_state;
+  bool matched = process_transitions(current_state->transitions, sm, e);
+  if (!matched && current_state->sub_sm != NULL) {
+    process_event(current_state->sub_sm, e);
+  }
 }
 
 // add_transition(state, rule) adds the given rule to the struct by prepending it
 //   to the state's linked list of transition rules.
 // Note that all rule data is held in the transition rule pool.
 void add_transition(struct State *state, struct TransitionRule *rule) {
-	state->transitions = add_rule(state->transitions, rule);
+  state->transitions = add_rule(state->transitions, rule);
 }
 
 // add_guarded_state_transition(state, e, guard, next_state) is a wrapper for add_transition.
 void add_guarded_state_transition(struct State *state, Event e, Guard guard, struct State *next_state) {
-	add_transition(state, make_pointer_rule(e, guard, change_state, next_state));
+  add_transition(state, make_pointer_rule(e, guard, change_state, next_state));
 }
 
 void add_state_transition(struct State *state, Event e, struct State *next_state) {
-	add_guarded_state_transition(state, e, NO_GUARD, next_state);
+  add_guarded_state_transition(state, e, NO_GUARD, next_state);
 }
 
 // add_guarded_event_rule(state, e, guard, event) is a wrapper for add_transition.
 void add_guarded_event_rule(struct State *state, Event e, Guard guard, Event event) {
-	add_transition(state, make_data_rule(e, guard, raise_action_event, event));
+  add_transition(state, make_data_rule(e, guard, raise_action_event, event));
 }
 
 void add_event_rule(struct State *state, Event e, Event event) {
-	add_guarded_event_rule(state, e, NO_GUARD, event);
+  add_guarded_event_rule(state, e, NO_GUARD, event);
 }
 
 // Default action functions
@@ -81,15 +81,15 @@ void add_event_rule(struct State *state, Event e, Event event) {
 // change_state(sm, next_state) switches the state machine to the next state.
 //   If the next state is a composite state, it initializes it and switches it to the default state.
 void change_state(struct StateMachine *sm, void *next_state) {
-	sm->current_state = next_state;
-	if(sm->current_state->sub_sm != NULL) {
-		init_sm(sm->current_state->sub_sm);
-	}
-	if(sm->current_state->enter != NULL) {
-		sm->current_state->enter();
-	}
+  sm->current_state = next_state;
+  if(sm->current_state->sub_sm != NULL) {
+    init_sm(sm->current_state->sub_sm);
+  }
+  if(sm->current_state->enter != NULL) {
+    sm->current_state->enter();
+  }
 }
 
 void raise_action_event(struct StateMachine *sm, uint16_t e) {
-	raise_event(e);
+  raise_event(e);
 }

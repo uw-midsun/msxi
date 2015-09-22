@@ -158,27 +158,27 @@ typedef void (* __SFR_FARPTR)();
 #include <intrinsics.h>
 
 #if __MSP430_HEADER_VERSION__ < 1107
-	#define LPM0         _bis_SR_register(LPM0_bits)         /* Enter Low Power Mode 0 */
-	#define LPM0_EXIT    _bic_SR_register_on_exit(LPM0_bits) /* Exit Low Power Mode 0 */
-	#define LPM1         _bis_SR_register(LPM1_bits)         /* Enter Low Power Mode 1 */
-	#define LPM1_EXIT    _bic_SR_register_on_exit(LPM1_bits) /* Exit Low Power Mode 1 */
-	#define LPM2         _bis_SR_register(LPM2_bits)         /* Enter Low Power Mode 2 */
-	#define LPM2_EXIT    _bic_SR_register_on_exit(LPM2_bits) /* Exit Low Power Mode 2 */
-	#define LPM3         _bis_SR_register(LPM3_bits)         /* Enter Low Power Mode 3 */
-	#define LPM3_EXIT    _bic_SR_register_on_exit(LPM3_bits) /* Exit Low Power Mode 3 */
-	#define LPM4         _bis_SR_register(LPM4_bits)         /* Enter Low Power Mode 4 */
-	#define LPM4_EXIT    _bic_SR_register_on_exit(LPM4_bits) /* Exit Low Power Mode 4 */
+  #define LPM0         _bis_SR_register(LPM0_bits)         /* Enter Low Power Mode 0 */
+  #define LPM0_EXIT    _bic_SR_register_on_exit(LPM0_bits) /* Exit Low Power Mode 0 */
+  #define LPM1         _bis_SR_register(LPM1_bits)         /* Enter Low Power Mode 1 */
+  #define LPM1_EXIT    _bic_SR_register_on_exit(LPM1_bits) /* Exit Low Power Mode 1 */
+  #define LPM2         _bis_SR_register(LPM2_bits)         /* Enter Low Power Mode 2 */
+  #define LPM2_EXIT    _bic_SR_register_on_exit(LPM2_bits) /* Exit Low Power Mode 2 */
+  #define LPM3         _bis_SR_register(LPM3_bits)         /* Enter Low Power Mode 3 */
+  #define LPM3_EXIT    _bic_SR_register_on_exit(LPM3_bits) /* Exit Low Power Mode 3 */
+  #define LPM4         _bis_SR_register(LPM4_bits)         /* Enter Low Power Mode 4 */
+  #define LPM4_EXIT    _bic_SR_register_on_exit(LPM4_bits) /* Exit Low Power Mode 4 */
 #else
-	#define LPM0      __bis_SR_register(LPM0_bits)         /* Enter Low Power Mode 0 */
-	#define LPM0_EXIT __bic_SR_register_on_exit(LPM0_bits) /* Exit Low Power Mode 0 */
-	#define LPM1      __bis_SR_register(LPM1_bits)         /* Enter Low Power Mode 1 */
-	#define LPM1_EXIT __bic_SR_register_on_exit(LPM1_bits) /* Exit Low Power Mode 1 */
-	#define LPM2      __bis_SR_register(LPM2_bits)         /* Enter Low Power Mode 2 */
-	#define LPM2_EXIT __bic_SR_register_on_exit(LPM2_bits) /* Exit Low Power Mode 2 */
-	#define LPM3      __bis_SR_register(LPM3_bits)         /* Enter Low Power Mode 3 */
-	#define LPM3_EXIT __bic_SR_register_on_exit(LPM3_bits) /* Exit Low Power Mode 3 */
-	#define LPM4      __bis_SR_register(LPM4_bits)         /* Enter Low Power Mode 4 */
-	#define LPM4_EXIT __bic_SR_register_on_exit(LPM4_bits) /* Exit Low Power Mode 4 */
+  #define LPM0      __bis_SR_register(LPM0_bits)         /* Enter Low Power Mode 0 */
+  #define LPM0_EXIT __bic_SR_register_on_exit(LPM0_bits) /* Exit Low Power Mode 0 */
+  #define LPM1      __bis_SR_register(LPM1_bits)         /* Enter Low Power Mode 1 */
+  #define LPM1_EXIT __bic_SR_register_on_exit(LPM1_bits) /* Exit Low Power Mode 1 */
+  #define LPM2      __bis_SR_register(LPM2_bits)         /* Enter Low Power Mode 2 */
+  #define LPM2_EXIT __bic_SR_register_on_exit(LPM2_bits) /* Exit Low Power Mode 2 */
+  #define LPM3      __bis_SR_register(LPM3_bits)         /* Enter Low Power Mode 3 */
+  #define LPM3_EXIT __bic_SR_register_on_exit(LPM3_bits) /* Exit Low Power Mode 3 */
+  #define LPM4      __bis_SR_register(LPM4_bits)         /* Enter Low Power Mode 4 */
+  #define LPM4_EXIT __bic_SR_register_on_exit(LPM4_bits) /* Exit Low Power Mode 4 */
 #endif
 
 #endif /* End #defines for C */

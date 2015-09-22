@@ -6,8 +6,8 @@
 
   Relays have two components:
     1) The relay itself (open when pin low, closed when pin high) (required)
-	2) The status pin used to verify relay state (low when relay open, high when closed) (optional)
-		If the status port is 0, it is assumed that the relay does not have a status pin.
+  2) The status pin used to verify relay state (low when relay open, high when closed) (optional)
+    If the status port is 0, it is assumed that the relay does not have a status pin.
 
 */
 #ifndef RELAY_H_
@@ -19,14 +19,14 @@
 #define NO_STATUS_PIN (struct IOMap) { NO_STATUS, 0 }
 
 struct Relay {
-	struct IOMap relay;
-	struct IOMap status;
+  struct IOMap relay;
+  struct IOMap status;
 };
 
 typedef enum {
-	OPEN,
-	CLOSED,
-	UNKNOWN
+  OPEN,
+  CLOSED,
+  UNKNOWN
 } RelayState;
 
 // init_relay(relay) initializes the relay, setting pin directions.

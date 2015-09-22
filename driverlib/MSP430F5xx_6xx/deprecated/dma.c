@@ -68,7 +68,7 @@ bool DMA_init (uint16_t baseAddress,
     param.transferUnitSelect = transferUnitSelect;
     param.triggerTypeSelect = triggerTypeSelect;
     DMA_initialize(baseAddress, &param);
-	return STATUS_SUCCESS;
+  return STATUS_SUCCESS;
 }
 
 void DMA_initialize(uint16_t baseAddress, DMA_initializeParam *param)

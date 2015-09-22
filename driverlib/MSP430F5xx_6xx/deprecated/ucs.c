@@ -55,11 +55,11 @@
 #ifdef __GNUC__
 #define __delay_cycles(x) \
 ({ \
-	volatile unsigned int j; \
-	for (j=0;j<x;j++) \
-	{ \
-	  __no_operation(); \
-	} \
+  volatile unsigned int j; \
+  for (j=0;j<x;j++) \
+  { \
+    __no_operation(); \
+  } \
 })
 
 #endif
@@ -473,7 +473,7 @@ bool UCS_LFXT1StartWithTimeout(uint16_t baseAddress,
         HWREG16(baseAddress + OFS_UCSCTL6_L) |= XT1DRIVE1_L + XT1DRIVE0_L;
     }
 
-   	//Enable LF mode and clear xcap and bypass
+     //Enable LF mode and clear xcap and bypass
     HWREG16(baseAddress + OFS_UCSCTL6) &= ~(XTS + XCAP_3 + XT1BYPASS);
     HWREG16(baseAddress + OFS_UCSCTL6) |= xcap;
 

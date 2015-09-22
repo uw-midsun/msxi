@@ -1,7 +1,7 @@
 ******************************************************************************
-                  MSP430 Linker Unix v4.4.3                    
+                  MSP430 Linker PC v4.4.3                      
 ******************************************************************************
->> Linked Sat Jun 13 22:20:42 2015
+>> Linked Thu Sep 17 18:20:06 2015
 
 OUTPUT FILE NAME:   <msxi-chaos.out>
 ENTRY POINT SYMBOL: "_c_int00_noargs"  address: 000044b4

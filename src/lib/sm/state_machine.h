@@ -5,7 +5,7 @@
 
   Each state has a specific action that it calls on entry. It is recommended to make this your initialization function.
     States also keep track of transition rules that are matched against incoming events in reverse order.
-	  (i.e. given rule1, rule2, rule3: events will be matched against rule3, then rule2, then rule1.)
+    (i.e. given rule1, rule2, rule3: events will be matched against rule3, then rule2, then rule1.)
     The transition rules support optional guards.
   If a transition rule is matched, it calls the appropriate action.
     Actions are provided with the state machine that called them and pre-defined data (either an integer or a pointer).
@@ -31,16 +31,16 @@ typedef void(*EntryFunc)();
 typedef void(*InitFunc)();
 
 struct State {
-	EntryFunc enter;
-	struct StateMachine *sub_sm;
-	struct TransitionRule *transitions;
+  EntryFunc enter;
+  struct StateMachine *sub_sm;
+  struct TransitionRule *transitions;
 };
 
 struct StateMachine {
-	struct State *current_state;
-	struct State *default_state;
-	bool initialized;
-	InitFunc init;
+  struct State *current_state;
+  struct State *default_state;
+  bool initialized;
+  InitFunc init;
 };
 
 // init_sm_framework() initializes the state machine framework.
@@ -48,7 +48,7 @@ void init_sm_framework();
 
 // init_sm(sm) initializes a state machine, populating it and then switching it to its default state.
 // requires: init_sm_framework() has been called.
-// 			 sm is not NULL.
+//        sm is not NULL.
 void init_sm(struct StateMachine *main);
 
 // init_state(state, entry_fn) initializes the given state, assigning its entry function.
@@ -96,7 +96,7 @@ void add_event_rule(struct State *state, Event e, Event event);
 // change_state(sm, next_state) changes the current state to the given state,
 //   calling its entry function.
 // requires: init_sm_framework() has been called.
-// 			 sm is not NULL.
+//        sm is not NULL.
 void change_state(struct StateMachine *sm, void *next_state);
 
 // raise_action_event(sm, e) raises the specified event in the global event queue.

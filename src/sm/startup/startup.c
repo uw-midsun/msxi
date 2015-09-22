@@ -21,50 +21,50 @@
 #define SOLAR_RELAY_CONFIG &(struct Relay) { SOLAR_RELAY, SOLAR_STATUS }
 
 static struct State initialize, enable_battery,
-					enable_solar, precharge_mcs,
-					complete;
+          enable_solar, precharge_mcs,
+          complete;
 static struct StateMachine sm = { .default_state = &initialize, .init = init_startup_sm };
 
 static void init_system() {
-	raise_event(INIT_COMPLETE);
+  raise_event(INIT_COMPLETE);
 }
 
 static void enable_solar_relay() {
-	// TODO: switch to guards?
-	if(close_relay(SOLAR_RELAY_CONFIG)) {
-		raise_event(SOLAR_ENABLED);
-	} else {
-		raise_event(SOLAR_FAIL);
-	}
+  // TODO: switch to guards?
+  if(close_relay(SOLAR_RELAY_CONFIG)) {
+    raise_event(SOLAR_ENABLED);
+  } else {
+    raise_event(SOLAR_FAIL);
+  }
 }
 
 static void complete_entry() {
-	raise_event(STARTUP_COMPLETE);
+  raise_event(STARTUP_COMPLETE);
 }
 
 static void raise_error(struct StateMachine *sm, uint16_t error) {
-	// TODO: Handle errors
+  // TODO: Handle errors
 }
 
 void init_startup_sm() {
-	init_state(&initialize, init_system);
-	add_state_transition(&initialize, INIT_COMPLETE, &enable_battery);
+  init_state(&initialize, init_system);
+  add_state_transition(&initialize, INIT_COMPLETE, &enable_battery);
 
-	init_composite_state(&enable_battery, get_battery_sm());
-	add_state_transition(&enable_battery, BATTERY_ENABLED, &enable_solar);
-	add_transition(&enable_battery, make_data_rule(BATTERY_FAIL, NO_GUARD, raise_error, 1));
+  init_composite_state(&enable_battery, get_battery_sm());
+  add_state_transition(&enable_battery, BATTERY_ENABLED, &enable_solar);
+  add_transition(&enable_battery, make_data_rule(BATTERY_FAIL, NO_GUARD, raise_error, 1));
 
-	init_state(&enable_solar, enable_solar_relay);
-	add_state_transition(&enable_solar, SOLAR_ENABLED, &precharge_mcs);
-	add_transition(&enable_solar, make_data_rule(SOLAR_FAIL, NO_GUARD, raise_error, 2));
+  init_state(&enable_solar, enable_solar_relay);
+  add_state_transition(&enable_solar, SOLAR_ENABLED, &precharge_mcs);
+  add_transition(&enable_solar, make_data_rule(SOLAR_FAIL, NO_GUARD, raise_error, 2));
 
-	init_composite_state(&precharge_mcs, get_precharge_sm());
-	add_state_transition(&precharge_mcs, PRECHARGE_COMPLETE, &complete);
-	add_transition(&precharge_mcs, make_data_rule(PRECHARGE_FAIL, NO_GUARD, raise_error, 3));
-	
-	init_state(&complete, complete_entry);
+  init_composite_state(&precharge_mcs, get_precharge_sm());
+  add_state_transition(&precharge_mcs, PRECHARGE_COMPLETE, &complete);
+  add_transition(&precharge_mcs, make_data_rule(PRECHARGE_FAIL, NO_GUARD, raise_error, 3));
+  
+  init_state(&complete, complete_entry);
 }
 
 struct StateMachine *get_startup_sm() {
-	return &sm;
+  return &sm;
 }

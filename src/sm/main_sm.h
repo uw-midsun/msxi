@@ -9,7 +9,7 @@
 #define MAIN_SM_H_
 
 typedef enum {
-	KILLSWITCH_ON
+  KILLSWITCH_ON
 } SystemEvent;
 
 void init_main_sm();

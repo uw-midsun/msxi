@@ -9,11 +9,11 @@
 #include <stdint.h>
 
 typedef enum {
-	PWR_STATUS,
-	MCU_CHG1,
-	MCU_DCHG1,
-	MCU_CHG2,
-	MCU_DCHG2
+  PWR_STATUS,
+  MCU_CHG1,
+  MCU_DCHG1,
+  MCU_CHG2,
+  MCU_DCHG2
 } VoltageIndex;
 
 void mcu_voltage_init(void);

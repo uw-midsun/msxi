@@ -16,8 +16,8 @@
 #define HEARTBEAT_EVENT_OFFSET 6000
 
 typedef enum {
-	HEARTBEAT_BAD = HEARTBEAT_EVENT_OFFSET,
-	HEARTBEAT_GOOD
+  HEARTBEAT_BAD = HEARTBEAT_EVENT_OFFSET,
+  HEARTBEAT_GOOD
 } HeartbeatEvent;
 
 // init_heartbeat(heartbeat_pin) initalizes the heartbeat check on the specified pin.

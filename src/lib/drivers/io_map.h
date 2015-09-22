@@ -14,18 +14,18 @@
 #include <stdint.h>
 
 struct IOMap {
-	uint8_t port;
-	uint16_t pins;
+  uint8_t port;
+  uint16_t pins;
 };
 
 typedef enum {
-	LOW,
-	HIGH
+  IO_LOW,
+  IO_HIGH
 } IOState;
 
 typedef enum {
-	PIN_IN,
-	PIN_OUT
+  PIN_IN,
+  PIN_OUT
 } IODirection;
 
 // set_io_dir(map, direction) sets the specified pin(s)' IO direction.

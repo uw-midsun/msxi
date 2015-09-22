@@ -20,7 +20,7 @@
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.TI MSP430 USB1/MSP430" value="msxi-chaos"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_PROJECT.TI MSP430 USB1/MSP430F5529" value="msxi-chaos"/>
 <stringAttribute key="com.ti.ccstudio.debug.debugModel.ATTR_TARGET_CONFIG" value="${target_config_active_default:msxi-chaos}"/>
-<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.TI MSP430 USB1/MSP430" value="/Users/tituschow/Documents/msxi-chaos/Debug (Launchpad)/msxi-chaos.out"/>
+<stringAttribute key="com.ti.ccstudio.debug.debugModel.MRU_PROGRAM.TI MSP430 USB1/MSP430" value="C:/Users\nobody\projects\msxi-chaos\Debug (Launchpad)\msxi-chaos.out"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/msxi-chaos"/>
 </listAttribute>
