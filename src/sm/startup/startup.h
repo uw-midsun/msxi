@@ -5,8 +5,7 @@
 
  */
 
-#ifndef STARTUP_H_
-#define STARTUP_H_
+#pragma once
 
 #define STARTUP_EVENT_OFFSET 1000
 
@@ -21,5 +20,3 @@ typedef enum {
 void init_startup_sm();
 
 struct StateMachine *get_startup_sm();
-
-#endif

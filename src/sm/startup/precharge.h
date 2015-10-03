@@ -8,8 +8,7 @@
   and add a transition rule that handles PRECHARGE_COMPLETE to escape the state machine.
 
 */
-#ifndef PRECHARGE_H_
-#define PRECHARGE_H_
+#pragma once
 
 // 1180mV -> 90~95% of voltage difference
 // Based on calculation: 120V -> 9mV:13.5mV -> ~1250mV
@@ -30,5 +29,3 @@ void init_precharge_sm();
 
 // get_precharge_sm() returns a pointer to the state machine for use in event handling.
 struct StateMachine *get_precharge_sm();
-
-#endif

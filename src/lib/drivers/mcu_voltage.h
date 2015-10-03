@@ -4,8 +4,7 @@
  *
  */
 
-#ifndef MCU_VOLTAGE_H_
-#define MCU_VOLTAGE_H_
+#pragma once
 #include <stdint.h>
 
 typedef enum {
@@ -18,5 +17,3 @@ typedef enum {
 
 void mcu_voltage_init(void);
 uint16_t get_voltage(VoltageIndex pin);
-
-#endif /* MCU_VOLTAGE_H_ */

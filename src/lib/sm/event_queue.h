@@ -9,8 +9,7 @@
   TODO: Add check for empty queue to allow sleeping/waking to conserve power?
 
 */
-#ifndef EVENT_QUEUE_H_
-#define EVENT_QUEUE_H_
+#pragma once
 #include <stdint.h>
 #include <stddef.h>
 #include <limits.h>
@@ -34,5 +33,3 @@ void raise_event(Event e);
 // get_next_event() returns the next event in the event queue.
 // requires: init_event_queue() has been called.
 Event get_next_event(void);
-
-#endif

@@ -4,14 +4,14 @@
   This provides a structure to represent port/pin mappings and related functions.
 
 */
-#ifndef IO_MAP_H_
-#define IO_MAP_H_
-#ifdef LAUNCHPAD
-#include "launchpad.h"
-#elif CHAOS
-#include "chaos.h"
-#endif
+#pragma once
 #include <stdint.h>
+
+#if CHAOS
+#include "chaos.h"
+#else
+#include "launchpad.h"
+#endif
 
 struct IOMap {
   uint8_t port;
@@ -49,5 +49,3 @@ void toggle_io(const struct IOMap *map);
 // get_io_state(map) returns the state of the specified pin.
 // requires: map's IO direction has been set to IN.
 IOState get_io_state(const struct IOMap *map);
-
-#endif

@@ -8,8 +8,7 @@
     raising an event in the event queue if it has.
 
 */
-#ifndef HEARTBEAT_H_
-#define HEARTBEAT_H_
+#pragma once
 #include "io_map.h"
 
 // Since this event is independent of the state machines, it must not conflict with any existing events.
@@ -23,4 +22,3 @@ typedef enum {
 // init_heartbeat(heartbeat_pin) initalizes the heartbeat check on the specified pin.
 void init_heartbeat(const struct IOMap *heartbeat_pin);
 
-#endif /* HEARTBEAT_H_ */

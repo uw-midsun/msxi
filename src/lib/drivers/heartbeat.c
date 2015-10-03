@@ -13,7 +13,6 @@
 #define HEARTBEAT_PERIOD 16328
 
 static struct IOMap pin = { 0 };
-static IOState state = LOW;
 
 void init_heartbeat(const struct IOMap *heartbeat_pin) {
   set_io_dir(heartbeat_pin, PIN_IN);
@@ -44,6 +43,7 @@ void init_heartbeat(const struct IOMap *heartbeat_pin) {
 
 #pragma vector = TIMER0_A0_VECTOR
 __interrupt void TIMER0_A0_ISR(void) {
+  static IOState state = IO_LOW;
   // Flags automatically cleared
   IOState new_state = get_io_state(&pin);
   if(new_state != state) {

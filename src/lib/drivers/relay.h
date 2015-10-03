@@ -10,8 +10,7 @@
     If the status port is 0, it is assumed that the relay does not have a status pin.
 
 */
-#ifndef RELAY_H_
-#define RELAY_H_
+#pragma once
 #include "io_map.h"
 #include <stdbool.h>
 
@@ -40,5 +39,3 @@ bool close_relay(const struct Relay *relay);
 
 // get_relay_status(relay) returns the state of the relay based on its status pin.
 RelayState get_relay_status(const struct Relay *relay);
-
-#endif

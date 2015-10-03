@@ -4,8 +4,7 @@
   A structure for transition rules.
 
 */
-#ifndef TRANSITION_H_
-#define TRANSITION_H_
+#pragma once
 #include "event_queue.h"
 #include <stdbool.h>
 
@@ -35,5 +34,3 @@ struct TransitionRule *make_data_rule(Event e, Guard guard, DataFunc fn, uint16_
 // add_rule(transitions, next_rule) adds the rule to the list of transition rules, returning the new list pointer.
 // Note that rules will be processed in reverse order: that is, rules are processed in LIFO order.
 struct TransitionRule *add_rule(struct TransitionRule *transitions, struct TransitionRule *next_rule);
-
-#endif /* TRANSITION_H_ */

@@ -5,8 +5,7 @@
   It is assumed that our LEDs are active-low.
 
 */
-#ifndef DEBUG_LED_H_
-#define DEBUG_LED_H_
+#pragma once
 #include "io_map.h"
 
 // All the debug leds are on Port 8.
@@ -28,4 +27,3 @@ void led_off(const struct IOMap *led);
 // requires: init_leds() has been called.
 void toggle_led(const struct IOMap *led);
 
-#endif /* DEBUG_LED_H_ */

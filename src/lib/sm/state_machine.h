@@ -20,8 +20,7 @@
   Some generic actions are provided, such as changing states and raising events.
 
 */
-#ifndef STATE_MACHINE_H_
-#define STATE_MACHINE_H_
+#pragma once
 #include "event_queue.h"
 #include "transition.h"
 
@@ -102,5 +101,3 @@ void change_state(struct StateMachine *sm, void *next_state);
 // raise_action_event(sm, e) raises the specified event in the global event queue.
 // requires: init_sm_framework() has been called.
 void raise_action_event(struct StateMachine *sm, uint16_t e);
-
-#endif

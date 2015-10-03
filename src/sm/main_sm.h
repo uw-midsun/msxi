@@ -5,8 +5,7 @@
 
  */
 
-#ifndef MAIN_SM_H_
-#define MAIN_SM_H_
+#pragma once
 
 typedef enum {
   KILLSWITCH_ON
@@ -15,5 +14,3 @@ typedef enum {
 void init_main_sm();
 
 struct StateMachine *get_main_sm();
-
-#endif

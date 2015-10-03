@@ -8,8 +8,7 @@
 
   Note: This pin config is for Chaos V2.
 */
-#ifndef PINS_H_
-#define PINS_H_
+#pragma once
 #include "gpio.h"
 
 // Due to how we're using the macros, we can't wrap "map" in brackets.
@@ -68,5 +67,3 @@
 #define DEBUG_LED_5      { GPIO_PORT_P8, GPIO_PIN5 }
 #define DEBUG_LED_7      { GPIO_PORT_P8, GPIO_PIN7 }
 #define DEBUG_LED_PORT8    { GPIO_PORT_P8, GPIO_PIN_ALL }
-
-#endif /* PINS_H_ */

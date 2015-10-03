@@ -8,8 +8,7 @@
   and add a transition rule that handles BATTERY_ENABLED to escape the state machine.
 
 */
-#ifndef ENABLE_BATTERY_H_
-#define ENABLE_BATTERY_H_
+#pragma once
 
 #define BATTERY_VOLTAGE PWR_STATUS
 
@@ -33,5 +32,3 @@ void init_battery_sm();
 
 // get_precharge_sm() returns a pointer to the state machine for use in event handling.
 struct StateMachine *get_battery_sm();
-
-#endif

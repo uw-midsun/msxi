@@ -6,8 +6,7 @@
 
 */
 
-#ifndef MOTOR_CONTROLLER_H_
-#define MOTOR_CONTROLLER_H_
+#pragma once
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -37,5 +36,3 @@ uint16_t get_precharge_voltage(const struct MotorController *controller);
 
 // get_discharge_voltage(controller) returns the discharge circuit's voltage.
 uint16_t get_discharge_voltage(const struct MotorController *controller);
-
-#endif
