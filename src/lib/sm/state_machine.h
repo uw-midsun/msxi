@@ -1,28 +1,25 @@
-/*
-  state_machine.h - Titus Chow
-
-  This is the framework for an object-oriented Moore? state machine.
-
-  Each state has a specific action that it calls on entry. It is recommended to make this your initialization function.
-    States also keep track of transition rules that are matched against incoming events in reverse order.
-    (i.e. given rule1, rule2, rule3: events will be matched against rule3, then rule2, then rule1.)
-    The transition rules support optional guards.
-  If a transition rule is matched, it calls the appropriate action.
-    Actions are provided with the state machine that called them and pre-defined data (either an integer or a pointer).
-
-  The recommended process for creating a state machine is to encapsulate each state machine in its own source and header files.
-  It should only expose its associated events and pointers to the state machine and its initialization function.
-  
-  When initializing a composite state, remember to add a transition rule to move to the next state on completion.
-    When first entered, its state machine will be populated. Note that this is lazy evaluation.
-    If re-entered, it will just switch back to its initial (default) state.
-  
-  Some generic actions are provided, such as changing states and raising events.
-
-*/
 #pragma once
 #include "event_queue.h"
 #include "transition.h"
+
+// This is the framework for an object-oriented Moore? state machine.
+
+// Each state has a specific action that is called on entry. It is recommended to make this
+//  your initialization function.
+
+// States have transition rules that are matched against incoming events in reverse order.
+//  (i.e. given rule1, rule2, rule3: events will be matched against rule3, then rule2, then rule1.)
+// If a transition rule is matched against it's optional guard, it calls the associated action.
+//  Actions are provided with the state machine that called them and pre-defined data.
+
+// The recommended process for creating a state machine is to encapsulate each state machine in its own source and header files.
+// It should only expose its associated events and pointers to the state machine and its initialization function.
+  
+// When creating a composite state, remember to add a transition rule to exit it on completion.
+//  When first entered, its state machine will be lazily populated.
+//  If re-entered, it will just switch back to its initial (default) state.
+  
+// Some generic actions are provided, such as changing states and raising events.
 
 #define NO_ENTRY_FN NULL
 
@@ -42,62 +39,37 @@ struct StateMachine {
   InitFunc init;
 };
 
-// init_sm_framework() initializes the state machine framework.
-void init_sm_framework();
+void sm_framework_init();
 
-// init_sm(sm) initializes a state machine, populating it and then switching it to its default state.
-// requires: init_sm_framework() has been called.
-//        sm is not NULL.
-void init_sm(struct StateMachine *main);
+// Initializes a state machine by populating it and then switching it to its default state.
+void sm_init(struct StateMachine *main);
 
-// init_state(state, entry_fn) initializes the given state, assigning its entry function.
-// requires: state is not NULL.
-void init_state(struct State *state, EntryFunc entry_fn);
+void state_init(struct State *state, EntryFunc entry_fn);
 
-// init_composite_state(state, init_fn, sm) initializes the given state as a composite state.
-//   It also populates the sub-state machine.
-// requires: sm must be initialized or init_fn must be sm's initialization function.
-//           state is not NULL.
-void init_composite_state(struct State *state, struct StateMachine *sm);
+// Initializes the state as a composite state with sm as its sub-state machine.
+void state_init_composite(struct State *state, struct StateMachine *sm);
 
-// process_event(sm, e) processes the given event using the provided state machine.
-// If the current state is composite, then events are processed using its sub-state machine.
-// requires: sm must be initialized and populated.
-void process_event(struct StateMachine *sm, Event e);
+void sm_process_event(struct StateMachine *sm, Event e);
 
-// add_transition(state, rule) add a custom transition rule to the given state.
-// requires: init_sm_framework() has been called.
-//           state is not NULL.
-void add_transition(struct State *state, struct TransitionRule *rule);
+// Adds a custom transition rule to the given state.
+void state_add_transition(struct State *state, struct TransitionRule *rule);
 
-// add_guarded_state_transition(state, e, guard, next_state) adds a guarded change_state rule to the given state.
-// requires: init_sm_framework() has been called.
-//           state is not NULL.
-void add_guarded_state_transition(struct State *state, Event e, Guard g, struct State *next_state);
+// Adds a guarded sm_change_state rule to the given state.
+void state_add_guarded_state_transition(struct State *state, Event e, Guard g, struct State *next_state);
 
-// add_state_transition(state, e, guard, next_state) adds a guarded change_state rule to the given state.
-// requires: init_sm_framework() has been called.
-//           state is not NULL.
-void add_state_transition(struct State *state, Event e, struct State *next_state);
+// Adds a generic sm_change_state rule to the given state.
+void state_add_state_transition(struct State *state, Event e, struct State *next_state);
 
-// add_guarded_state_transition(state, e, guard, next_state) adds a guarded raise_action_event rule to the given state.
-// requires: init_sm_framework() has been called.
-//           state is not NULL.
-void add_guarded_event_rule(struct State *state, Event e, Guard g, Event event);
+// Adds a guarded sm_raise_event rule to the given state.
+void state_add_guarded_event_rule(struct State *state, Event e, Guard g, Event event);
 
-// add_state_transition(state, e, guard, next_state) adds a raise_action_event rule to the given state.
-// requires: init_sm_framework() has been called.
-//           state is not NULL.
-void add_event_rule(struct State *state, Event e, Event event);
+// Adds a generic sm_raise_event rule to the given state.
+void state_add_event_rule(struct State *state, Event e, Event event);
 
 // Generic actions
 
-// change_state(sm, next_state) changes the current state to the given state,
-//   calling its entry function.
-// requires: init_sm_framework() has been called.
-//        sm is not NULL.
-void change_state(struct StateMachine *sm, void *next_state);
+// Changes the state machine's current state to the given state, calling its entry function.
+void sm_change_state(struct StateMachine *sm, void *next_state);
 
-// raise_action_event(sm, e) raises the specified event in the global event queue.
-// requires: init_sm_framework() has been called.
-void raise_action_event(struct StateMachine *sm, uint16_t e);
+// Raises the specified event in the global event queue.
+void sm_raise_event(struct StateMachine *sm, uint16_t e);

@@ -1,11 +1,6 @@
-/*
-  startup.h - Titus Chow
-
-  This is the Startup state machine. It runs the car's startup procedure.
-
- */
-
 #pragma once
+
+// This is the startup state machine. It handles relay order and motor controller precharge.
 
 #define STARTUP_EVENT_OFFSET 1000
 
@@ -17,6 +12,6 @@ typedef enum {
   SOLAR_FAIL
 } StartupEvent;
 
-void init_startup_sm();
+void startup_sm_init();
 
-struct StateMachine *get_startup_sm();
+struct StateMachine *startup_sm_get_info();

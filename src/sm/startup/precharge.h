@@ -1,14 +1,7 @@
-/*
-  precharge.h - Titus Chow
-
-  This is a state machine that controls motor controller precharging.
-  To use this as a composite state, create a state with
-    enter -> init_precharge_sm
-  sub_sm -> get_precharge_sm()
-  and add a transition rule that handles PRECHARGE_COMPLETE to escape the state machine.
-
-*/
 #pragma once
+
+// This is a state machine that controls motor controller precharging.
+// It fires PRECHARGE_COMPLETE when complete.
 
 // 1180mV -> 90~95% of voltage difference
 // Based on calculation: 120V -> 9mV:13.5mV -> ~1250mV
@@ -24,8 +17,6 @@ typedef enum {
   PRECHARGE_FAIL
 } PrechargeEvent;
 
-// init_precharge_sm() sets up the precharge state machine.
-void init_precharge_sm();
+void precharge_sm_init();
 
-// get_precharge_sm() returns a pointer to the state machine for use in event handling.
-struct StateMachine *get_precharge_sm();
+struct StateMachine *precharge_sm_get_info();

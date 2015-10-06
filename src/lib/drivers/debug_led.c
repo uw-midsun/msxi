@@ -1,28 +1,24 @@
-/*
-  debug_led.c - Titus Chow
-  
-  This is basically a wrapper for IOMap.
-
-*/
 #include "debug_led.h"
+  
+// This is basically a wrapper for IOMap.
 
-void init_leds() {
+void led_init() {
   struct IOMap debug_leds[DEBUG_LED_COUNT] = DEBUG_LEDS;
   int i;
   for(i = 0; i < DEBUG_LED_COUNT; i++) {
-    set_io_low(&debug_leds[i]);
-    set_io_dir(&debug_leds[i], PIN_OUT);
+    io_set_state(&debug_leds[i], IO_LOW);
+    io_set_dir(&debug_leds[i], PIN_OUT);
   }
 }
 
 void led_on(const struct IOMap *led) {
-  set_io_low(led);
+  io_set_state(led, IO_LOW);
 }
 
 void led_off(const struct IOMap *led) {
-  set_io_high(led);
+  io_set_state(led, IO_HIGH);
 }
 
-void toggle_led(const struct IOMap *led) {
-  toggle_io(led);
+void led_toggle(const struct IOMap *led) {
+  io_toggle(led);
 }

@@ -1,17 +1,12 @@
-/*
-  transition.c - Titus Chow
-  
-  This abstracts transition rules from the state machine.
-    It's mostly for compiler correctness, since pointers can technically be passed as integers.
-
-  Transition rules are held in an object pool to avoid having to deal with memory allocation.
-  They act as linked lists to allow a variable number of transition rules per state.
-
-  The pool size should be adjusted to match the total number of rules in the system.
-
-*/
 #include "transition.h"
 #include <assert.h>
+  
+// This is mostly for compiler correctness, since pointers can technically be passed as integers.
+
+// Transition rules are held in an object pool to avoid having to deal with memory allocation.
+// They act as linked lists to allow a variable number of transition rules per state.
+
+// The pool size should be adjusted to match the total number of rules in the system.
 
 #define NO_ACTION (struct Action) { NULL, 0, DATA }
 #define TRANSITION_POOL_SIZE 20
@@ -43,7 +38,7 @@ struct TransitionRule {
 static struct TransitionRule rule_pool[TRANSITION_POOL_SIZE] = { 0 };
 
 // init_transitions() initializes the transition rule pool.
-void init_transitions() {
+void transitions_init() {
   struct TransitionRule *temp_rule;
   for (temp_rule = rule_pool; temp_rule < rule_pool + TRANSITION_POOL_SIZE; temp_rule++) {
     temp_rule->event = NULL_EVENT;
@@ -53,11 +48,9 @@ void init_transitions() {
   }
 }
 
-// process_transitions(transitions, sm, e) processes the transitions in the given list of transitions,
-//   checking if the events match and the guard is either true or does not exist.
 // Note that actions can either have integer or pointer data.
-//   This is mostly for correctness, since pointers can technically be passed as ints.
-bool process_transitions(struct TransitionRule *transitions, struct StateMachine *sm, Event e) {
+//  This is mostly for correctness, since pointers can technically be passed as ints.
+bool transitions_process(struct TransitionRule *transitions, struct StateMachine *sm, Event e) {
   struct TransitionRule *rule = transitions;
   while (rule != NULL) {
     if (rule->event == e &&
@@ -74,7 +67,7 @@ bool process_transitions(struct TransitionRule *transitions, struct StateMachine
   return false;
 }
 
-static struct TransitionRule *get_free_rule() {
+static struct TransitionRule *prv_get_free_rule() {
   struct TransitionRule *temp_rule;
   for (temp_rule = rule_pool; temp_rule < rule_pool + TRANSITION_POOL_SIZE; temp_rule++) {
     if (temp_rule->event == NULL_EVENT) {
@@ -86,23 +79,34 @@ static struct TransitionRule *get_free_rule() {
   return NULL;
 }
 
-static struct TransitionRule *make_transition_rule(Event e, Guard guard, struct Action action) {
-  struct TransitionRule *rule = get_free_rule();
+static struct TransitionRule *prv_make_transition_rule(Event e, Guard guard, struct Action action) {
+  struct TransitionRule *rule = prv_get_free_rule();
   rule->event = e;
   rule->guard = guard;
   rule->action = action;
   return rule;
 }
 
-struct TransitionRule *make_pointer_rule(Event e, Guard guard, PointerFunc fn, void *pointer) {
-  return make_transition_rule(e, guard, (struct Action) { .fn_pointer = fn, .pointer = pointer, POINTER });
+struct TransitionRule *transitions_make_pointer_rule(Event e, Guard guard,
+                                                     PointerFunc fn, void *pointer) {
+  return prv_make_transition_rule(e, guard, (struct Action) {
+    .fn_pointer = fn,
+    .pointer = pointer,
+    .type = POINTER
+  });
 }
 
-struct TransitionRule *make_data_rule(Event e, Guard guard, DataFunc fn, uint16_t data) {
-  return make_transition_rule(e, guard, (struct Action) { .fn_data = fn, .data = data, DATA });
+struct TransitionRule *transitions_make_data_rule(Event e, Guard guard,
+                                                  DataFunc fn, uint16_t data) {
+  return prv_make_transition_rule(e, guard, (struct Action) {
+    .fn_data = fn,
+    .data = data,
+    .type = DATA
+  });
 }
 
-struct TransitionRule *add_rule(struct TransitionRule *transitions, struct TransitionRule *next_rule) {
+struct TransitionRule *transitions_add_rule(struct TransitionRule *transitions,
+                                            struct TransitionRule *next_rule) {
   next_rule->next_rule = transitions;
   return next_rule;
 }

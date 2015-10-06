@@ -1,16 +1,3 @@
-/*
- * mcu_voltage.c
- * Titus Chow
- *
- * Measures and returns the voltage of certain pins:
- * P7.7 - PWR_STATUS(A15)
- * P6.0 - MCU_CHG1  (A0)
- * P6.1 - MCU_DCHG1  (A1)
- * P6.2 - MCU_CHG2  (A2)
- * P6.3 - MCU_DCHG2  (A3)
- *
- */
-
 #include "mcu_voltage.h"
 #include "io_map.h"
 #include "adc12_a.h"
@@ -22,78 +9,78 @@ static volatile uint16_t results[5];
 
 void mcu_voltage_init(void) {
   // Enable pins as inputs for ADC
-  set_io_peripheral_dir(IOMAP(POWER_STATUS), PIN_IN);
-  set_io_peripheral_dir(IOMAP(MC_VOLTAGES), PIN_IN);
+  io_set_peripheral_dir(IOMAP(POWER_STATUS), PIN_IN);
+  io_set_peripheral_dir(IOMAP(MC_VOLTAGES), PIN_IN);
 
   // Initialize ADC12_A module
   // 5 MHz oscillator from UCS
   // 12-bit resolution (default)
   ADC12_A_init(ADC12_A_BASE,
-         ADC12_A_SAMPLEHOLDSOURCE_SC,
-         ADC12_A_CLOCKSOURCE_ADC12OSC,
-         ADC12_A_CLOCKDIVIDER_1);
+               ADC12_A_SAMPLEHOLDSOURCE_SC,
+               ADC12_A_CLOCKSOURCE_ADC12OSC,
+               ADC12_A_CLOCKDIVIDER_1);
 
   ADC12_A_enable(ADC12_A_BASE);
 
   // -> Requires ~184? cycles with a 158kOhm input + 5 MHz clock (28.2.5.3)
   // Enable Multiple Sampling
   ADC12_A_setupSamplingTimer(ADC12_A_BASE,
-                 ADC12_A_CYCLEHOLD_256_CYCLES,
-                 ADC12_A_CYCLEHOLD_4_CYCLES,
-                 ADC12_A_MULTIPLESAMPLESENABLE);
+                             ADC12_A_CYCLEHOLD_256_CYCLES,
+                             ADC12_A_CYCLEHOLD_4_CYCLES,
+                             ADC12_A_MULTIPLESAMPLESENABLE);
 
 
   // Configure Memory Buffers:
   // Map input A15 (PWR_STATUS) to buffer 0
   ADC12_A_memoryConfigure(ADC12_A_BASE,
-              ADC12_A_MEMORY_0,
-              ADC12_A_INPUT_A15,
-              ADC12_A_VREFPOS_AVCC,
-              ADC12_A_VREFNEG_AVSS,
-              ADC12_A_NOTENDOFSEQUENCE);
+                          ADC12_A_MEMORY_0,
+                          ADC12_A_INPUT_A15,
+                          ADC12_A_VREFPOS_AVCC,
+                          ADC12_A_VREFNEG_AVSS,
+                          ADC12_A_NOTENDOFSEQUENCE);
 
   // Map input A0 (MCU_CHG1) to buffer 1
   ADC12_A_memoryConfigure(ADC12_A_BASE,
-              ADC12_A_MEMORY_1,
-              ADC12_A_INPUT_A0,
-              ADC12_A_VREFPOS_AVCC,
-              ADC12_A_VREFNEG_AVSS,
-              ADC12_A_NOTENDOFSEQUENCE);
+                          ADC12_A_MEMORY_1,
+                          ADC12_A_INPUT_A0,
+                          ADC12_A_VREFPOS_AVCC,
+                          ADC12_A_VREFNEG_AVSS,
+                          ADC12_A_NOTENDOFSEQUENCE);
 
   // Map input A1 (MCU_DCHG1) to buffer 2
   ADC12_A_memoryConfigure(ADC12_A_BASE,
-              ADC12_A_MEMORY_2,
-              ADC12_A_INPUT_A1,
-              ADC12_A_VREFPOS_AVCC,
-              ADC12_A_VREFNEG_AVSS,
-              ADC12_A_NOTENDOFSEQUENCE);
+                          ADC12_A_MEMORY_2,
+                          ADC12_A_INPUT_A1,
+                          ADC12_A_VREFPOS_AVCC,
+                          ADC12_A_VREFNEG_AVSS,
+                          ADC12_A_NOTENDOFSEQUENCE);
 
   // Map input A2 (MCU_CHG2) to buffer 3
   ADC12_A_memoryConfigure(ADC12_A_BASE,
-              ADC12_A_MEMORY_3,
-              ADC12_A_INPUT_A2,
-              ADC12_A_VREFPOS_AVCC,
-              ADC12_A_VREFNEG_AVSS,
-              ADC12_A_NOTENDOFSEQUENCE);
+                          ADC12_A_MEMORY_3,
+                          ADC12_A_INPUT_A2,
+                          ADC12_A_VREFPOS_AVCC,
+                          ADC12_A_VREFNEG_AVSS,
+                          ADC12_A_NOTENDOFSEQUENCE);
 
   // Map input A3 (MCU_DCHG2) to buffer 4
   ADC12_A_memoryConfigure(ADC12_A_BASE,
-              ADC12_A_MEMORY_4,
-              ADC12_A_INPUT_A3,
-              ADC12_A_VREFPOS_AVCC,
-              ADC12_A_VREFNEG_AVSS,
-              ADC12_A_ENDOFSEQUENCE);
+                          ADC12_A_MEMORY_4,
+                          ADC12_A_INPUT_A3,
+                          ADC12_A_VREFPOS_AVCC,
+                          ADC12_A_VREFNEG_AVSS,
+                          ADC12_A_ENDOFSEQUENCE);
 
   // Enable memory buffer 4 interrupt
   ADC12_A_clearInterrupt(ADC12_A_BASE, ADC12IE4);
   ADC12_A_enableInterrupt(ADC12_A_BASE, ADC12IE4);
 }
 
-uint16_t get_voltage(VoltageIndex pin) {
+uint16_t mcu_voltage_sample(VoltageIndex pin) {
   // Start sampling + conversion cycle
   ADC12_A_startConversion(ADC12_A_BASE,
-              ADC12_A_MEMORY_0,
-              ADC12_A_SEQOFCHANNELS);
+                          ADC12_A_MEMORY_0,
+                          ADC12_A_SEQOFCHANNELS);
 
   // Enter LPM4 while waiting for interrupt
   __bis_SR_register(LPM4_bits);
@@ -123,20 +110,15 @@ __interrupt void ADC12ISR(void) {
     case 12: break;         //Vector 12:  ADC12IFG3
     case 14:                //Vector 14:  ADC12IFG4
       // Move A15 results, IFG is cleared
-      results[0] = ADC12_A_getResults(ADC12_A_BASE,
-                      ADC12_A_MEMORY_0);
+      results[0] = ADC12_A_getResults(ADC12_A_BASE, ADC12_A_MEMORY_0);
       // Move A0 results, IFG is cleared
-      results[1] = ADC12_A_getResults(ADC12_A_BASE,
-                      ADC12_A_MEMORY_1);
+      results[1] = ADC12_A_getResults(ADC12_A_BASE, ADC12_A_MEMORY_1);
       // Move A1 results, IFG is cleared
-      results[2] = ADC12_A_getResults(ADC12_A_BASE,
-                      ADC12_A_MEMORY_2);
+      results[2] = ADC12_A_getResults(ADC12_A_BASE, ADC12_A_MEMORY_2);
       // Move A2 results, IFG is cleared
-      results[3] = ADC12_A_getResults(ADC12_A_BASE,
-                           ADC12_A_MEMORY_3);
+      results[3] = ADC12_A_getResults(ADC12_A_BASE, ADC12_A_MEMORY_3);
       // Move A3 results, IFG is cleared
-      results[4] = ADC12_A_getResults(ADC12_A_BASE,
-                      ADC12_A_MEMORY_4);
+      results[4] = ADC12_A_getResults(ADC12_A_BASE, ADC12_A_MEMORY_4);
 
       // Exit LPM4 after interrupt processes
       __bic_SR_register_on_exit(LPM4_bits);

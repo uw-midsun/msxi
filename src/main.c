@@ -5,8 +5,8 @@
 int main() {
   WDT_A_hold(WDT_A_BASE);
 
-  init_sm_framework();
-  init_sm(get_main_sm());
+  sm_framework_init();
+  sm_init(main_sm_get_info());
 
   __enable_interrupt();
 
@@ -14,6 +14,6 @@ int main() {
 
   while (true) {
     e = get_next_event();
-    process_event(get_main_sm(), e);
+    sm_process_event(main_sm_get_info(), e);
   }
 }

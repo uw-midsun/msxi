@@ -1,12 +1,8 @@
-/*
-  transition.h - Titus Chow
-  
-  A structure for transition rules.
-
-*/
 #pragma once
 #include "event_queue.h"
 #include <stdbool.h>
+
+// This abstracts transition rules from the state machine framework.
 
 #define NO_GUARD NULL
 #define ELSE NULL
@@ -19,18 +15,18 @@ typedef void(*PointerFunc)(struct StateMachine *, void *);
 typedef bool(*Guard)();
 
 // init_transitions() initalizes the transition framework.
-void init_transitions();
+void transitions_init();
 
-// process_transitions(transitions, sm, e) processes all the transition rules in the list, executing the first rule that matches.
-//   It returns true if a rule was matched, false if not.
-bool process_transitions(struct TransitionRule *transitions, struct StateMachine *sm, Event e);
+// Processes all the transition rules in the list, executing the first rule that matches.
+// Returns true if a rule was matched, false if not.
+bool transitions_process(struct TransitionRule *transitions, struct StateMachine *sm, Event e);
 
-// make_pointer_rule(e, guard, fn, pointer) returns a pointer-based transition rule.
-struct TransitionRule *make_pointer_rule(Event e, Guard guard, PointerFunc fn, void *pointer);
+// Returns a pointer-based transition rule.
+struct TransitionRule *transitions_make_pointer_rule(Event e, Guard guard, PointerFunc fn, void *pointer);
 
-// make_data_rule(e, guard, fn, data) returns a data-based transition rule.
-struct TransitionRule *make_data_rule(Event e, Guard guard, DataFunc fn, uint16_t data);
+// Returns an integer-based transition rule.
+struct TransitionRule *transitions_make_data_rule(Event e, Guard guard, DataFunc fn, uint16_t data);
 
-// add_rule(transitions, next_rule) adds the rule to the list of transition rules, returning the new list pointer.
+// Adds the rule to the list of transition rules, returning the new list pointer.
 // Note that rules will be processed in reverse order: that is, rules are processed in LIFO order.
-struct TransitionRule *add_rule(struct TransitionRule *transitions, struct TransitionRule *next_rule);
+struct TransitionRule *transitions_add_rule(struct TransitionRule *transitions, struct TransitionRule *next_rule);

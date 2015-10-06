@@ -1,11 +1,11 @@
-/*
-  io_map.h - Titus Chow
-
-  This provides a structure to represent port/pin mappings and related functions.
-
-*/
 #pragma once
 #include <stdint.h>
+
+// Provides common functions and convenient mappings for interfacing with IO pins.
+
+// Due to how we're using the macro, we can't wrap "map" in brackets.
+// Thus, it's up to the user not to call IOMAP(map) with other arguments.
+#define IOMAP(map) &(struct IOMap) map
 
 #if CHAOS
 #include "chaos.h"
@@ -28,24 +28,13 @@ typedef enum {
   PIN_OUT
 } IODirection;
 
-// set_io_dir(map, direction) sets the specified pin(s)' IO direction.
-void set_io_dir(const struct IOMap *map, IODirection direction);
+void io_set_dir(const struct IOMap *map, IODirection direction);
 
-// set_io_peripheral_dir(map) sets the specified pin(s)'s IO direction, enabling their secondary function.
-void set_io_peripheral_dir(const struct IOMap *map, IODirection direction);
+// Enables the pin's secondary function.
+void io_set_peripheral_dir(const struct IOMap *map, IODirection direction);
 
-// set_io_high(map) sets the specified pin(s) to output high.
-// requires: map's IO direction has been set to OUT.
-void set_io_high(const struct IOMap *map);
+void io_set_state(const struct IOMap *map, const IOState state);
 
-// set_io_low(map) sets the specified pin(s) to output low.
-// requires: map's IO direction has been set to OUT.
-void set_io_low(const struct IOMap *map);
+void io_toggle(const struct IOMap *map);
 
-// toggle_io(map) toggles the output state of the specified pin(s).
-// requires: map's IO direction has been set to OUT.
-void toggle_io(const struct IOMap *map);
-
-// get_io_state(map) returns the state of the specified pin.
-// requires: map's IO direction has been set to IN.
-IOState get_io_state(const struct IOMap *map);
+IOState io_get_state(const struct IOMap *map);

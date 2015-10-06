@@ -1,35 +1,22 @@
-/*
-  event_queue.h - Titus Chow
-  
-  This module is responsible for managing the system's event queue.
-  The queue operates on the First In, First Out (FIFO) principle.
-  
-  All states (including substates) raise events in this queue.
-
-  TODO: Add check for empty queue to allow sleeping/waking to conserve power?
-
-*/
 #pragma once
 #include <stdint.h>
 #include <stddef.h>
 #include <limits.h>
+
+// This is responsible for managing the system's event queue.
+// The queue is a FIFO linked list.
+// All states (including composite states) raise events in this queue.
 
 typedef uint16_t Event;
 
 #define NULL_EVENT (Event)UINT_MAX
 #define QUEUE_EMPTY NULL
 
-// init_event_queue() initializes the event queue.
 void init_event_queue(void);
 
-// unsafe_raise_event(e) adds an event to the system event queue unsafely.
-//   That is, interrupts can cause race conditions.
-void unsafe_raise_event(Event e);
+// Adds an event to the system event queue unsafely. Use this for ISR
+void event_raise_isr(Event e);
 
-// raise_event(e) adds an event to the system event queue.
-// requires: init_event_queue() has been called.
-void raise_event(Event e);
+void event_raise(Event e);
 
-// get_next_event() returns the next event in the event queue.
-// requires: init_event_queue() has been called.
 Event get_next_event(void);
