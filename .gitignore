@@ -231,3 +231,7 @@ FakesAssemblies/
 *.opt/Debug__opt_for_speed__1
 /Debug__opt_for_speed__2
 /Debug__opt_for_speed__3
+
+
+# CCS
+Debug (Launchpad)/
