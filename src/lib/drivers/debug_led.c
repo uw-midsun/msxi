@@ -2,12 +2,13 @@
   
 // This is basically a wrapper for IOMap.
 
-void led_init() {
-  struct IOMap debug_leds[DEBUG_LED_COUNT] = DEBUG_LEDS;
-  int i;
-  for(i = 0; i < DEBUG_LED_COUNT; i++) {
-    io_set_state(&debug_leds[i], IO_LOW);
-    io_set_dir(&debug_leds[i], PIN_OUT);
+#define ARRAY_LENGTH(array) (sizeof((array))/sizeof((array)[0]))
+
+void led_init(const struct IOMap leds[]) {
+  uint16_t i, length = ARRAY_LENGTH(leds);
+  for(i = 0; i < length; i++) {
+    io_set_state(&leds[i], IO_LOW);
+    io_set_dir(&leds[i], PIN_OUT);
   }
 }
 

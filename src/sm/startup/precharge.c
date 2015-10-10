@@ -19,7 +19,7 @@
 // On error: raise PRECHARGE_FAIL.
 
 // TODO: make more modular
-
+/*
 static struct State precharging_left, left_mc_enabled,
               precharging_right, right_mc_enabled;
 static struct StateMachine sm = { .default_state = &precharging_left, .init = precharge_sm_init };
@@ -97,8 +97,9 @@ void precharge_sm_init() {
   right_mc_enabled.enter = prv_right_mc_init;
   state_add_event_rule(&right_mc_enabled, MOTOR_CONTROLLER_ENABLED, PRECHARGE_COMPLETE);
   // -- end --
-}
+}*/
 
 struct StateMachine *precharge_sm_get_info() {
-  return &sm;
+  return NULL;
+  //return &sm;
 }

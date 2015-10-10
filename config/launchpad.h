@@ -13,9 +13,10 @@
 // CAN1
 
 // SPI1
-#define SPI1_SCK          { GPIO_PORT_P3, GPIO_PIN0 }
-#define SPI1_SIMO         { GPIO_PORT_P3, GPIO_PIN4 }
-#define SPI1_SOMI         { GPIO_PORT_P3, GPIO_PIN5 }
+#define SPI0_SCK          { GPIO_PORT_P3, GPIO_PIN0 }
+#define SPI0_SIMO         { GPIO_PORT_P3, GPIO_PIN4 }
+#define SPI0_SOMI         { GPIO_PORT_P3, GPIO_PIN5 }
+#define SPI0_CS           { GPIO_PORT_P1, GPIO_PIN2 }
 
 // Relays
 #define BATTERY_RELAY     { GPIO_PORT_P3, GPIO_PIN2 }

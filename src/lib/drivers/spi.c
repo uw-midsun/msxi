@@ -1,69 +1,64 @@
-#include "spi1.h"
+#include <drivers/spi.h>
 #include "driverlib.h"
-
- // P3.4 -> Data Out    (UCA0SIMO)
- // P3.5 <- Data In    (UCA0SOMI)
- // P3.0 -> Clock Out  (UCA0CLK)
- // PX.Y -> Slave Reset
-
-#define SPI_CLOCK 500000 // Desired SPI frequency
 
 volatile uint8_t data;
 
-bool spi1_init(struct IOMap reset_pin) {
-  // Set PX.Y for slave reset
-  io_set_dir(&reset_pin, PIN_OUT);
-  io_set_state(&reset_pin, IO_HIGH);
+bool spi_init(const struct SPIConfig *spi) {
+  // Set CS pin high
+  io_set_state(&spi->cs, IO_HIGH);
+  io_set_dir(&spi->cs, PIN_OUT);
 
-  // Set secondary fucntion P3.0, 4. 5
-  GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P3, GPIO_PIN0 + GPIO_PIN4 + GPIO_PIN5);
+  // Set secondary function for SIMO, SOMI, and SCLK pins - direction doesn't matter
+  io_set_peripheral_dir(&spi->data_out, PIN_IN);
+  io_set_peripheral_dir(&spi->data_in, PIN_IN);
+  io_set_peripheral_dir(&spi->clock_out, PIN_IN);
 
   // Prepare to initialize SPI1 with SMCLK, MSB first, 3-pin Master
   USCI_A_SPI_initMasterParam param = {
     .selectClockSource = USCI_A_SPI_CLOCKSOURCE_SMCLK,
     .clockSourceFrequency = UCS_getSMCLK(),
-    .desiredSpiClock = SPI_CLOCK,
+    .desiredSpiClock = spi->clock_freq,
     .msbFirst = USCI_A_SPI_MSB_FIRST,
     .clockPhase = USCI_A_SPI_PHASE_DATA_CHANGED_ONFIRST_CAPTURED_ON_NEXT,
     .clockPolarity = USCI_A_SPI_CLOCKPOLARITY_INACTIVITY_HIGH
   };
 
   // Attempt to initalize SPI
-  if(!USCI_A_SPI_initMaster(USCI_A0_BASE, &param)) {
+  if(!USCI_A_SPI_initMaster(spi->base_addr, &param)) {
     // SPI failed to initialize
     return false;
   }
 
   // Enable the SPI module
-  USCI_A_SPI_enable(USCI_A0_BASE);
+  USCI_A_SPI_enable(spi->base_addr);
 
   // Clear and then enable receive interrupt - don't want it to fire immediately
   // (When we get an RX interrupt, the transmit register is ready for another byte.)
-  USCI_A_SPI_clearInterruptFlag(USCI_A0_BASE, USCI_A_SPI_RECEIVE_INTERRUPT);
-  USCI_A_SPI_enableInterrupt(USCI_A0_BASE, USCI_A_SPI_RECEIVE_INTERRUPT);
+  USCI_A_SPI_clearInterruptFlag(spi->base_addr, USCI_A_SPI_RECEIVE_INTERRUPT);
+  USCI_A_SPI_enableInterrupt(spi->base_addr, USCI_A_SPI_RECEIVE_INTERRUPT);
 
-  // Toggle Slave - Active Low
-  io_set_state(&reset_pin, IO_LOW);
+  // Select slave - Active low
+  io_set_state(&spi->cs, IO_LOW);
 
   __delay_cycles(50); // Wait for slave to initialize
 
   return true;
 }
 
-void spi1_write(uint8_t byte_out) {
-  USCI_A_SPI_transmitData(USCI_A0_BASE, byte_out);
+void spi_write(const struct SPIConfig *spi, uint8_t byte_out) {
+  USCI_A_SPI_transmitData(spi->base_addr, byte_out);
 
   // Enter LMP4 and wait for byte to be recieved -> TX cleared
   // TODO: Should it be a different LPM?
   __bis_SR_register(LPM4_bits);
 }
 
-uint8_t spi1_read(void) {
-  return spi1_exchange(0xFF); // Send a dummy byte
+uint8_t spi_read(const struct SPIConfig *spi) {
+  return spi_exchange(spi, 0xFF); // Send a dummy byte
 }
 
-uint8_t spi1_exchange(uint8_t byte_out) {
-  spi1_write(byte_out);
+uint8_t spi_exchange(const struct SPIConfig *spi, uint8_t byte_out) {
+  spi_write(spi, byte_out);
   return data;
 }
 

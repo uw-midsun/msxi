@@ -4,11 +4,7 @@
 // Provides an interface for the debug LEDs.
 // It is assumed that our LEDs are active-low.
 
-// All the debug leds are on Port 8.
-#define DEBUG_LEDS { DEBUG_LED_PORT8 }
-#define DEBUG_LED_COUNT 1
-
-void led_init();
+void led_init(const struct IOMap leds[]);
 
 void led_on(const struct IOMap *led);
 

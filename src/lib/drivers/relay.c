@@ -3,6 +3,8 @@
 // TODO: find out if we need a delay between changing a relay and checking its status pin.
 
 void relay_init(const struct Relay *relay) {
+  // Assume relays are open-low and we want it to start low
+  io_set_state(&relay->relay, IO_LOW);
   io_set_dir(&relay->relay, PIN_OUT);
   if (relay->status.port != NO_STATUS_PORT) {
     io_set_dir(&relay->status, PIN_IN);

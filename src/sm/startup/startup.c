@@ -1,8 +1,12 @@
 #include "startup.h"
 #include "sm/state_machine.h"
 #include "drivers/relay.h"
+#include "drivers/spi.h"
+#include "drivers/debug_led.h"
 #include "precharge.h"
 #include "enable_battery.h"
+
+#include "config.h"
 
 // This is the state machine that runs the car through the startup procedure.
 
@@ -13,20 +17,28 @@
 //  4) Precharge - Precharges and enables the left and right motor controllers.
 //  5) Complete - Startup complete.
 
-#define SOLAR_RELAY_CONFIG &(struct Relay) { SOLAR_RELAY, SOLAR_STATUS }
-
 static struct State initialize, enable_battery,
                     enable_solar, precharge_mcs,
                     complete;
 static struct StateMachine sm = { .default_state = &initialize, .init = startup_sm_init };
 
 static void prv_init_system() {
+  // Initialize _everything_
+  // Move into main?
+  led_init(debug_leds);
+  spi_init(&spi_a0);
+  adc12_init(&adc12_a);
+  mc_init(&mc_left);
+  mc_init(&mc_right);
+  relay_init(&relay_battery);
+  relay_init(&relay_solar);
+
   event_raise(INIT_COMPLETE);
 }
 
 static void prv_enable_solar_relay() {
   // TODO: switch to guards?
-  if(relay_set_state(SOLAR_RELAY_CONFIG, RELAY_CLOSED)) {
+  if(relay_set_state(&relay_solar, RELAY_CLOSED)) {
     event_raise(SOLAR_ENABLED);
   } else {
     event_raise(SOLAR_FAIL);

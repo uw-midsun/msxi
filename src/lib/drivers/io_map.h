@@ -3,19 +3,9 @@
 
 // Provides common functions and convenient mappings for interfacing with IO pins.
 
-// Due to how we're using the macro, we can't wrap "map" in brackets.
-// Thus, it's up to the user not to call IOMAP(map) with other arguments.
-#define IOMAP(map) &(struct IOMap) map
-
-#if CHAOS
-#include "chaos.h"
-#else
-#include "launchpad.h"
-#endif
-
 struct IOMap {
   uint8_t port;
-  uint16_t pins;
+  uint8_t pins;
 };
 
 typedef enum {

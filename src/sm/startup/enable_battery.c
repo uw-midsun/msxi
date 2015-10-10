@@ -2,7 +2,9 @@
 #include "sm/state_machine.h"
 #include "drivers/heartbeat.h"
 #include "drivers/relay.h"
-#include "drivers/mcu_voltage.h"
+#include "drivers/adc12.h"
+
+#include "config.h"
 
 // This is a state machine for handling battery status and control.
 // Hook BATTERY_ENABLED to leave the state machine and BATTERY_FAIL to handle errors.
@@ -21,9 +23,6 @@
 //   enter() -> Close battery relay, raise BATTERY_ENABLED
 // On error: raise BATTERY_FAIL.
 
-
-#define BATTERY_RELAY_CONFIG &(struct Relay) { BATTERY_RELAY, BATTERY_STATUS }
-
 static struct State init_plutus, plutus_enabled,
                     dcdc_check, battery_enabled;
 static struct StateMachine sm = { .default_state = &init_plutus, .init = battery_sm_init };
@@ -37,7 +36,7 @@ static void prv_power_canbus() {
 // Called once Plutus has powered up
 // Initalizes the heartbeat check, which raises events every ~1s.
 static void prv_init_heartbeat() {
-  heartbeat_begin(IOMAP(PLUTUS_HEARTBEAT));
+  heartbeat_begin(&plutus_heartbeat);
 }
 
 static void prv_init_dcdc_check() {
@@ -46,7 +45,7 @@ static void prv_init_dcdc_check() {
 
 static void prv_init_battery() {
   // TODO: switch to guards?
-  if(relay_set_state(BATTERY_RELAY_CONFIG, RELAY_CLOSED)) {
+  if(relay_set_state(&relay_battery, RELAY_CLOSED)) {
     event_raise(BATTERY_ENABLED);
   } else {
     event_raise(BATTERY_FAIL);
@@ -60,7 +59,7 @@ static void wait(struct StateMachine *sm, uint16_t ms) {
 
 // Checks if PWR_STATUS is within bounds: ~11V to ~13V
 static bool prv_is_dcdc_good() {
-  int power_status = mcu_voltage_sample(PWR_STATUS);
+  int power_status = adc12_sample(&adc12_a, PWR_STATUS);
   return power_status >= DCDC_LOWER_THRESHOLD && power_status <= DCDC_UPPER_THRESHOLD;
 }
 
