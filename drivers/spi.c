@@ -24,9 +24,9 @@ struct SPIModule {
 // we use across our boards. This emulates what driverlib does.
 #if defined(__MSP430F247__)
 static const struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
-  { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&IFG2, UCA0RXIFG}, {&IE, UCA0RXIE} },
-  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&IFG2, UCA1RXIFG}, {&IE, UCA1RXIE} },
-  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&IFG2, UCB0RXIFG}, {&IE, UCB0RXIE} }
+  { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&IFG2, UCA0RXIFG}, {&IE2, UCA0RXIE} },
+  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&IFG2, UCA1RXIFG}, {&IE2, UCA1RXIE} },
+  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&IFG2, UCB0RXIFG}, {&IE2, UCB0RXIE} }
 };
 #elif defined(__MSP430F5529__) || defined(__MSP430F5438A__)
 static const struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
