@@ -7,6 +7,9 @@
 #define GPIO_PORT_P3    0x03
 #define GPIO_PORT_P4    0x04
 #define GPIO_PORT_P5    0x05
+#define GPIO_PORT_P6    0x06
+#define GPIO_PORT_P7    0x07
+#define GPIO_PORT_P8    0x08
 
 #define GPIO_PIN0       (0x01)
 #define GPIO_PIN1       (0x02)

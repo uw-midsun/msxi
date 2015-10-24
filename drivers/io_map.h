@@ -1,5 +1,5 @@
 #pragma once
-#include "gpio.h"
+#include "gpio_map.h"
 #include <stdint.h>
 #include <stdbool.h>
 

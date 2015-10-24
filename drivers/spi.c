@@ -1,5 +1,4 @@
 #include "spi.h"
-#include "msp430.h"
 
 struct SPIResult {
   uint8_t data;
@@ -7,24 +6,40 @@ struct SPIResult {
 };
 
 struct SPIModule {
-  uint8_t *ctl0;
-  uint8_t *ctl1;
-  uint8_t *br0;
-  uint8_t *br1;
-  uint8_t ifg;
-  uint8_t ie;
+  volatile uint8_t *ctl0;
+  volatile uint8_t *ctl1;
+  volatile uint8_t *br0;
+  volatile uint8_t *br1;
+  struct {
+    volatile uint8_t *addr;
+    uint8_t value;
+  } ifg;
+  struct {
+    volatile uint8_t *addr;
+    uint8_t value;
+  } ie;
 };
 
 // Since the F247 doesn't support driverlib, this is a static array of all the SPI registers
 // we use across our boards. This emulates what driverlib does.
-static volatile struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
-  { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, UCA0RXIFG, UCA0RXIE },
-  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, UCA1RXIFG, UCA1RXIE },
-  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, UCB0RXIFG, UCB0RXIE },
-#ifdef __MSP430_HAS_USCI_B3__
-  { &UCB3CTL0, &UCB3CTL1, &UCB3BR0, &UCB3BR1, UCB3RXIFG, UCB3RXIE }
+#if defined(__MSP430F247__)
+static const struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
+  { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&IFG2, UCA0RXIFG}, {&IE, UCA0RXIE} },
+  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&IFG2, UCA1RXIFG}, {&IE, UCA1RXIE} },
+  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&IFG2, UCB0RXIFG}, {&IE, UCB0RXIE} }
+};
+#elif defined(__MSP430F5529__) || defined(__MSP430F5438A__)
+static const struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
+  { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&UCA0IFG, UCRXIFG}, {&UCA0IE, UCRXIE} },
+  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&UCA1IFG, UCRXIFG}, {&UCA1IE, UCRXIE} },
+  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&UCB0IFG, UCRXIFG}, {&UCB0IE, UCRXIE} },
+#if defined(__MSP430_HAS_USCI_B3__)
+  { &UCB3CTL0, &UCB3CTL1, &UCB3BR0, &UCB3BR1, {&UCB3IFG, UCRXIFG}, {&UCB3IE, UCRXIE} }
 #endif
 };
+#else
+#error Device not supported!
+#endif
 
 volatile struct SPIResult results[SPI_NUM_PORTS] = {};
 
@@ -53,8 +68,8 @@ bool spi_init(const struct SPIConfig *spi) {
   *SPI_MODULE[spi->port].ctl1 &= ~UCSWRST;
 
   // Clear and enable the recieve interrupt
-  IFG2 &= ~SPI_MODULE[spi->port].ifg;
-  IE2 |= SPI_MODULE[spi->port].ie;
+  *SPI_MODULE[spi->port].ifg.addr &= ~SPI_MODULE[spi->port].ifg.value;
+  *SPI_MODULE[spi->port].ie.addr |= SPI_MODULE[spi->port].ie.value;
 
   __delay_cycles(50); // Wait for slave to initialize
 
@@ -109,6 +124,7 @@ static prv_update_data(const uint8_t port, const uint8_t data) {
 }
 
 // Add a new interrupt vector for each SPI port you want to handle.
+#if defined(__MSP430F247__)
 #pragma vector = USCIAB0RX_VECTOR
 __interrupt void USCIAB0RX_ISR(void) {
   prv_update_data(SPI_B0, UCB0RXBUF);
@@ -116,3 +132,18 @@ __interrupt void USCIAB0RX_ISR(void) {
   // Exit LPM3 after interrupt processes
   __bic_SR_register_on_exit(LPM3_bits);
 }
+#elif defined(__MSP430F5529__) || defined(__MSP430F5438A__)
+#define STRINGIFY(str) #str
+#define SPI_INTERRUPT(port) \
+_Pragma(STRINGIFY(vector=USCI_##port##_VECTOR)) \
+__interrupt void USCI_##port##_ISR(void) { \
+  prv_update_data(SPI_##port, UC##port##RXBUF); \
+  _bic_SR_register_on_exit(LPM3_bits); \
+}
+
+// macro magic whoo - should probably replace this eventually
+SPI_INTERRUPT(A0)
+SPI_INTERRUPT(A1)
+SPI_INTERRUPT(B0)
+SPI_INTERRUPT(B3)
+#endif

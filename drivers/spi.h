@@ -1,5 +1,6 @@
 #pragma once
 #include "io_map.h"
+#include "msp430.h"
 #include <stdbool.h>
 
 // Interrupt-driven SPI driver for USCI_A/Bx. Note that SPI is a synchronous protocol.
@@ -12,8 +13,8 @@ typedef enum {
   SPI_A0 = 0,
   SPI_A1,
   SPI_B0,
-#ifdef __MSP430_HAS_USCI_B3__
-  SPI_B3
+#if defined(__MSP430_HAS_USCI_B3__)
+  SPI_B3,
 #endif
   SPI_NUM_PORTS
 } SPIPort;
