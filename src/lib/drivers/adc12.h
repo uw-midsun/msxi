@@ -1,5 +1,6 @@
 #pragma once
 #include "io_map.h"
+#include "adc12_a.h"
 #include <stdint.h>
 
 // Driver for ADC12_A
@@ -13,16 +14,16 @@ typedef enum {
   PIN_COUNT
 } ADC12Index;
 
-typedef struct ADC12BufferConfig {
+struct ADC12BufferConfig {
   struct IOMap pin;
   uint8_t source;
-} ADC12BufferConfig;
+};
 
-typedef struct ADC12Config {
+struct ADC12Config {
   struct IOMap enable;
-  ADC12BufferConfig buffers[PIN_COUNT];
-} ADC12Config;
+  struct ADC12BufferConfig buffers[PIN_COUNT];
+};
 
-void adc12_init(const ADC12Config *adc);
+void adc12_init(const struct ADC12Config *adc);
 
-uint16_t adc12_sample(const ADC12Config *adc, const ADC12Index pin);
+uint16_t adc12_sample(const struct ADC12Config *adc, const ADC12Index pin);

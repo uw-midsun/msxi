@@ -1,5 +1,4 @@
 #include "adc12.h"
-#include "adc12_a.h"
 
 #define ADC_SCALE(x) (((x)*3300)/4095) //0 to 4095 -> 0 to 3300mV
 #define LAST_INDEX (PIN_COUNT - 1)
@@ -9,7 +8,7 @@
 // Modified by ADC interrupts
 static volatile uint16_t results[PIN_COUNT];
 
-void adc12_init(const ADC12Config *adc) {
+void adc12_init(const struct ADC12Config *adc) {
   // In order to measure the precharge/discharge circuits, the enable pin must be high.
   io_set_state(&adc->enable, IO_HIGH);
   io_set_dir(&adc->enable, PIN_OUT);
@@ -55,7 +54,7 @@ void adc12_init(const ADC12Config *adc) {
   ADC12_A_enableInterrupt(ADC12_A_BASE, ADC12_INTERRUPT);
 }
 
-uint16_t adc12_sample(const ADC12Config *adc, const ADC12Index pin) {
+uint16_t adc12_sample(const struct ADC12Config *adc, const ADC12Index pin) {
   // Start sampling + conversion cycle
   ADC12_A_startConversion(ADC12_A_BASE,
                           ADC12_A_MEMORY_0,

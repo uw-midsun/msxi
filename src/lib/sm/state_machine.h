@@ -14,11 +14,11 @@
 
 // The recommended process for creating a state machine is to encapsulate each state machine in its own source and header files.
 // It should only expose its associated events and pointers to the state machine and its initialization function.
-  
+
 // When creating a composite state, remember to add a transition rule to exit it on completion.
 //  When first entered, its state machine will be lazily populated.
 //  If re-entered, it will just switch back to its initial (default) state.
-  
+
 // Some generic actions are provided, such as changing states and raising events.
 
 #define NO_ENTRY_FN NULL

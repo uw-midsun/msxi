@@ -1,15 +1,14 @@
 #include "config.h"
-#include "driverlib.h"
 
 // Config for the Launchpad
 
-const SPIConfig spi_a0 = {
+const struct SPIConfig spi_a0 = {
   .data_out = { GPIO_PORT_P3, GPIO_PIN3 },
   .data_in = { GPIO_PORT_P3, GPIO_PIN4 },
   .clock_out = { GPIO_PORT_P2, GPIO_PIN7 },
   .cs = { GPIO_PORT_P1, GPIO_PIN6 },
   .clock_freq = 500000,
-  .base_addr = USCI_A0_BASE
+  .port = SPI_A0
 };
 
 const struct Relay relay_battery = {
@@ -54,7 +53,7 @@ const struct MotorController mc_right = {
   .discharge_index = MC_DCHG_RIGHT
 };
 
-const ADC12Config adc12_a = {
+const struct ADC12Config adc12_a = {
   .enable = { GPIO_PORT_P6, GPIO_PIN4 },
   .buffers = {
     [PWR_STATUS] = {

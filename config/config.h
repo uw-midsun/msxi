@@ -5,7 +5,7 @@
 #include "drivers/motor_controller.h"
 #include "drivers/adc12.h"
 
-extern const SPIConfig spi_a0;
+extern const struct SPIConfig spi_a0;
 
 extern const struct Relay relay_battery, relay_solar;
 
