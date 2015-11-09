@@ -17,13 +17,19 @@ void sm_init(struct StateMachine *sm) {
 void state_init(struct State *state, EntryFunc entry_fn) {
   state->enter = entry_fn;
   state->sub_sm = NULL;
-  state->transitions = NULL;
+  state->transitions = (struct Transitions) {
+    .root = NULL,
+    .last = NULL
+  };
 }
 
 void state_init_composite(struct State *state, struct StateMachine *sm) {
   state->enter = NULL;
   state->sub_sm = sm;
-  state->transitions = NULL;
+  state->transitions = (struct Transitions) {
+    .root = NULL,
+    .last = NULL
+  };
 }
 
 // Loops through the current state's transition rules
@@ -34,9 +40,9 @@ void state_init_composite(struct State *state, struct StateMachine *sm) {
 // This means that events will only ever call one action each.
 // If the current state is composite, then events will be processed using its state machine
 //   after its transition rules are checked.
-void sm_process_event(struct StateMachine *sm, Event e) {
+void sm_process_event(struct StateMachine *sm, struct Event e) {
   struct State *current_state = sm->current_state;
-  bool matched = transitions_process(current_state->transitions, sm, e);
+  bool matched = transitions_process(&current_state->transitions, sm, e);
   if (!matched && current_state->sub_sm != NULL) {
     sm_process_event(current_state->sub_sm, e);
   }
@@ -45,22 +51,22 @@ void sm_process_event(struct StateMachine *sm, Event e) {
 // Adds the given rule to the struct by prepending it to the state's list of transition rules.
 // Note that all rule data is held in the transition rule pool.
 void state_add_transition(struct State *state, struct TransitionRule *rule) {
-  state->transitions = transitions_add_rule(state->transitions, rule);
+  transitions_add_rule(&state->transitions, rule);
 }
 
-void state_add_guarded_state_transition(struct State *state, Event e, Guard guard, struct State *next_state) {
+void state_add_guarded_state_transition(struct State *state, EventID e, Guard guard, struct State *next_state) {
   state_add_transition(state, transitions_make_pointer_rule(e, guard, sm_change_state, next_state));
 }
 
-void state_add_state_transition(struct State *state, Event e, struct State *next_state) {
+void state_add_state_transition(struct State *state, EventID e, struct State *next_state) {
   state_add_guarded_state_transition(state, e, NO_GUARD, next_state);
 }
 
-void state_add_guarded_event_rule(struct State *state, Event e, Guard guard, Event event) {
+void state_add_guarded_event_rule(struct State *state, EventID e, Guard guard, EventID event) {
   state_add_transition(state, transitions_make_data_rule(e, guard, sm_raise_event, event));
 }
 
-void state_add_event_rule(struct State *state, Event e, Event event) {
+void state_add_event_rule(struct State *state, EventID e, EventID event) {
   state_add_guarded_event_rule(state, e, NO_GUARD, event);
 }
 
@@ -80,5 +86,5 @@ void sm_change_state(struct StateMachine *sm, void *next_state) {
 }
 
 void sm_raise_event(struct StateMachine *sm, uint16_t e) {
-  event_raise(e);
+  event_raise(e, 0);
 }

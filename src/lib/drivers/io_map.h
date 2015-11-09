@@ -37,3 +37,9 @@ void io_toggle(const struct IOMap *map);
 IOState io_get_state(const struct IOMap *map);
 
 void io_configure_interrupt(const struct IOMap *map, bool enabled, IOInterruptEdge edge);
+
+// Returns whether the specified pin has its interrupt flag set and clears it.
+bool io_process_interrupt(const struct IOMap *map);
+
+// Flips the interrupt edge
+void io_toggle_interrupt_edge(const struct IOMap *map);

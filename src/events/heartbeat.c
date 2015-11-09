@@ -4,6 +4,7 @@
 
 // SMCLK: ~1.045 MHz, divided by 64: 16328Hz -> ~1 second
 #define HEARTBEAT_PERIOD 16328
+#define HEARTBEAT_BAD IO_LOW
 
 static struct IOMap pin = { 0 };
 
@@ -35,14 +36,22 @@ void heartbeat_begin(const struct IOMap *heartbeat_pin) {
   Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
 }
 
+// Heartbeat guards
+bool heartbeat_good(uint64_t data) {
+  return (data != HEARTBEAT_BAD);
+}
+
+bool heartbeat_bad(uint64_t data) {
+  return (data == HEARTBEAT_BAD);
+}
+
 #pragma vector = TIMER0_A0_VECTOR
 __interrupt void TIMER0_A0_ISR(void) {
-  static IOState state = IO_LOW;
+  static IOState state = HEARTBEAT_BAD;
   // Flags automatically cleared
   IOState new_state = io_get_state(&pin);
   if(new_state != state) {
     state = new_state;
-    // Enum trickery - should probably change
-    event_raise_isr(HEARTBEAT_EVENT_OFFSET + state);
+    event_raise_isr(HEARTBEAT_CHANGE, state);
   }
 }
