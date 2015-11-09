@@ -11,7 +11,7 @@
 #define EVENT_POOL_SIZE 10
 
 struct EventNode {
-  Event e;
+  struct Event e;
   struct EventNode *next;
 };
 
@@ -38,7 +38,7 @@ void init_event_queue(void) {
 static struct EventNode *prv_get_free_node(void) {
   struct EventNode *temp_node;
   for (temp_node = node_pool; temp_node < node_pool + EVENT_POOL_SIZE; temp_node++) {
-    if (temp_node->e == NULL_EVENT) {
+    if (temp_node->e.id == NULL_EVENT_ID) {
       return temp_node;
     }
   }
@@ -55,9 +55,9 @@ static void prv_release_node(struct EventNode *node) {
 
 // Sets e as the queue's last node using a node in the pool.
 //  Note that this is unsafe - Interrupts may cause race conditions.
-void event_raise_isr(Event e) {
+void event_raise_isr(EventID id, uint64_t data) {
   struct EventNode *event_node = prv_get_free_node();
-  event_node->e = e;
+  event_node->e = (struct Event) { id, data };
   event_node->next = QUEUE_EMPTY;
 
   if (event_queue.last == QUEUE_EMPTY) {
@@ -69,21 +69,21 @@ void event_raise_isr(Event e) {
 }
 
 // This disables interrupts to prevent race conditions.
-void event_raise(Event e) {
+void event_raise(EventID id, uint64_t data) {
   __disable_interrupt();
-  event_raise_isr(e);
+  event_raise_isr(id, data);
   __enable_interrupt();
 }
 
 // Pops the first node. If there aren't any events queued, it just returns an empty node.
-Event get_next_event(void) {
+struct Event event_get_next(void) {
   if (event_queue.first == QUEUE_EMPTY) {
     return NULL_EVENT;
   }
 
   __disable_interrupt();
   struct EventNode *first_node = event_queue.first;
-  Event event = first_node->e;
+  struct Event event = first_node->e;
   event_queue.first = first_node->next;
   if (first_node->next == QUEUE_EMPTY) {
     event_queue.last = QUEUE_EMPTY;

@@ -145,5 +145,7 @@ __interrupt void USCI_##port##_ISR(void) { \
 SPI_INTERRUPT(A0)
 SPI_INTERRUPT(A1)
 SPI_INTERRUPT(B0)
+#if defined(__MSP430_HAS_USCI_B3__)
 SPI_INTERRUPT(B3)
+#endif
 #endif

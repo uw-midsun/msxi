@@ -55,3 +55,23 @@ void io_configure_interrupt(const struct IOMap *map, bool enabled, IOInterruptEd
     *GPIO_PORT_IE[map->port] &= ~map->pins;
   }
 }
+
+bool io_process_interrupt(const struct IOMap *map) {
+  if ((*GPIO_PORT_IFG[map->port] & map->pins) != 0) {
+    // Clear flag
+    *GPIO_PORT_IFG[map->port] &= ~map->pins;
+    return true;
+  }
+
+  return false;
+}
+
+void io_toggle_interrupt_edge(const struct IOMap *map) {
+  // 0 = EDGE_RISING, 1 = EDGE_FALLING
+  if ((*GPIO_PORT_IES[map->port] & map->pins) == 0) {
+    *GPIO_PORT_IES[map->port] |= map->pins;
+  } else {
+    *GPIO_PORT_IES[map->port] &= ~map->pins;
+  }
+}
+
