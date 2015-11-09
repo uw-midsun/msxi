@@ -1,4 +1,4 @@
-[submodule "src/ms-lib"]
+[submodule "src/lib"]
 	path = src/lib
 	url = https://github.com/uw-midsun/ms-lib.git
-	branch = master
+	branch = chaos
