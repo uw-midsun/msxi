@@ -60,9 +60,9 @@
 
 // cnvst (conversions) control registers
 // cnvst only cares about D0 and D1 (sometimes)
-#define CNVST_IN_GATED                                      (0 << 0)
-#define CNVST_IN_UNGATED                                    (1 << 0)
-#define CNVST_IN_PULSE                                      (1 << 1)
+#define CNVST_IN_UNGATED                                      (0 << 0)
+#define CNVST_IN_GATED                                        (1 << 0)
+#define CNVST_IN_PULSE                                        (1 << 1)
 
 // read register stuff
 #define READ_CELL_VOLTAGE_1                                 (0x00 << 2)    // D11 to D0, read
