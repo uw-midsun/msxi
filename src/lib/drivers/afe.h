@@ -40,12 +40,12 @@
 
 
 // 32-bit write command to frame 32 SCLKs to read back the desired voltage
-#define AD7280A_TXVAL                       0xF800030A    // see AD7280A datasheet
+#define AD7280A_TXVAL                       0xF800030A      // see AD7280A datasheet
 
 
 // number of bits that CRC-8 uses when computing a checksum
-#define AD7280A_CRC_NUMBITS_READ            22            // CRC bits,  read
-#define AD7280A_CRC_NUMBITS_WRITE           21            // CRC bits,  write
+#define AD7280A_CRC_NUMBITS_READ            22              // CRC bits,  read
+#define AD7280A_CRC_NUMBITS_WRITE           21              // CRC bits,  write
 
 /**
  * AD7280 uses the following CRC-8 polynomial (Big-Endian), with order 8
@@ -59,28 +59,28 @@
 
 
 // misc bits
-#define AD7280A_ADC_12_BIT_RES              4095          // AD7280A uses a 12 bit ADC
-#define AD7280A_WRITE_BIT_PATTERN           0x2           // required Bits[D2:D0]
+#define AD7280A_ADC_12_BIT_RES              4095            // AD7280A uses a 12 bit ADC
+#define AD7280A_WRITE_BIT_PATTERN           0x2             // required Bits[D2:D0]
 
 // other configuration
-#define AD7280A_DEV_MAX_CHAIN               8             // maximum number of devices in daisy chain
-#define AD7280A_DEV_IN_CHAIN                6             // number of devices in the chain
-#define AD7280A_CELLS_PER_DEVICE            6             // number of cells per AD7280A
+#define AD7280A_DEV_MAX_CHAIN               8               // maximum number of devices in daisy chain
+#define AD7280A_DEV_IN_CHAIN                6               // number of devices in the chain
+#define AD7280A_CELLS_PER_DEVICE            6               // number of cells per AD7280A
 
-#define AD7280A_DEVICEADDR_ALL              0x1F          // address all devices
-#define AD7280A_DEVICEADDR_MASTER           0             // master device in daisy chain
+#define AD7280A_DEVICEADDR_ALL              0x1F            // address all devices
+#define AD7280A_DEVICEADDR_MASTER           0               // master device in daisy chain
 
 // SPI configuration
 // according to the datasheet, the recommended SCLK to ensure correct operation of daisy-chain interface is 1MHz
-#define AD7280A_SPI_MAX_CLK                 1000000     // clock speed in Hz
+#define AD7280A_SPI_MAX_CLK                 1000000         // clock speed in Hz
 // when reading back from a single device in a stack of AD7280A's, the SCLK must be lower than
 //   1 MHz to read back register data up the chain
-#define AD7280A_SPI_CLK                     1000000     // clock speed in Hz
+#define AD7280A_SPI_CLK                     1000000         // clock speed in Hz
 
 // other configuration
-#define AD7280A_DEV_MAX_CHAIN               8             // maximum number of devices in daisy chain
-#define AD7280A_DEV_IN_CHAIN                6             // number of devices in the chain
-#define AD7280A_CELLS_PER_DEVICE            6             // number of cells per AD7280A
+#define AD7280A_DEV_MAX_CHAIN               8               // maximum number of devices in daisy chain
+#define AD7280A_DEV_IN_CHAIN                6               // number of devices in the chain
+#define AD7280A_CELLS_PER_DEVICE            6               // number of cells per AD7280A
 
 // error thresholds
 // discharge
@@ -100,81 +100,121 @@
 #define AD7280A_ERR_CHRG_THRESH_VLT_L       1
 
 // structures
-typedef struct ad7280a_config {
-  SPIConfig *spi_config;                                  // spi configuration
-  uint8_t crc_table[256];                                 // crc-8 lookup table
-  bool crc_error;                                         // crc read calculation status
-} AD7280AConfig;
+typedef struct afe_config {
+  SPIConfig *spi_config;                                    // spi configuration
+  struct IOMap cnvst;                                       // pin configuration
+  uint8_t devices;                                          // devices in daisy chain (1 - 8)
+  uint8_t crc_table[256];                                   // crc-8 lookup table
+  bool crc_error;                                           // crc read calculation status
+  uint8_t rdbck_delay;                                      // readback delay (usually)
+  Threshold *charge;
+  Threshold *discharge;
+} AFEConfig;
 
+
+struct error_thresholds {
+    int current_high;
+    int current_low;
+    int voltage_high;
+    int voltage_low;
+} Threshold;
 
 
 /**
  * Initialize communications with the devices in daisy-chain, and generates
  *   and stores the lookup table for CRC-8 use in the device's RAM
- * @param   ac          pointer to the AD7280AConfig
+ * @param   ac          pointer to the AFEConfig
  */
-bool AD7280A_init(AD7280AConfig *ac);
+bool afe_init(AFEConfig *ac);
 
 
 /**
  * Computes the XOR remainder for each of the 256 possible CRC-8 bytes, and
- *   stores it in the crc_table field within the AD7280AConfig
- * @param   ac          pointer to the AD7280AConfig
+ *   stores it in the crc_table field within the AFEConfig
+ * @param   ac          pointer to the AFEConfig
  */
-static void prv_crc8_build_table(AD7280AConfig *ac);
+static void prv_crc8_build_table(AFEConfig *ac);
 
 
 /**
  * CRC calculation for read AND write operations on the bits for a read/write:
  *   - 21 bits for a write
  *   - 22 bits for a read
- * @param   ac          pointer to the AD7280AConfig
+ * @param   ac          pointer to the AFEConfig
  * @param   message     only the data bits that the CRC is computed on
  * @return: crc remainder term after xor division
  */
-uint8_t AD7280A_crc8_calculate(AD7280AConfig *ac, uint32_t val);
-
-
-/**
- * Verify the CRC obtained from a read command
- * @param   ac          pointer to the AD7280AConfig
- * @param   val         data received from the AD7280A during a read command
- */
-bool prv_crc8_check(AD7280AConfig *ac, uint32_t val);
+uint8_t afe_crc8_calculate(AFEConfig *ac, uint32_t val);
 
 
 /**
  * CRC Write
  * computes the CRC-8 checksum and then performs the write command on the
  *   device on the SPI bus
- * @param   ac                pointer to the AD7280AConfig
+ * @param   ac                pointer to the AFEConfig
  * @param   device_addr       the device address
  * @param   register_addr     the register address to write data to
  * @param   data              the data to write to the register
  */
-uint8_t AD7280A_write(AD7280AConfig *ac, uint16_t device_addr, uint16_t register_addr, bool all, uint16_t data);
-
-
-
-static uint32_t prv_transfer_32_bits(AD7280AConfig *ac, uint32_t msg);
+uint32_t afe_write(AFEConfig *ac, uint16_t device_addr, uint16_t register_addr, bool all, uint16_t data);
 
 
 /**
- * Reads back the data at the register address from the given device
+ * [afe_read_conversions description]
+ * @param  afe           [description]
+ * @param  device_addr   [description]
+ * @param  register_addr [description]
+ * @return               [description]
  */
-uint32_t AD7280A_read(AD7280ACONFIG *ac, uint16_t device_addr, uint16_t register_addr);
+uint8_t afe_read_conversions(AFEConfig *afe, uint16_t device_addr, uint16_t register_addr);
 
 
 /**
- * Converts ADC value to voltage
- * Possibly static? do i need this even
+ * Read back the data at a register
+ * @param  afe           pointer to the AFEConfig
+ * @param  device_addr   the device address
+ * @param  register_addr the register address to write data to
+ * @return               the value read back from the register
  */
-float AD7280A_convert_value(uint16_t data);
+uint32_t afe_read_register(AFEConfig *afe, uint16_t device_addr, uint16_t register_addr);
+
+
+
+/**
+ * Enable balancing for the cells
+ * @param  afe         [description]
+ * @param  device_addr [description]
+ * @param  cells       [description]
+ * @return             [description]
+ */
+bool enable_cbx(AFEConfig *afe, uint16_t device_addr, uint8_t cells);
+
+
+/**
+ * Disable balancing for the cells
+ * @param  afe         [description]
+ * @param  device_addr [description]
+ * @param  cells       [description]
+ * @return             [description]
+ */
+bool disable_cbx(AFEConfig *afe, uint16_t device_addr, uint8_t cells);
+
+
+/**
+ * Set the cbx timer
+ * @param  afe         [description]
+ * @param  device_addr [description]
+ * @param  cell        an individual cell (0 to 5)
+ * @param  duration    [description]
+ * @return             [description]
+ */
+bool set_cbx_timer(AFEConfig *afe, uint16_t device_addr, uint8_t cell, uint8_t duration);
+
 
 
 /**
  * Apply a known voltage to verify the operation of the ADC and reference buffer
  *   for all parts in the daisy chain
- * @param   ac          pointer to the AD7280AConfig
+ * @param   ac          pointer to the AFEConfig
  */
-void AD7280A_self_test(AD7280AConfig *ac);
+void afe_self_test(AFEConfig *ac);
