@@ -1,4 +1,6 @@
 #include "horn.h"
+#include "can_config.h"
+#include <stddef.h>
 
 static const struct CANConfig *can_cfg = NULL;
 static const struct IOMap *pin = NULL;
@@ -24,8 +26,8 @@ void horn_process_message(struct StateMachine *sm, uint16_t ignored) {
   // Not sure if we care about CAN errors, but this clears any that may have occurred.
   can_process_interrupt(can_cfg, &msg, &error);
 
-  if ((msg.id & CAN_MESSAGE_MASK) == 0x123) {
-    // We got a horn message (don't care about who's sending it)
+  if (msg.id == THEMIS_HORN) {
+    // We got a horn message
     // Horn messages carry a boolean value - off or on.
     EventID e = (msg.data == 1) ? HORN_ON : HORN_OFF;
     event_raise(e, 0);

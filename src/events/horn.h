@@ -1,6 +1,7 @@
 #pragma once
 #include "drivers/io_map.h"
 #include "drivers/can.h"
+#include "sm/state_machine.h"
 #include "sm_config.h"
 
 // CAN processor for horn messages
@@ -11,7 +12,7 @@ typedef enum {
   HORN_OFF
 } HornEvent;
 
-// Initializes the CAN interface and enables the interrupt.
+// Enables the CAN interrupt. The CAN interface should already be initialized.
 void horn_init(const struct CANConfig *can, const struct IOMap *horn);
 
 // Add this as an event rule for CAN_INTERRUPT.
