@@ -31,14 +31,15 @@ struct State {
 struct StateMachine {
   struct State *current_state;
   struct State *default_state;
-  bool initialized;
   InitFunc init;
+  uint8_t id;
+  bool initialized;
 };
 
-void sm_framework_init();
+void sm_framework_init(void);
 
 // Initializes a state machine by populating it and then switching it to its default state.
-void sm_init(struct StateMachine *main);
+void sm_init(struct StateMachine *sm);
 
 void state_init(struct State *state, EntryFunc entry_fn);
 

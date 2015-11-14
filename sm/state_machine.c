@@ -1,8 +1,8 @@
 #include "state_machine.h"
 #include <stddef.h>
 
-void sm_framework_init() {
-  init_event_queue();
+void sm_framework_init(void) {
+  event_queue_init();
   transitions_init();
 }
 

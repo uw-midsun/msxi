@@ -259,12 +259,15 @@ void can_check_error(const struct CANConfig *can, struct CANError *error) {
 
 void can_process_interrupt(const struct CANConfig *can,
                            struct CANMessage *msg, struct CANError *error) {
+  // TODO: flag checking is already handled in can_receive. Can we remove it from here?
   uint8_t flags;
   prv_read(can, CANINTF, &flags, 1);
 
   if (flags & EFLAG) {
     can_check_error(can, error);
-  } else if (flags & (RX0IE | RX1IE)) {
+  }
+
+  if (flags & (RX0IE | RX1IE)) {
     can_receive(can, msg);
   }
 }

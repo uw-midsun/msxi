@@ -19,7 +19,7 @@ struct Event {
 #define NULL_EVENT (struct Event) { NULL_EVENT_ID, 0 }
 #define QUEUE_EMPTY NULL
 
-void init_event_queue(void);
+void event_queue_init(void);
 
 // Adds an event to the system event queue unsafely. Use this for ISR
 void event_raise_isr(EventID id, uint64_t data);

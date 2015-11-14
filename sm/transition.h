@@ -20,7 +20,7 @@ typedef void(*PointerFunc)(struct StateMachine *, void *);
 typedef bool(*Guard)(uint64_t);
 
 // Initalizes the transition framework
-void transitions_init();
+void transitions_init(void);
 
 // Processes all the transition rules in the list, executing the first rule that matches.
 // Returns true if a rule was matched, false if not.

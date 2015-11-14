@@ -37,8 +37,8 @@ struct TransitionRule {
 
 static struct TransitionRule rule_pool[TRANSITION_POOL_SIZE] = { 0 };
 
-// init_transitions() initializes the transition rule pool.
-void transitions_init() {
+// Initializes the transition rule pool.
+void transitions_init(void) {
   struct TransitionRule *temp_rule;
   for (temp_rule = rule_pool; temp_rule < rule_pool + TRANSITION_POOL_SIZE; temp_rule++) {
     temp_rule->event = NULL_EVENT_ID;

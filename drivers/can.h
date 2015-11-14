@@ -35,7 +35,7 @@ struct CANMessage {
 struct CANError {
   union {
     uint8_t flags;
-    struct { // Little endian ???
+    struct { // Little endian
       bool error_warning:1;
       bool rx_warning:1;
       bool tx_warning:1;

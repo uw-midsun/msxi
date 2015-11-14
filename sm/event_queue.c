@@ -23,8 +23,7 @@ struct EventQueue {
 static struct EventNode node_pool[EVENT_POOL_SIZE];
 static struct EventQueue event_queue;
 
-void init_event_queue(void) {
-
+void event_queue_init(void) {
   struct EventNode *temp_node;
   for (temp_node = node_pool; temp_node < node_pool + EVENT_POOL_SIZE; temp_node++) {
     temp_node->e = NULL_EVENT;
