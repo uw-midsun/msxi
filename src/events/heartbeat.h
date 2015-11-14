@@ -1,22 +1,22 @@
 #pragma once
 #include "drivers/io_map.h"
+#include "sm_config.h"
 
 // Interrupt-based heartbeat check for Plutus (Battery board).
 // Plutus should output high on Chaos's heartbeat pin while good.
+// This technically isn't a heartbeat, but Plutus should watchdog reset in any scenario
+//  that would prevent the heartbeat pin from being brought low.
 
 // Since this event is independent of the state machines,
 //  it must not conflict with any existing events.
 
 typedef enum {
-  HEARTBEAT_CHANGE = 6000
+  HEARTBEAT_BAD = PROTECTED_EVENT_ID(EVENT_HEARTBEAT),
+  HEARBEAT_GOOD
 } HeartbeatEvent;
 
-// Initializes the heartbeat check on the specified pin.
-// Every ~1s, it will check to see if the pin's state has changed,
-//  raising an event in the event queue if it has.
+// Initializes the heartbeat pin and interrupt.
 void heartbeat_begin(const struct IOMap *heartbeat_pin);
 
-// Heartbeat guards - use with HEARTBEAT_CHANGE to respond to heartbeat events.
-bool heartbeat_good(uint64_t data);
-
-bool heartbeat_bad(uint64_t data);
+// Call this in the appropriate port's ISR.
+void heartbeat_interrupt(void);

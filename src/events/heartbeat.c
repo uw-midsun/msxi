@@ -2,56 +2,23 @@
 #include "sm/event_queue.h"
 #include "timer_a.h"
 
-// SMCLK: ~1.045 MHz, divided by 64: 16328Hz -> ~1 second
-#define HEARTBEAT_PERIOD 16328
-#define HEARTBEAT_BAD IO_LOW
+static const struct IOMap *pin = NULL;
 
-static struct IOMap pin = { 0 };
+void heartbeat_init(const struct IOMap *heartbeat_pin) {
+  pin = heartbeat_pin;
+  io_set_dir(pin, PIN_IN);
 
-void heartbeat_begin(const struct IOMap *heartbeat_pin) {
-  io_set_dir(heartbeat_pin, PIN_IN);
-  pin = *heartbeat_pin;
-
-  // Set up & Start Timer_A0 for Up Mode sourced by SMCLK/64
-  Timer_A_initUpModeParam initUpParam = {
-    .clockSource = TIMER_A_CLOCKSOURCE_SMCLK,
-    .clockSourceDivider = TIMER_A_CLOCKSOURCE_DIVIDER_64,
-    .timerPeriod = HEARTBEAT_PERIOD,
-    .timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE,
-    .timerClear = TIMER_A_DO_CLEAR,
-    .startTimer = false
-  };
-  Timer_A_initUpMode(TIMER_A0_BASE, &initUpParam);
-
-  // Set up & Start compare mode
-  Timer_A_clearCaptureCompareInterruptFlag(TIMER_A0_BASE, TIMER_A_CAPTURECOMPARE_REGISTER_0);
-  Timer_A_initCompareModeParam initCompParam = {
-    .compareRegister = TIMER_A_CAPTURECOMPARE_REGISTER_0,
-    .compareInterruptEnable = TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE,
-    .compareOutputMode = TIMER_A_OUTPUTMODE_OUTBITVALUE,
-    .compareValue = HEARTBEAT_PERIOD
-  };
-  Timer_A_initCompareMode(TIMER_A0_BASE, &initCompParam);
-
-  Timer_A_startCounter(TIMER_A0_BASE, TIMER_A_UP_MODE);
+  // Good heartbeat = high
+  io_configure_interrupt(pin, true, EDGE_RISING);
 }
 
-// Heartbeat guards
-bool heartbeat_good(uint64_t data) {
-  return (data != HEARTBEAT_BAD);
-}
+void heartbeat_interrupt(void) {
+  if (io_process_interrupt(pin)) {
 
-bool heartbeat_bad(uint64_t data) {
-  return (data == HEARTBEAT_BAD);
-}
+    // Raise a heartbeat state event - high means good
+    EventID e = (io_get_state(pin) == IO_HIGH) ? HEARBEAT_GOOD : HEARTBEAT_BAD;
+    event_raise_isr(e, 0);
 
-#pragma vector = TIMER0_A0_VECTOR
-__interrupt void TIMER0_A0_ISR(void) {
-  static IOState state = HEARTBEAT_BAD;
-  // Flags automatically cleared
-  IOState new_state = io_get_state(&pin);
-  if(new_state != state) {
-    state = new_state;
-    event_raise_isr(HEARTBEAT_CHANGE, state);
+    io_toggle_interrupt_edge(pin);
   }
 }

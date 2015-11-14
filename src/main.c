@@ -1,4 +1,3 @@
-#include "sm/main_sm.h"
 #include "sm/state_machine.h"
 #include "wdt_a.h"
 
