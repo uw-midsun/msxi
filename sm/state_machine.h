@@ -36,7 +36,10 @@ struct StateMachine {
   bool initialized;
 };
 
-void sm_framework_init(void);
+typedef void(*SMDebugFunc)(const struct StateMachine *);
+
+// The debug function will be called whenever a state machine is entered.
+void sm_framework_init(SMDebugFunc debug_fn);
 
 // Initializes a state machine by populating it and then switching it to its default state.
 void sm_init(struct StateMachine *sm);

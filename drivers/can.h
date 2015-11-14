@@ -4,12 +4,8 @@
 // CAN driver
 // Look at the protocol doc for an explanation of our ID system.
 
-#define CAN_DEVICE_MASK 0x7E0
-#define CAN_MESSAGE_MASK 0x1F
-#define CAN_ID(device, message) (((device) << 5) | (message))
-
 struct CANConfig {
-  struct SPIConfig *spi;
+  const struct SPIConfig *spi;
   struct IOMap interrupt_pin;
   struct {
     uint16_t mask;

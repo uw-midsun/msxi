@@ -1,7 +1,10 @@
 #include "state_machine.h"
 #include <stddef.h>
 
-void sm_framework_init(void) {
+static SMDebugFunc sm_debug = NULL;
+
+void sm_framework_init(SMDebugFunc debug_fn) {
+  sm_debug = debug_fn;
   event_queue_init();
   transitions_init();
 }
@@ -12,6 +15,11 @@ void sm_init(struct StateMachine *sm) {
     sm->initialized = true;
   }
   sm_change_state(sm, sm->default_state);
+
+  if (sm_debug != NULL) {
+    // Call the debug function if it exists, passing the state machine (for its ID)
+    sm_debug(sm);
+  }
 }
 
 void state_init(struct State *state, EntryFunc entry_fn) {

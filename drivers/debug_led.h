@@ -4,7 +4,8 @@
 // Provides an interface for the debug LEDs.
 // It is assumed that our LEDs are active-low.
 
-void led_init(const struct IOMap leds[]);
+// Initialize the given array of leds
+void led_init(const struct IOMap leds[], uint8_t num);
 
 void led_on(const struct IOMap *led);
 
