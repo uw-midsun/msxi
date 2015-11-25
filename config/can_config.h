@@ -1,13 +1,13 @@
 #pragma once
 
 // CAN message map
-// TODO: do these need to be synced across devices?
 
 #define CAN_DEVICE_MASK 0x7E0
 #define CAN_MESSAGE_MASK 0x1F
 #define CAN_FULL_MASK (CAN_DEVICE_MASK | CAN_MESSAGE_MASK)
 #define CAN_DEVICE_ID(device) ((device) << 5)
 #define CAN_ID(device, message) (CAN_DEVICE_ID(device) | (message))
+#define CAN_FAIL_CODE(gen, sub) ((gen) << 32 | (sub))
 
 typedef enum {
   DEVICE_CHAOS = 0,
@@ -17,7 +17,7 @@ typedef enum {
   DEVICE_TELEMETRY,
   DEVICE_LEFT_MC,
   DEVICE_RIGHT_MC,
-  DEVICE_UNUSED
+  DEVICE_UNUSED = CAN_FULL_MASK // Used to force max data type
 } DeviceID;
 
 typedef enum {
@@ -30,9 +30,9 @@ typedef enum {
 typedef enum {
   FAIL_RELAY = 0,
   FAIL_KILLSWITCH,
-  FAIL_PLUTUS_BAD,
+  FAIL_HEARTBEAT_BAD,
   FAIL_DCDC_BAD,
-  FAIL_PRECHARGE_BAD
+  FAIL_MC_BAD
 } ChaosFailCode;
 
 typedef enum {

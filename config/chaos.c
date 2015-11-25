@@ -42,7 +42,7 @@ const struct Relay relay_battery = {
 };
 
 const struct MotorController mc_left = {
-  .enable = {
+  .main = {
     .relay = { GPIO_PORT_P4, GPIO_PIN2 },
     .status = { GPIO_PORT_P4, GPIO_PIN3 }
   },
@@ -59,7 +59,7 @@ const struct MotorController mc_left = {
 };
 
 const struct MotorController mc_right = {
-  .enable = {
+  .main = {
     .relay = { GPIO_PORT_P4, GPIO_PIN4 },
     .status = { GPIO_PORT_P4, GPIO_PIN5 }
   },

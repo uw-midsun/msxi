@@ -18,19 +18,22 @@ void horn_init(const struct CANConfig *can, const struct IOMap *horn) {
   io_configure_interrupt(&can->interrupt_pin, true, EDGE_FALLING);
 }
 
-// Data rule to process CAN messages. This should be
+// Data rule to process and act on CAN messages.
 void horn_process_message(struct StateMachine *sm, uint16_t ignored) {
   struct CANMessage msg = { 0 };
   struct CANError error = { 0 };
 
   // Not sure if we care about CAN errors, but this clears any that may have occurred.
-  can_process_interrupt(can_cfg, &msg, &error);
-
-  if (msg.id == THEMIS_HORN) {
-    // We got a horn message
-    // Horn messages carry a boolean value - off or on.
-    EventID e = (msg.data == 1) ? HORN_ON : HORN_OFF;
-    event_raise(e, 0);
+  while(can_process_interrupt(can_cfg, &msg, &error)) {
+    if (msg.id == THEMIS_HORN) {
+      // We got a horn message
+      // Horn messages carry a boolean value - off or on.
+      if (msg.data == 0) {
+        io_set_state(pin, IO_LOW);
+      } else {
+        io_set_state(pin, IO_HIGH);
+      }
+    }
   }
 }
 

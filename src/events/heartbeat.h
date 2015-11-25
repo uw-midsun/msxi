@@ -16,7 +16,10 @@ typedef enum {
 } HeartbeatEvent;
 
 // Initializes the heartbeat pin and interrupt.
-void heartbeat_begin(const struct IOMap *heartbeat_pin);
+void heartbeat_init(const struct IOMap *heartbeat_pin);
+
+// Forces a heartbeat event to be fired.
+void heartbeat_fire_event(void);
 
 // Call this in the appropriate port's ISR.
 void heartbeat_interrupt(void);

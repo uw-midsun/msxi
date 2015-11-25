@@ -9,11 +9,4 @@ typedef enum {
   RELAY_FAIL
 } RelayEvent;
 
-typedef enum {
-  RELAY_SOLAR,
-  RELAY_BATTERY,
-} RelayID;
-
 bool protected_relay_set_state(const struct Relay *relay, const RelayState state);
-
-bool protected_mc_

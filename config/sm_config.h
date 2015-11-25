@@ -11,17 +11,23 @@
 #define PROTECTED_EVENT_ID(offset) ((offset) * 10000)
 
 typedef enum {
-  SM_OFF = 1,
-  SM_RUNNING,
-  SM_POWER_INIT,
+  SM_MAIN = 1,
+  SM_RUN,
+  SM_STARTUP,
   SM_PRECHARGE,
   SM_SHUTDOWN,
+  SM_DISCHARGE,
   SM_CHARGING,
-  SM_FAILURE
+  SM_FAILURE,
+  FORCE_SM_ID_SIZE = 65535 // Forces it to be a uint16_t
 } StateMachineID;
 
 typedef enum {
   EVENT_HEARTBEAT = 1,
   EVENT_INPUT,
-  EVENT_HORN
+  EVENT_HORN,
+  EVENT_POWER,
+  EVENT_RELAY,
+  EVENT_FAILURE,
+  FORCE_EVENT_ID_SIZE = 65535 // Forces it to be a uint16_t
 } ProtectedEventID;

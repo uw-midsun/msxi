@@ -35,6 +35,7 @@ void input_interrupt(void) {
 
   if (io_process_interrupt(&switches->killswitch)) {
     event_raise_isr(EMERGENCY_STOP, 0);
+    // TODO: can we exit the interrupt?
   }
 }
 
