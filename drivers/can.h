@@ -54,5 +54,6 @@ void can_receive(const struct CANConfig *can, struct CANMessage *msg);
 
 void can_check_error(const struct CANConfig *can, struct CANError *error);
 
-void can_process_interrupt(const struct CANConfig *can,
+// Returns whether we processed anything
+bool can_process_interrupt(const struct CANConfig *can,
                            struct CANMessage *msg, struct CANError *error);

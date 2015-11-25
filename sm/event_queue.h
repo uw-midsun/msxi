@@ -7,7 +7,6 @@
 // The queue is a FIFO linked list.
 // All states (including composite states) raise events in this queue.
 
-
 typedef uint16_t EventID;
 
 struct Event {

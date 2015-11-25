@@ -17,6 +17,7 @@
 struct Relay {
   struct IOMap relay;
   struct IOMap status;
+  uint8_t id;
 };
 
 typedef enum {

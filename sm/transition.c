@@ -13,13 +13,15 @@
 
 typedef enum {
   DATA,
-  POINTER
+  POINTER,
+  EVENT_DATA
 } ActionType;
 
 struct Action {
   union {
     DataFunc fn_data;
     PointerFunc fn_pointer;
+    EventDataFunc fn_edata;
   };
   union {
     uint16_t data;
@@ -48,8 +50,7 @@ void transitions_init(void) {
   }
 }
 
-// Note that actions can either have integer or pointer data.
-//  This is mostly for correctness, since pointers can technically be passed as ints.
+// Note that actions can either have integer, pointer, or event data.
 bool transitions_process(struct Transitions *transitions, struct StateMachine *sm,
                          struct Event e) {
   struct TransitionRule *rule = transitions->root;
@@ -58,8 +59,10 @@ bool transitions_process(struct Transitions *transitions, struct StateMachine *s
       (rule->guard == NO_GUARD || rule->guard(e.data))) {
       if (rule->action.type == POINTER) {
         rule->action.fn_pointer(sm, rule->action.pointer);
-      } else {
+      } else if (rule->action.type == DATA){
         rule->action.fn_data(sm, rule->action.data);
+      } else if (rule->action.type == EVENT_DATA) {
+        rule->action.fn_edata(sm, e.data);
       }
       return true;
     }
@@ -104,6 +107,15 @@ struct TransitionRule *transitions_make_data_rule(EventID event, Guard guard,
     .fn_data = fn,
     .data = data,
     .type = DATA
+  });
+}
+
+struct TransitionRule *transitions_make_event_data_rule(uint16_t event, Guard guard,
+                                                        EventDataFunc fn) {
+  return prv_make_transition_rule(event, guard, (struct Action) {
+    .fn_edata = fn,
+    .data = 0, // ignored
+    .type = EVENT_DATA
   });
 }
 

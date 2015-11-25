@@ -17,6 +17,7 @@ struct Transitions {
 
 typedef void(*DataFunc)(struct StateMachine *, uint16_t);
 typedef void(*PointerFunc)(struct StateMachine *, void *);
+typedef void(*EventDataFunc)(struct StateMachine *, uint64_t);
 typedef bool(*Guard)(uint64_t);
 
 // Initalizes the transition framework
@@ -33,6 +34,10 @@ struct TransitionRule *transitions_make_pointer_rule(uint16_t event, Guard guard
 // Returns an integer-based transition rule.
 struct TransitionRule *transitions_make_data_rule(uint16_t event, Guard guard,
                                                   DataFunc fn, uint16_t data);
+
+// Returns an event data-based transition rule.
+struct TransitionRule *transitions_make_event_data_rule(uint16_t event, Guard guard,
+                                                        EventDataFunc fn);
 
 // Adds the rule to the list of transition rules
 void transitions_add_rule(struct Transitions *transitions, struct TransitionRule *next_rule);
