@@ -130,7 +130,8 @@ bool afe_init(struct AFEConfig *afe) {
   uint32_t reply = prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_VOLTAGE_1, false, READ_CELL_VOLTAGE_1);
 
   // read back all slave device ids
-  for (int i = 0; i < afe->devices; ++i) {
+  int i;
+  for (i = 0; i < afe->devices; ++i) {
     reply = prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_VOLTAGE_1, false, READ_CELL_VOLTAGE_1);
   }
 
