@@ -20,7 +20,6 @@ struct ADC12BufferConfig {
 };
 
 struct ADC12Config {
-  struct IOMap enable;
   struct ADC12BufferConfig buffers[PIN_COUNT];
 };
 

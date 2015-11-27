@@ -9,10 +9,6 @@
 static volatile uint16_t results[PIN_COUNT];
 
 void adc12_init(const struct ADC12Config *adc) {
-  // In order to measure the precharge/discharge circuits, the enable pin must be high.
-  io_set_state(&adc->enable, IO_HIGH);
-  io_set_dir(&adc->enable, PIN_OUT);
-
   // Enable pins as inputs for ADC
   uint16_t i;
   for (i = 0; i < PIN_COUNT; i++) {
