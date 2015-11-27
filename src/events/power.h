@@ -18,6 +18,13 @@ typedef enum {
   POWER_GOOD
 } PowerEvent;
 
+typedef enum {
+  LV_ENABLED,
+  LV_DISABLED
+} LVPowerState;
+
+void power_set_lv(const struct IOMap *enable_lv, const LVPowerState state);
+
 // Valid state transition action - blocking DC-DC status check
 // Pass the PowerConfig to this action.
 void power_status_check(void *dcdc);

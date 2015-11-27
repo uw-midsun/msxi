@@ -1,6 +1,7 @@
 #include "shutdown.h"
 #include "discharge.h"
 #include "drivers/relay.h"
+#include "events/power.h"
 #include "config.h"
 
 static void prv_init_sm(void);
@@ -17,7 +18,7 @@ static void prv_kill() {
   relay_set_state(&relay_solar, RELAY_OPEN);
 
   // Kill LV power
-  io_set_state(&enable_lv, IO_LOW);
+  power_set_lv(&enable_lv, LV_DISABLED);
   event_raise(SHUTDOWN_COMPLETE, 0);
 }
 

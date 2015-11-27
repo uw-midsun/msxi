@@ -5,7 +5,8 @@
 #include "drivers/relay.h"
 #include "events/motor_controller.h"
 #include "drivers/adc12.h"
-#include "../src/sm/sm_debug.h"
+#include "sm/sm_debug.h"
+#include "events/input.h"
 
 extern const struct SPIConfig spi_a0;
 

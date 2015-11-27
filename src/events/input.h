@@ -22,7 +22,8 @@ typedef enum {
 void input_init(const struct SwitchInput *input);
 
 // Call this in the appropriate port's ISR.
-void input_interrupt(void);
+// Returns whether we should exit LPM.
+bool input_interrupt(const struct SwitchInput *input);
 
 // Input Guards - Use this with POWER_ON to determine which mode to enter.
 bool input_is_charge(uint64_t data);

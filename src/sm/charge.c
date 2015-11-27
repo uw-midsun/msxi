@@ -5,6 +5,7 @@
 #include "events/protected_relay.h"
 #include "events/fail.h"
 #include "events/input.h"
+#include "events/power.h"
 
 static void prv_init_sm(void);
 static struct State enable, heartbeat, charging;
@@ -17,7 +18,7 @@ static struct StateMachine sm = {
 static void prv_enable() {
   // Ensure that LV power is enabled - powers the rest of the boards
   // Note that LV power is generally enabled.
-  io_set_state(&enable_lv, IO_HIGH);
+  power_set_lv(&enable_lv, LV_ENABLED);
   protected_relay_set_state(&relay_solar, RELAY_CLOSED);
 }
 

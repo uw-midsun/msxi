@@ -5,6 +5,14 @@
 #define MAX_ATTEMPTS 1
 #define WAIT_SECONDS 1
 
+void power_set_lv(const struct IOMap *enable_lv, const LVPowerState state) {
+  // Assuming the enable LV pin is active-high
+  IOState s = (state == LV_ENABLED) ? IO_HIGH : IO_LOW;
+  io_set_state(enable_lv, s);
+
+  io_set_dir(enable_lv, PIN_OUT);
+}
+
 static bool prv_poll_status(const struct PowerConfig *pwr) {
   uint16_t voltage = adc12_sample(pwr->adc, pwr->measure);
 

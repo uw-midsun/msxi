@@ -22,7 +22,7 @@ static struct StateMachine sm = {
 
 static void prv_reset_peripherals() {
   // Enable LV power
-  io_set_state(&enable_lv, IO_HIGH);
+  power_set_lv(&enable_lv, LV_ENABLED);
 
   // Reset relays and LEDs
   mc_init(&mc_config);
