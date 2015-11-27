@@ -20,12 +20,8 @@ struct MotorController {
 struct MCConfig {
   const struct ADC12Config *adc;
   struct IOMap enable_measure;
-  struct {
-    uint8_t precharge;
-    uint8_t discharge;
-  } max_time; // In seconds
   uint8_t num_mc;
-  struct MotorController *mc[];
+  const struct MotorController *mc[];
 };
 
 typedef enum {
