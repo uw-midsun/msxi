@@ -75,15 +75,6 @@ struct AFEConfig {
 bool afe_init(struct AFEConfig *ac);
 
 
-/**
- * Reads the conversion of one channel
- * @param  afe                pointer to the AFEConfig
- * @param  device_addr        the device address
- * @param  register_addr      the register to read (either READ_CELL_VOLTAGE_X or READ_AUX_ADC_X)
- * @return                    ADC code, or 0 if an error occurred (error flag in afe also raised)
- */
-uint16_t afe_read_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16_t register_addr);
-
 
 /**
  * Read back the data at a register

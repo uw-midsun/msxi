@@ -112,37 +112,34 @@ static uint32_t prv_write(struct AFEConfig *afe, uint16_t device_addr, uint16_t 
 }
 
 
-bool afe_init(struct AFEConfig *afe) {
-  // initialize CRC table into RAM
-  prv_crc8_build_table(afe);
-
-  // initialize SPI
-  bool status = spi_init(afe->spi_config);
-
-  // Example 1: Initializing the AD7280A in datasheet
-  // initialize devices in daisy chain
-  prv_write(afe, AFE_DEVICEADDR_MASTER, AFE_CONTROL_LB, true, CTRL_LB_DSY_CHN_RDBCK_ENBL | CTRL_LB_LOCK_DEVICE_ADDR);
-
-  // configure the read register for all devices
-  prv_write(afe, AFE_DEVICEADDR_MASTER, AFE_READ, true, READ_CONTROL_LB);
-
-  // read master address by writing to the highest available address
-  uint32_t reply = prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_VOLTAGE_1, false, READ_CELL_VOLTAGE_1);
-
-  // read back all slave device ids
-  int i;
-  for (i = 0; i < afe->devices; ++i) {
-    reply = prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_VOLTAGE_1, false, READ_CELL_VOLTAGE_1);
-  }
-
-  // initialize crc_error
-  afe->crc_error = false;
-
-  return status;
+/**
+ * Convert the cell voltage input data to a voltage value
+ * @param   data              the data to convert to a mV value
+ */
+static uint16_t prv_convert_voltage(uint16_t data) {
+  // see Transfer Function (p. 16/48)
+  return (data * 4096) / 4;
 }
 
 
-uint16_t afe_read_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16_t register_addr) {
+/**
+ * Convert the auxiliary ADC input data to a voltage value
+ */
+static uint16_t prv_convert_adc(uint16_t data) {
+  // see Transfer Function (p. 16/48)
+  return (data * 4096) / 5;
+}
+
+
+
+/**
+ * Reads the conversion of one channel
+ * @param  afe                pointer to the AFEConfig
+ * @param  device_addr        the device address
+ * @param  register_addr      the register to read (either READ_CELL_VOLTAGE_X or READ_AUX_ADC_X)
+ * @return                    ADC code, or 0 if an error occurred (error flag in afe also raised)
+ */
+uint16_t prv_read_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16_t register_addr) {
   // Example 4 in datasheet
   // write the register address to be read from to the read register
   prv_write(afe, device_addr, AFE_READ, false, register_addr);
@@ -188,6 +185,49 @@ uint16_t afe_read_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16
     // crc_error flag will have been raised
     return 0;
   }
+}
+
+
+bool afe_init(struct AFEConfig *afe) {
+  // initialize CRC table into RAM
+  prv_crc8_build_table(afe);
+
+  // initialize SPI
+  bool status = spi_init(afe->spi_config);
+
+  // Example 1: Initializing the AD7280A in datasheet
+  // initialize devices in daisy chain
+  prv_write(afe, AFE_DEVICEADDR_MASTER, AFE_CONTROL_LB, true, CTRL_LB_DSY_CHN_RDBCK_ENBL | CTRL_LB_LOCK_DEVICE_ADDR);
+
+  // configure the read register for all devices
+  prv_write(afe, AFE_DEVICEADDR_MASTER, AFE_READ, true, READ_CONTROL_LB);
+
+  // read master address by writing to the highest available address
+  uint32_t reply = prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_VOLTAGE_1, false, READ_CELL_VOLTAGE_1);
+
+  // read back all slave device ids
+  int i;
+  for (i = 0; i < afe->devices; ++i) {
+    reply = prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_VOLTAGE_1, false, READ_CELL_VOLTAGE_1);
+  }
+
+  // initialize crc_error
+  afe->crc_error = false;
+
+  return status;
+}
+
+
+uint16_t afe_voltage_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16_t cell) {
+  uint16_t result = prv_read_conversion(afe, device_addr, cell);
+
+  return prv_convert_voltage(result);
+}
+
+uint16_t afe_aux_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16_t aux_adc) {
+  uint16_t result = prv_read_conversion(afe, device_addr, aux_adc);
+
+  return prv_convert_adc(result);
 }
 
 
