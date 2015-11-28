@@ -42,6 +42,11 @@
 #define AFE_DEVICEADDR_MASTER           0               // master device in daisy chain
 
 
+//
+#define CELL_THRESH_RES                 16              // 16mV
+#define AUX_THRESH_RES                  16              // 19mV
+
+
 // structures
 struct Threshold {
   uint16_t voltage_high;
@@ -60,8 +65,8 @@ struct AFEConfig {
   uint8_t crc_table[256];               // crc-8 lookup table
   bool crc_error;                       // crc read calculation status
   uint8_t rdbck_delay;                  // readback delay (usually)
-  struct Threshold *charge;
-  struct Threshold *discharge;
+  struct Threshold charge;
+  struct Threshold discharge;
 };
 
 
@@ -84,6 +89,26 @@ bool afe_init(struct AFEConfig *ac);
  * @return                    the value read back from the register
  */
 uint32_t afe_read_register(struct AFEConfig *afe, uint16_t device_addr, uint16_t register_addr);
+
+
+/**
+ * Read the AUX ADC conversion on one channel
+ * @param  afe                pointer to the AFEConfig
+ * @param  device_addr        the device address (0 - # of slave devices)
+ * @param  aux_adc            the AUX ADC to read from (0 - 5)
+ * @return                    converted ADC value
+ */
+uint16_t afe_aux_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16_t aux_adc);
+
+
+/**
+ * Read the Voltage ADC conversion on one channel
+ * @param  afe                pointer to the AFEConfig
+ * @param  device_addr        the device address (0 - # of slave devices)
+ * @param  aux_adc            the AUX ADC to read from (0 - 5)
+ * @return                    converted Voltage value in mV
+ */
+uint16_t afe_voltage_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16_t cell);
 
 
 /**

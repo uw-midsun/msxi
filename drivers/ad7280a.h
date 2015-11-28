@@ -26,6 +26,9 @@
 #define AFE_READ                        0x1C            // D7 to D0,  read/write
 #define AFE_CNVST_CONTROL               0x1D            // D7 to D0,  read/write
 
+// Since AFE_CELL_VOLTAGE and AFE_AUX_ADC are offset by 6, we'll use this offset
+#define AFE_ADC_OFFSET                  6
+
 // control registers
 // lower 8 bits
 #define CTRL_LB_DSY_CHN_RDBCK_ENBL                  (1 << 0)    // D0

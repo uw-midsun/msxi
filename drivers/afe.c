@@ -225,7 +225,7 @@ uint16_t afe_voltage_conversion(struct AFEConfig *afe, uint16_t device_addr, uin
 }
 
 uint16_t afe_aux_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16_t aux_adc) {
-  uint16_t result = prv_read_conversion(afe, device_addr, aux_adc);
+  uint16_t result = prv_read_conversion(afe, device_addr, aux_adc + AFE_ADC_OFFSET);
 
   return prv_convert_adc(result);
 }
@@ -270,16 +270,16 @@ bool afe_set_cbx_timer(struct AFEConfig *afe, uint16_t device_addr, uint8_t cbx_
 
 bool afe_set_thresh(struct AFEConfig *afe, struct Threshold *thresh) {
   // write undervoltage threshold
-  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_UNDERVOLTAGE, true, thresh->voltage_low);
+  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_UNDERVOLTAGE, true, thresh->voltage_low / CELL_THRESH_RES);
 
   // write overvoltage threshold
-  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_OVERVOLTAGE, true, thresh->voltage_high);
+  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_OVERVOLTAGE, true, thresh->voltage_high / CELL_THRESH_RES);
 
   // set adc under-temperature threshold
-  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_AUX_ADC_UNDERVOLTAGE, true, thresh->temp_low);
+  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_AUX_ADC_UNDERVOLTAGE, true, thresh->temp_low / AUX_THRESH_RES);
 
   // set adc over-temperature threshold
-  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_AUX_ADC_OVERVOLTAGE, true, thresh->temp_high);
+  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_AUX_ADC_OVERVOLTAGE, true, thresh->temp_high / AUX_THRESH_RES);
   return true;
 }
 
