@@ -8,6 +8,8 @@
 // i.e. All motor controllers begin precharge, then all are checked for power state.
 //      Once all motor controllers are precharged, we open the main relays.
 
+#define MAX_MOTOR_CONTROLLERS 2
+
 struct MotorController {
   struct Relay main;
   struct Relay charge;
@@ -21,7 +23,7 @@ struct MCConfig {
   const struct ADC12Config *adc;
   struct IOMap enable_measure;
   uint8_t num_mc;
-  const struct MotorController *mc[];
+  const struct MotorController *mc[MAX_MOTOR_CONTROLLERS];
 };
 
 typedef enum {

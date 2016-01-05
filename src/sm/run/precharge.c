@@ -10,7 +10,7 @@
 static void prv_init_sm(void);
 static struct State init, precharge, end;
 static struct StateMachine sm = {
-  .default_state = &precharge,
+  .default_state = &init,
   .init = prv_init_sm,
   .id = SM_PRECHARGE
 };
@@ -25,6 +25,7 @@ static void prv_begin_precharge() {
 
 static void prv_check_precharge() {
   delay_seconds(1); // TODO: tune delay
+
   mc_process(&mc_config, mc_precharge_power, PRECHARGE_SUCCESS, PRECHARGE_TIMEOUT);
 }
 
@@ -50,11 +51,11 @@ static void prv_init_sm() {
                                                                prv_handle_fail));
 
   state_init(&precharge, prv_check_precharge);
-  state_add_state_transition(&init, PRECHARGE_TIMEOUT, &precharge); // Loop
-  state_add_state_transition(&init, PRECHARGE_SUCCESS, &end);
+  state_add_state_transition(&precharge, PRECHARGE_TIMEOUT, &precharge); // Loop
+  state_add_state_transition(&precharge, PRECHARGE_SUCCESS, &end);
 
   state_init(&end, prv_end_precharge);
-  state_add_transition(&init, transitions_make_event_data_rule(PRECHARGE_FAIL, NO_GUARD,
+  state_add_transition(&end, transitions_make_event_data_rule(PRECHARGE_FAIL, NO_GUARD,
                                                                prv_handle_fail));
 }
 

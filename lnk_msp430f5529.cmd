@@ -1,5 +1,5 @@
 /* ============================================================================ */
-/* Copyright (c) 2014, Texas Instruments Incorporated                           */
+/* Copyright (c) 2015, Texas Instruments Incorporated                           */
 /*  All rights reserved.                                                        */
 /*                                                                              */
 /*  Redistribution and use in source and binary forms, with or without          */
@@ -44,7 +44,7 @@
 /* -heap   0x0100                                   HEAP AREA SIZE            */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-/* Version: 1.159                                                             */
+/* Version: 1.173                                                             */
 /*----------------------------------------------------------------------------*/
 
 /****************************************************************************/
@@ -230,7 +230,7 @@ SECTIONS
     COMP_B       : { * ( .int60 ) } > INT60 type = VECT_INIT
     UNMI         : { * ( .int61 ) } > INT61 type = VECT_INIT
     SYSNMI       : { * ( .int62 ) } > INT62 type = VECT_INIT
-    .reset       : {}               > RESET  /* MSP430 Reset vector         */ 
+    .reset       : {}               > RESET  /* MSP430 Reset vector         */
 }
 
 /****************************************************************************/

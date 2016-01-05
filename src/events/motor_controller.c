@@ -3,9 +3,9 @@
 
 // Around 90% charged - TODO: verify value
 // LV25-P in: ~9.02mA; out: ~22.56mA -> 120V => 2100mV
-#define SAFE_PRECHARGE_THRESHOLD 1800
-// 0 volts?
-#define SAFE_DISCHARGE_THRESHOLD 0
+#define SAFE_PRECHARGE_THRESHOLD 1741
+// ~5 volts?
+#define SAFE_DISCHARGE_THRESHOLD 24
 
 void prv_init_mc(const struct MotorController *controller) {
   relay_init(&controller->charge);
@@ -25,7 +25,7 @@ void mc_init(const struct MCConfig *config) {
   }
 
   // Don't enable the charge pump circuitry until we need it
-  io_set_state(&config->enable_measure, IO_LOW);
+  io_set_dir(&config->enable_measure, PIN_OUT);
   mc_set_transducer_state(config, TRANSDUCER_DISABLED);
 }
 
@@ -34,8 +34,7 @@ void mc_process(const struct MCConfig *config, SuccessFunc fn,
   int mc = 0;
   bool success = true;
   while (mc < config->num_mc && success) {
-    const struct MotorController *controller = config->mc[mc];
-    success = fn(controller, config->adc);
+    success = fn(config->mc[mc], config->adc);
     mc++;
   }
   EventID e = (success) ? on_success : on_fail;
@@ -49,7 +48,7 @@ bool mc_precharge_begin(const struct MotorController *mc, const struct ADC12Conf
 }
 
 bool mc_precharge_power(const struct MotorController *mc, const struct ADC12Config *adc) {
-  return adc12_sample(adc, mc->charge_index) >= SAFE_PRECHARGE_THRESHOLD;
+  return (adc12_sample(adc, mc->charge_index) >= SAFE_PRECHARGE_THRESHOLD);
 }
 
 bool mc_precharge_end(const struct MotorController *mc, const struct ADC12Config *adc) {
