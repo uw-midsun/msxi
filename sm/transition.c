@@ -9,7 +9,7 @@
 // The pool size should be adjusted to match the total number of rules in the system.
 
 #define NO_ACTION (struct Action) { NULL, 0, DATA }
-#define TRANSITION_POOL_SIZE 20
+#define TRANSITION_POOL_SIZE 100
 
 typedef enum {
   DATA,

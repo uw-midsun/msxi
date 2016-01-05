@@ -10,6 +10,8 @@
 #define GPIO_PORT_P6    0x06
 #define GPIO_PORT_P7    0x07
 #define GPIO_PORT_P8    0x08
+#define GPIO_PORT_P9    0x09
+#define GPIO_PORT_P10   0x0A
 
 #define GPIO_PIN0       (0x01)
 #define GPIO_PIN1       (0x02)

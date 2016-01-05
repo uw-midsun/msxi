@@ -5,6 +5,8 @@
 // This is responsible for managing the car's relays.
 // Since relays are mechanical parts, they can fail.
 //  Thus, the results of these functions must be verified when called.
+// Note that a relay's AUX output is at 12V. We use another relay to switch a 3.3V signal
+//  that corresponds to the AUX output and measure that.
 
 // Relays have two components:
 //  1) The relay itself (open when pin low, closed when pin high) (required)

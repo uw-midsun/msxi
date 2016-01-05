@@ -10,7 +10,7 @@ void sm_framework_init(SMDebugFunc debug_fn) {
 }
 
 void sm_init(struct StateMachine *sm) {
-  if(!sm->initialized) {
+  if (!sm->initialized) {
     sm->init();
     sm->initialized = true;
   }

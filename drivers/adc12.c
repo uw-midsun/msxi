@@ -1,6 +1,6 @@
 #include "adc12.h"
 
-#define ADC_SCALE(x) (((x)*3300)/4095) //0 to 4095 -> 0 to 3300mV
+#define ADC_SCALE(x) (uint16_t)(((x)*(uint32_t)3300)/4096) //0 to 4095 -> 0 to 3300mV
 #define LAST_INDEX (PIN_COUNT - 1)
 #define ADC12_INTERRUPT (1 << (LAST_INDEX)) // ADC12IEx
 #define ADC12_INTERRUPT_VECTOR (((LAST_INDEX) * 2) + 6) // ADC12IFGx
