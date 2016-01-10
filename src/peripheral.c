@@ -15,7 +15,11 @@
 void peripheral_init(void) {
   power_set_lv(&enable_lv, LV_DISABLED);
 
+  __enable_interrupt();
   can_init(&can);
+  // TODO: Figure out why CAN interrupt is firing - attempts to raise event before event pool's up
+  __disable_interrupt();
+
   fail_init(&can);
   sm_debug_init(&sm_debug);
   horn_init(&can, &horn);
@@ -28,6 +32,8 @@ void peripheral_init(void) {
 
   relay_init(&relay_battery);
   relay_init(&relay_solar);
+
+  __enable_interrupt();
 }
 
 #pragma vector = PORT1_VECTOR

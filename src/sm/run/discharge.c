@@ -44,15 +44,20 @@ static void prv_handle_fail(struct StateMachine *sm, uint64_t mc) {
 }
 
 static void prv_init_sm() {
+  // Begin discharge of motor controllers in parallel
+  // Fail on DISCHARGE_FAIL (from failed relay)
   state_init(&init, prv_begin_discharge);
   state_add_state_transition(&init, DISCHARGE_BEGIN, &discharge);
   state_add_transition(&init, transitions_make_event_data_rule(DISCHARGE_FAIL, NO_GUARD,
                                                                prv_handle_fail));
 
+  // Loop until discharge is complete
   state_init(&discharge, prv_check_discharge);
   state_add_state_transition(&init, DISCHARGE_TIMEOUT, &discharge); // Loop
   state_add_state_transition(&init, DISCHARGE_SUCCESS, &end);
 
+  // End discharge
+  // Fail on DISCHARGE_FAIL (from failed relay)
   state_init(&end, prv_end_discharge);
   state_add_transition(&init, transitions_make_event_data_rule(DISCHARGE_FAIL, NO_GUARD,
                                                                prv_handle_fail));

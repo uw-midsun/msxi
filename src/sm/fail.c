@@ -21,6 +21,9 @@ static void prv_kill() {
 }
 
 static void prv_init_sm() {
+  // Kill HV power
+  // Note that all on-failure actions should have taken place already, making this state simple.
+  // POWER_OFF is specified as the exit event so
   state_init(&fail, prv_kill);
 }
 

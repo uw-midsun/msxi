@@ -23,9 +23,11 @@ static void prv_kill() {
 }
 
 static void prv_init_sm() {
+  // Handled by DISCHARGE sub-SM
   state_init_composite(&discharge, discharge_get_sm());
   state_add_state_transition(&discharge, discharge_get_exit_event(), &kill);
 
+  // Kill HV + LV power
   state_init(&kill, prv_kill);
 }
 

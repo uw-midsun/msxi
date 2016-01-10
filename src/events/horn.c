@@ -13,9 +13,6 @@ void horn_init(const struct CANConfig *can, const struct IOMap *horn) {
   // Horn is connected to an active-high MOSFET?
   io_set_state(pin, IO_LOW);
   io_set_dir(pin, PIN_OUT);
-
-  // TODO: should this be moved into the driver?
-  io_configure_interrupt(&can->interrupt_pin, true, EDGE_FALLING);
 }
 
 // Data rule to process and act on CAN messages.
