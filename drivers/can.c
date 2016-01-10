@@ -96,7 +96,7 @@ void can_init(const struct CANConfig *can) {
 
   // TODO: how can we use the interrupt pin?
   io_set_dir(&can->interrupt_pin, PIN_IN);
-  //io_configure_interrupt(&can->interrupt, true, EDGE_FALLING);
+  io_configure_interrupt(&can->interrupt_pin, true, EDGE_FALLING);
 
   // For debug
   uint8_t control_registers[8] = { 0 };

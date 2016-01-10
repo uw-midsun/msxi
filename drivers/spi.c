@@ -18,23 +18,24 @@ struct SPIModule {
     volatile uint8_t *addr;
     uint8_t value;
   } ie;
+  volatile uint8_t *txbuf;
 };
 
 // Since the F247 doesn't support driverlib, this is a static array of all the SPI registers
 // we use across our boards. This emulates what driverlib does.
 #if defined(__MSP430F247__)
 static const struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
-  { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&IFG2, UCA0RXIFG}, {&IE2, UCA0RXIE} },
-  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&IFG2, UCA1RXIFG}, {&IE2, UCA1RXIE} },
-  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&IFG2, UCB0RXIFG}, {&IE2, UCB0RXIE} }
+  { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&IFG2, UCA0RXIFG}, {&IE2, UCA0RXIE}, &UCA0TXBUF },
+  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&IFG2, UCA1RXIFG}, {&IE2, UCA1RXIE}, &UCA1TXBUF },
+  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&IFG2, UCB0RXIFG}, {&IE2, UCB0RXIE}, &UCB0TXBUF }
 };
 #elif defined(__MSP430F5529__) || defined(__MSP430F5438A__)
 static const struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
-  { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&UCA0IFG, UCRXIFG}, {&UCA0IE, UCRXIE} },
-  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&UCA1IFG, UCRXIFG}, {&UCA1IE, UCRXIE} },
-  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&UCB0IFG, UCRXIFG}, {&UCB0IE, UCRXIE} },
+  { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&UCA0IFG, UCRXIFG}, {&UCA0IE, UCRXIE}, &UCA0TXBUF },
+  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&UCA1IFG, UCRXIFG}, {&UCA1IE, UCRXIE}, &UCA1TXBUF },
+  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&UCB0IFG, UCRXIFG}, {&UCB0IE, UCRXIE}, &UCB0TXBUF },
 #if defined(__MSP430_HAS_USCI_B3__)
-  { &UCB3CTL0, &UCB3CTL1, &UCB3BR0, &UCB3BR1, {&UCB3IFG, UCRXIFG}, {&UCB3IE, UCRXIE} }
+  { &UCB3CTL0, &UCB3CTL1, &UCB3BR0, &UCB3BR1, {&UCB3IFG, UCRXIFG}, {&UCB3IE, UCRXIE}, &UCB3TXBUF }
 #endif
 };
 #else
@@ -81,7 +82,7 @@ void spi_transmit(const struct SPIConfig *spi, uint8_t data) {
   results[spi->port].flags |= SPI_EXCHANGE_ERROR;
   results[spi->port].data = 0;
 
-  UCB0TXBUF = data;
+  *SPI_MODULE[spi->port].txbuf = data;
 
   // Enter LPM3 and wait for byte to be recieved -> TX cleared
   __bis_SR_register(LPM3_bits);

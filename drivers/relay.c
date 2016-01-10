@@ -13,8 +13,7 @@ void relay_init(const struct Relay *relay) {
 
 bool relay_set_state(const struct Relay *relay, const RelayState state) {
   io_set_state(&relay->relay, (state == RELAY_OPEN) ? IO_LOW : IO_HIGH);
-  return true;
-  //return (relay_get_status(relay) == state) || (relay_get_status(relay) == RELAY_UNKNOWN);
+  return (relay_get_status(relay) == state) || (relay_get_status(relay) == RELAY_UNKNOWN);
 }
 
 RelayState relay_get_status(const struct Relay *relay) {
