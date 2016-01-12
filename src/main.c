@@ -10,6 +10,7 @@ int main() {
 
   // stack_color();
 
+  __enable_interrupt();
   peripheral_init();
 
   sm_framework_init(sm_debug_alert);
