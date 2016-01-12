@@ -1,17 +1,17 @@
 #pragma once
 #include "io_map.h"
-#include "adc12_a.h"
+//#include "adc12_a.h"
 #include <stdint.h>
 
 // Driver for ADC12_A
 
 typedef enum {
-  PWR_STATUS = 0,
-  MC_CHG_LEFT,
-  MC_DCHG_LEFT,
-  MC_CHG_RIGHT,
-  MC_DCHG_RIGHT,
-  PIN_COUNT
+  ADC12_MEM0 = 0,
+  ADC12_MEM1,
+  ADC12_MEM2,
+  ADC12_MEM3,
+  ADC12_MEM4,
+  ADC12_MEM_MAX
 } ADC12Index;
 
 struct ADC12BufferConfig {
@@ -20,7 +20,9 @@ struct ADC12BufferConfig {
 };
 
 struct ADC12Config {
-  struct ADC12BufferConfig buffers[PIN_COUNT];
+  struct ADC12BufferConfig buffers[ADC12_MEM_MAX];
+  uint8_t count;
+  bool continuous;
 };
 
 void adc12_init(const struct ADC12Config *adc);
