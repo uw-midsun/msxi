@@ -29,13 +29,6 @@ void peripheral_init(void) {
 
   relay_init(&relay_battery);
   relay_init(&relay_solar);
-
-
-  // Testing
-  mc_set_transducer_state(&mc_config, TRANSDUCER_ENABLED);
-  while (true) {
-    volatile uint16_t voltage = adc12_sample(&adc12_a, ADC12_MEM1);
-  }
 }
 
 #pragma vector = PORT1_VECTOR
