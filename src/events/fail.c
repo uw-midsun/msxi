@@ -5,6 +5,14 @@
 
 static const struct CANConfig *can_cfg;
 
+typedef enum {
+  FAIL_RELAY = 1,
+  FAIL_KILLSWITCH,
+  FAIL_HEARTBEAT_BAD,
+  FAIL_MC_BAD,
+  FAIL_DCDC_BAD
+} FailReason;
+
 void fail_init(const struct CANConfig *can) {
   can_cfg = can;
 }

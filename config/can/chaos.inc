@@ -1,0 +1,4 @@
+// CAN(name, id, format)
+// Valid formats: BOOL, UINT8, UINT16, UINT32, UINT64, FLOAT
+CAN(STATE_CHANGE, 0x01, UINT32)
+CAN(FAIL,         0x02, UINT32)

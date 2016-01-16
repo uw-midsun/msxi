@@ -1,40 +1,30 @@
 #pragma once
 
 // CAN message map
+// Devices are prepended with DEVICE_ (ex. DEVICE_CHAOS)
+// Messages are prepended with [device]_ (ex. CHAOS_STATE_CHANGE)
 
 #define CAN_DEVICE_MASK 0x7E0
 #define CAN_MESSAGE_MASK 0x1F
 #define CAN_FULL_MASK (CAN_DEVICE_MASK | CAN_MESSAGE_MASK)
-#define CAN_DEVICE_ID(device) ((device) << 5)
-#define CAN_ID(device, message) (CAN_DEVICE_ID(device) | (message))
-#define CAN_FAIL_CODE(gen, sub) ((gen) << 32 | (sub))
 
+#define DEVICE(name, id) DEVICE_##name = ((id) << 5),
 typedef enum {
-  DEVICE_CHAOS = 0,
-  DEVICE_PLUTUS,
-  DEVICE_THEMIS,
-  DEVICE_LIGHTS,
-  DEVICE_TELEMETRY,
-  DEVICE_LEFT_MC,
-  DEVICE_RIGHT_MC,
-  DEVICE_UNUSED = CAN_FULL_MASK // Used to force max data type
+#include "can/devices.inc"
 } DeviceID;
+#undef DEVICE
 
+#define _CAN(device, name, id, format) device##_##name = ((DEVICE_##device) | (id)),
+#define CAN(name, id, format) _CAN(THEMIS, name, id, format)
 typedef enum {
-  CHAOS_STATE_CHANGE = CAN_ID(DEVICE_CHAOS, 0),
-  CHAOS_FAIL
-} ChaosMessageID;
-
-// Failure codes use the data_u32 type.
-// [1] = General failure code, [0] = Sub-failure code
-typedef enum {
-  FAIL_RELAY = 0,
-  FAIL_KILLSWITCH,
-  FAIL_HEARTBEAT_BAD,
-  FAIL_DCDC_BAD,
-  FAIL_MC_BAD
-} ChaosFailCode;
-
-typedef enum {
-  THEMIS_HORN = CAN_ID(DEVICE_THEMIS, 0),
+#include "can/themis.inc"
 } ThemisMessageID;
+#undef CAN
+
+#define CAN(name, id, format) _CAN(CHAOS, name, id, format)
+typedef enum {
+#include "can/chaos.inc"
+} ChaosMessageID;
+#undef CAN
+
+#undef _CAN
