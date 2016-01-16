@@ -70,7 +70,7 @@ void can_init(const struct CANConfig *can) {
   prv_bit_modify(can, CANCTRL, OPMODE_MASK | CLKOUT_MASK, OPMODE_CONFIG | CLKPRE_4);
 
   // TODO: rewrite with bit_modify?
-  uint8_t registers[] = {
+  static const uint8_t registers[] = {
     0x05, // CNF3: 250 kbps -> PS2 Length = 5
     BTLMODE_CNF3 | SAMPLE_3X | (0x06 << 3) | 0x01, // PS1 Length = 6, PRSEG Length = 1
     0x01, // CNF1: BRP = 1
