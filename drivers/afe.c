@@ -2,11 +2,7 @@
 #include "afe.h"
 #include "spi.h"
 
-/**
- * Computes the XOR remainder for each of the 256 possible CRC-8 bytes, and
- *   stores it in the crc_table field within the AD7280AConfig
- * @param   afe         pointer to the AD7280AConfig
- */
+
 static void prv_crc8_build_table(struct AFEConfig *afe) {
   uint8_t i, k;
   for (i = 0; i < 256; ++i) {
@@ -27,14 +23,6 @@ static void prv_crc8_build_table(struct AFEConfig *afe) {
 }
 
 
-/**
- * CRC calculation for read AND write operations on the bits for a read/write:
- *   - 21 bits for a write
- *   - 22 bits for a read
- * @param   ac          pointer to the AFEConfig
- * @param   message     only the data bits that the CRC is computed on
- * @return: crc remainder term after xor division
- */
 static uint8_t prv_crc8_calculate(struct AFEConfig *afe, uint32_t val) {
   uint8_t crc = afe->crc_table[val >> 16 & 0xFF];
 
@@ -89,15 +77,6 @@ static uint32_t prv_transfer_32_bits(struct AFEConfig *afe, uint32_t msg) {
 }
 
 
-/**
- * CRC Write
- * computes the CRC-8 checksum and then performs the write command on the
- *   device on the SPI bus
- * @param   ac                pointer to the AFEConfig
- * @param   device_addr       the device address
- * @param   register_addr     the register address to write data to
- * @param   data              the data to write to the register
- */
 static uint32_t prv_write(struct AFEConfig *afe, uint16_t device_addr, uint16_t register_addr, bool all, uint16_t data) {
   // flip the bits that crc-8 needs, then "or" the other bits on AFTER
   uint32_t msg = ((uint32_t)device_addr << 27 | (uint32_t)register_addr << 21 | ((data & 0xFF) << 13) | ((uint32_t)all << 12));
@@ -112,33 +91,19 @@ static uint32_t prv_write(struct AFEConfig *afe, uint16_t device_addr, uint16_t 
 }
 
 
-/**
- * Convert the cell voltage input data to a voltage value
- * @param   data              the data to convert to a mV value
- */
 static uint16_t prv_convert_voltage(uint16_t data) {
   // see Transfer Function (p. 16/48)
   return (data * 4096) / 4;
 }
 
 
-/**
- * Convert the auxiliary ADC input data to a voltage value
- */
 static uint16_t prv_convert_adc(uint16_t data) {
   // see Transfer Function (p. 16/48)
+  // todo: derive an equation to convert to temperature (should be linear)
   return (data * 4096) / 5;
 }
 
 
-
-/**
- * Reads the conversion of one channel
- * @param  afe                pointer to the AFEConfig
- * @param  device_addr        the device address
- * @param  register_addr      the register to read (either READ_CELL_VOLTAGE_X or READ_AUX_ADC_X)
- * @return                    ADC code, or 0 if an error occurred (error flag in afe also raised)
- */
 uint16_t prv_read_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16_t register_addr) {
   // Example 4 in datasheet
   // write the register address to be read from to the read register
@@ -223,6 +188,7 @@ uint16_t afe_voltage_conversion(struct AFEConfig *afe, uint16_t device_addr, uin
 
   return prv_convert_voltage(result);
 }
+
 
 uint16_t afe_aux_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16_t aux_adc) {
   uint16_t result = prv_read_conversion(afe, device_addr, aux_adc + AFE_ADC_OFFSET);

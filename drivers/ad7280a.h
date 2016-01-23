@@ -1,12 +1,14 @@
 #pragma once
 
 // Register map
+// cell voltage
 #define AFE_CELL_VOLTAGE_1              0x00            // D11 to D0, read
 #define AFE_CELL_VOLTAGE_2              0x01            // D11 to D0, read
 #define AFE_CELL_VOLTAGE_3              0x02            // D11 to D0, read
 #define AFE_CELL_VOLTAGE_4              0x03            // D11 to D0, read
 #define AFE_CELL_VOLTAGE_5              0x04            // D11 to D0, read
 #define AFE_CELL_VOLTAGE_6              0x05            // D11 to D0, read
+// adc
 #define AFE_AUX_ADC_1                   0x06            // D11 to D0, read
 #define AFE_AUX_ADC_2                   0x07            // D11 to D0, read
 #define AFE_AUX_ADC_3                   0x08            // D11 to D0, read
@@ -134,3 +136,7 @@
 #define AFE_SPI_MAX_CLK                 1000000         // clock speed in Hz
 
 // other configuration
+
+
+
+
