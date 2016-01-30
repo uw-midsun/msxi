@@ -2,9 +2,8 @@
 #include "afe.h"
 #include "spi.h"
 
-
 static void prv_crc8_build_table(struct AFEConfig *afe) {
-  uint8_t i, k;
+  uint16_t i, k;
   for (i = 0; i < 256; ++i) {
     uint8_t crc = i;
 
@@ -50,10 +49,12 @@ static uint32_t prv_transfer_32_bits(struct AFEConfig *afe, uint32_t msg) {
   buffer.data = msg;
 
   // MSP430 uses little Endian
+  spi_select(afe->spi_config);
   spi_transmit(afe->spi_config, buffer.part[3]);
   spi_transmit(afe->spi_config, buffer.part[2]);
   spi_transmit(afe->spi_config, buffer.part[1]);
   spi_transmit(afe->spi_config, buffer.part[0]);
+  spi_deselect(afe->spi_config);
 
   union {
     uint32_t data;
@@ -61,10 +62,12 @@ static uint32_t prv_transfer_32_bits(struct AFEConfig *afe, uint32_t msg) {
   } receive;
 
   // MSP430 uses little Endian
+  spi_select(afe->spi_config);
   receive.part[3] = spi_receive(afe->spi_config);
   receive.part[2] = spi_receive(afe->spi_config);
   receive.part[1] = spi_receive(afe->spi_config);
   receive.part[0] = spi_receive(afe->spi_config);
+  spi_deselect(afe->spi_config);
 
   uint32_t reply = receive.data;
 
@@ -76,20 +79,18 @@ static uint32_t prv_transfer_32_bits(struct AFEConfig *afe, uint32_t msg) {
   return 0;
 }
 
-
 static uint32_t prv_write(struct AFEConfig *afe, uint16_t device_addr, uint16_t register_addr, bool all, uint16_t data) {
   // flip the bits that crc-8 needs, then "or" the other bits on AFTER
-  uint32_t msg = ((uint32_t)device_addr << 27 | (uint32_t)register_addr << 21 | ((data & 0xFF) << 13) | ((uint32_t)all << 12));
+  uint32_t msg = ((uint32_t)device_addr << 27 | (uint32_t)register_addr << 21 | (((uint32_t)data & 0xFF) << 13) | ((uint32_t)all << 12));
 
   if (register_addr == AFE_CONTROL_LB) { // D4 is reserved :)
-    msg |= (1 << 4);
+    msg |= ((uint32_t)1 << 17);
   }
 
   msg |= (prv_crc8_calculate(afe, msg >> 11) << 3) | AFE_WRITE_BIT_PATTERN;
 
   return prv_transfer_32_bits(afe, msg);
 }
-
 
 static uint16_t prv_convert_voltage(uint16_t data) {
   // see Transfer Function (p. 16/48)
@@ -153,7 +154,7 @@ uint16_t prv_read_conversion(struct AFEConfig *afe, uint16_t device_addr, uint16
 }
 
 
-bool afe_init(struct AFEConfig *afe) {
+uint32_t afe_init(struct AFEConfig *afe) {
   // initialize CRC table into RAM
   prv_crc8_build_table(afe);
 
@@ -167,6 +168,9 @@ bool afe_init(struct AFEConfig *afe) {
   // configure the read register for all devices
   prv_write(afe, AFE_DEVICEADDR_MASTER, AFE_READ, true, READ_CONTROL_LB);
 
+  // write to highest available address, and then read back 6 addresses
+  //uint32_t reply = prv_transmit(afe, AFE_DEVICEADDR_ALL, AFE_CELL_VOLTAGE_1, false, READ_CELL_VOLTAGE_1);
+
   // read master address by writing to the highest available address
   uint32_t reply = prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_VOLTAGE_1, false, READ_CELL_VOLTAGE_1);
 
@@ -179,7 +183,7 @@ bool afe_init(struct AFEConfig *afe) {
   // initialize crc_error
   afe->crc_error = false;
 
-  return status;
+  return reply;
 }
 
 

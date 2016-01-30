@@ -75,7 +75,7 @@ struct AFEConfig {
 
 
 // initialize devices in daisy chain
-bool afe_init(struct AFEConfig *ac);
+uint32_t afe_init(struct AFEConfig *ac);
 
 
 // read back the data at a register
