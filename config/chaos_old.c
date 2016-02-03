@@ -7,14 +7,14 @@ const struct SPIConfig spi_a0 = {
   .data_out = { GPIO_PORT_P3, GPIO_PIN4 },
   .data_in = { GPIO_PORT_P3, GPIO_PIN5 },
   .clock_out = { GPIO_PORT_P3, GPIO_PIN0 },
-  .cs = { GPIO_PORT_P1, GPIO_PIN0 },
+  .cs = { GPIO_PORT_P1, GPIO_PIN2 },
   .clock_freq = 500000,
   .port = SPI_A0
 };
 
 const struct CANConfig can = {
   .spi = &spi_a0,
-  .interrupt_pin = { GPIO_PORT_P1, GPIO_PIN1 },
+  .interrupt_pin = { GPIO_PORT_P1, GPIO_PIN5 },
   .rxb0 = {
     .mask = CAN_DEVICE_MASK,
     .filter = {
@@ -61,7 +61,7 @@ const struct ADC12Config adc12_a = {
 };
 
 const struct Relay relay_battery = {
-  .relay = { GPIO_PORT_P3, GPIO_PIN6 },
+  .relay = { GPIO_PORT_P3, GPIO_PIN3 },
   .status = { GPIO_PORT_P3, GPIO_PIN7 }
 }, relay_solar = {
   .relay = { GPIO_PORT_P4, GPIO_PIN0 },
@@ -74,11 +74,11 @@ const struct MotorController mc_left = {
     .status = { GPIO_PORT_P4, GPIO_PIN3 }
   },
   .charge = {
-    .relay = { GPIO_PORT_P5, GPIO_PIN4 },
+    .relay = { GPIO_PORT_P4, GPIO_PIN7 },
     .status = NO_STATUS_PIN
   },
   .discharge = {
-    .relay = { GPIO_PORT_P5, GPIO_PIN5 },
+    .relay = { GPIO_PORT_P5, GPIO_PIN4 },
     .status = NO_STATUS_PIN
   },
   .charge_index = ADC12_MEM1,
@@ -91,11 +91,11 @@ const struct MotorController mc_right = {
     .status = { GPIO_PORT_P4, GPIO_PIN5 }
   },
   .charge = {
-    .relay = { GPIO_PORT_P5, GPIO_PIN6 },
+    .relay = { GPIO_PORT_P5, GPIO_PIN5 },
     .status = NO_STATUS_PIN
   },
   .discharge = {
-    .relay = { GPIO_PORT_P5, GPIO_PIN7 },
+    .relay = { GPIO_PORT_P7, GPIO_PIN2 },
     .status = NO_STATUS_PIN
   },
   .charge_index = ADC12_MEM3,
@@ -104,7 +104,7 @@ const struct MotorController mc_right = {
 
 const struct MCConfig mc_config = {
   .adc = &adc12_a,
-  .enable_measure = { GPIO_PORT_P5, GPIO_PIN1 },
+  .enable_measure = { GPIO_PORT_P6, GPIO_PIN4 },
   .num_mc = 2,
   .mc = {
     &mc_left,
@@ -112,13 +112,13 @@ const struct MCConfig mc_config = {
   }
 };
 
-const struct IOMap plutus_heartbeat = { GPIO_PORT_P1, GPIO_PIN5 },
+const struct IOMap plutus_heartbeat = { GPIO_PORT_P1, GPIO_PIN7 },
                    horn = { GPIO_PORT_P7, GPIO_PIN6 },
-                   enable_lv = { GPIO_PORT_P1, GPIO_PIN3 };
+                   enable_lv = { GPIO_PORT_P7, GPIO_PIN3 };
 
 const struct SMDebugConfig sm_debug = {
   .can = &can,
-  .leds = {
+  .leds = { // TODO: verify this is a row of LEDs LSB-first
     { GPIO_PORT_P8, GPIO_PIN0 },
     { GPIO_PORT_P8, GPIO_PIN1 },
     { GPIO_PORT_P8, GPIO_PIN2 },
@@ -131,7 +131,7 @@ const struct SMDebugConfig sm_debug = {
 };
 
 const struct SwitchInput switches = {
-  .power = { GPIO_PORT_P2, GPIO_PIN0 },
-  .select = { GPIO_PORT_P2, GPIO_PIN1 },
-  .killswitch = { GPIO_PORT_P2, GPIO_PIN2 }
+  .power = { GPIO_PORT_P10, GPIO_PIN7 },
+  .select = { GPIO_PORT_P6, GPIO_PIN5 },
+  .killswitch = { GPIO_PORT_P7, GPIO_PIN5 }
 };
