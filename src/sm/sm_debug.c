@@ -6,7 +6,10 @@ const struct SMDebugConfig *config = NULL;
 void sm_debug_init(const struct SMDebugConfig *debug) {
   config = debug;
 
-  led_init(config->leds, 8);
+  uint8_t i;
+  for (i = 0; i < 8; i++) {
+    led_init(&config->leds[i]);
+  }
 }
 
 // Light up the LED row as the binary representation of the ID.
@@ -14,11 +17,8 @@ static void prv_led_byte(uint8_t id) {
   uint8_t i;
   for (i = 0; i < 8; i++) {
     // Get the value of the bit at i - if it's 0, turn off the LED otherwise turn it on.
-    if (((id >> i) & 1) == 0) {
-      led_off(&config->leds[i]);
-    } else {
-      led_on(&config->leds[i]);
-    }
+    LEDState state = (((id >> i) & 1) == 0) ? LED_OFF : LED_ON;
+    led_set_state(&config->leds[i], state);
   }
 }
 

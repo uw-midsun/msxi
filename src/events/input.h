@@ -7,9 +7,10 @@
 // Power events are generated with the select switch's state as the data value.
 
 struct SwitchInput {
-  struct IOMap power;      // Power toggle button
-  struct IOMap select;     // Running/Charging selection switch
-  struct IOMap killswitch; // Killswitch
+  struct IOMap power;       // Power toggle button
+  struct IOMap power_led;   // Power button LED
+  struct IOMap select;      // Running/Charging selection switch
+  struct IOMap killswitch;  // Killswitch
 };
 
 typedef enum {

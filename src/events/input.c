@@ -1,6 +1,6 @@
 #include "input.h"
 #include "sm/event_queue.h"
-#include <msp430.h>
+#include "drivers/led.h"
 
 typedef enum {
   POWER_CHARGE = IO_LOW,
@@ -9,6 +9,7 @@ typedef enum {
 
 void input_init(const struct SwitchInput *input) {
   io_set_dir(&input->power, PIN_IN);
+  led_init(&input->power_led);
   io_set_dir(&input->select, PIN_IN);
   io_set_dir(&input->killswitch, PIN_IN);
 
@@ -21,6 +22,9 @@ bool input_interrupt(const struct SwitchInput *input) {
   if (io_process_interrupt(&input->power)) {
     // Active-low switch - low = power on, high = power off
     EventID e = (io_get_state(&input->power) == IO_HIGH) ? POWER_OFF : POWER_ON;
+    LEDState state = (io_get_state(&input->power) == IO_HIGH) ? LED_OFF : LED_ON;
+
+    led_set_state(&input->power_led, state);
 
     // Raise an event with the selection switch's state as a data value
     event_raise_isr(e, io_get_state(&input->select));

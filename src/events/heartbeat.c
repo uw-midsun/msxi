@@ -6,7 +6,7 @@ static const struct IOMap *pin = NULL;
 
 void heartbeat_init(const struct IOMap *heartbeat_pin) {
   pin = heartbeat_pin;
-  io_set_dir(pin, PIN_IN);
+  io_set_resistor_dir(pin, PIN_IN, RESISTOR_PULLDOWN);
 
   // Good heartbeat = high
   io_configure_interrupt(pin, true, EDGE_RISING);
