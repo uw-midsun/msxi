@@ -1,5 +1,5 @@
+#include <can/config.h>
 #include "sm_debug.h"
-#include "can_config.h"
 
 const struct SMDebugConfig *config = NULL;
 

@@ -1,5 +1,5 @@
 #include "horn.h"
-#include "can_config.h"
+#include "can/config.h"
 #include <stddef.h>
 
 static const struct CANConfig *can_cfg = NULL;

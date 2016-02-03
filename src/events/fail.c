@@ -1,5 +1,5 @@
 #include "fail.h"
-#include "can_config.h"
+#include "can/config.h"
 #include "drivers/can.h"
 #include "sm/event_queue.h"
 
