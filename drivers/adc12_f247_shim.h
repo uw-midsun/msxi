@@ -1,3 +1,4 @@
+<<<<<<< 005183cccf128506cf3beadc99ce478278320155
 #pragma once
 // This shims the MSP430F5xxx ADC12 registers to the MSP430F247.
 
