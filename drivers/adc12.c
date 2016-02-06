@@ -1,5 +1,6 @@
 #include "adc12.h"
 #include <msp430.h>
+#include "adc12_f247_shim.h"
 
 #define ADC_SCALE(x) (uint16_t)(((x)*(uint32_t)3300)/4096) //0 to 4095 -> 0 to 3300mV
 #define LAST_INDEX (ADC12_MEM_MAX - 1)
