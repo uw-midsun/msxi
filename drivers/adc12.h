@@ -1,6 +1,5 @@
 #pragma once
 #include "io_map.h"
-//#include "adc12_a.h"
 #include <stdint.h>
 
 // Driver for ADC12_A
