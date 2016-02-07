@@ -3,8 +3,8 @@
 
 typedef void (*PotHandler)(struct InputConfig *);
 
-// Scale from [low, high] to [0, 1.0f]
-static uint32_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot) {
+// Scale from [low, high] to [0, scale]
+static uint32_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot, float scale) {
   uint16_t pot_value = adc12_sample(input->adc, pot->input);
   union {
     float f;
@@ -12,8 +12,20 @@ static uint32_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot) {
   } scaled;
 
   scaled.f = ((float)(pot_value - pot->calibration.low) /
-              (pot->calibration.high - pot->calibration.low));
+              (pot->calibration.high - pot->calibration.low)) * scale;
   return scaled.i;
+}
+
+static float prv_scale_gain(struct BrakeInput *brake) {
+  uint8_t numerator;
+  for (numerator = 0; numerator < REGEN_GAIN_RESOLUTION; numerator++) {
+    // Active-low: Only one can be active at a time
+    if (io_get_state(&brake->gain[numerator]) == IO_LOW) {
+      break;
+    }
+  }
+
+  return (float)(numerator + 1) / (REGEN_GAIN_RESOLUTION + 1);
 }
 
 // Called on edges of mechanical and regen brakes.
@@ -26,7 +38,8 @@ static void prv_handle_brake(struct InputConfig *input) {
   if (mech_active || regen_active) {
     // raise brake event
     // [63-32]: mechanical (bool), [31-0]: regen (float)
-    uint32_t regen = prv_scale_pot(input, &input->brake.regen);
+    // Scale from [0, GAIN_MAX]
+    uint32_t regen = prv_scale_pot(input, &brake->regen, prv_scale_gain(brake));
     event_raise(brake->regen.event, ((uint64_t)mech_active << 32) | regen);
   } else {
     // raise no brake event
@@ -37,7 +50,7 @@ static void prv_handle_brake(struct InputConfig *input) {
 static void prv_handle_throttle(struct InputConfig *input) {
   struct PotInput *throttle = &input->throttle;
 
-  event_raise(throttle->event, prv_scale_pot(input, throttle));
+  event_raise(throttle->event, prv_scale_pot(input, throttle, 1.0f));
 }
 
 static void prv_check_pot(struct InputConfig *input, struct PotInput *pot, PotHandler update_fn) {
@@ -61,6 +74,31 @@ static void prv_check_direction(struct DirectionInput *dir) {
   if (state != dir->state) {
     dir->state = state;
     event_raise(dir->event, state);
+  }
+}
+
+void input_init(struct InputConfig *input) {
+  int i;
+  for (i = 0; i < NUM_POLLED_INPUTS; i++) {
+    if (input->polled[i].led.port != NO_LED_PORT) {
+      led_init(&input->polled[i].led);
+    }
+    io_set_dir(&input->polled[i].input, PIN_IN);
+  }
+
+  for (i = 0; i < NUM_ISR_INPUTS; i++) {
+    if (input->isr[i].led.port != NO_LED_PORT) {
+      led_init(&input->isr[i].led);
+    }
+    io_set_dir(&input->isr[i].input, PIN_IN);
+  }
+
+  io_set_dir(&input->direction.forward, PIN_IN);
+  io_set_dir(&input->direction.backward, PIN_IN);
+
+  io_set_dir(&input->brake.mech, PIN_IN);
+  for (i = 0; i < REGEN_GAIN_RESOLUTION; i++) {
+    io_set_dir(&input->brake.gain[i], PIN_IN);
   }
 }
 

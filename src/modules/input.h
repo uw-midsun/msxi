@@ -7,11 +7,12 @@
 
 #define NO_LED_PORT 0
 #define NO_LED_PIN (struct IOMap) { NO_STATUS_PORT, 0 }
+#define REGEN_GAIN_RESOLUTION 6
 
 typedef enum {
   POLLED_INPUT_OFFSET,
-  CRUISE_CHANGE,
-  CRUISE_DIR_CHANGE,
+  CRUISE_DIR_POS,
+  CRUISE_DIR_NEG,
   POLLED_INPUT_MAX
 } PolledInputEvent;
 #define NUM_POLLED_INPUTS (POLLED_INPUT_MAX - POLLED_INPUT_OFFSET)
@@ -23,6 +24,7 @@ typedef enum {
   HAZARD_CHANGE,
   HORN_CHANGE,
   IGNITION_CHANGE,
+  CRUISE_CHANGE,
   ISR_INPUT_MAX
 } InterruptInputEvent;
 #define NUM_ISR_INPUTS (ISR_INPUT_MAX - ISR_INPUT_OFFSET)
@@ -53,6 +55,7 @@ struct PotInput {
 struct BrakeInput {
   struct PotInput regen;
   struct IOMap mech;
+  struct IOMap gain[REGEN_GAIN_RESOLUTION]; // Regen gain: weakest to highest
 };
 
 struct DirectionInput {
