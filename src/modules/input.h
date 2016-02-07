@@ -5,6 +5,9 @@
 
 // Controls input - event generator
 
+#define NO_LED_PORT 0
+#define NO_LED_PIN (struct IOMap) { NO_STATUS_PORT, 0 }
+
 typedef enum {
   POLLED_INPUT_OFFSET,
   CRUISE_CHANGE,
@@ -37,26 +40,19 @@ struct Input {
   IOState state; // Used for polled switches
 };
 
-// TODO: Combine throttle + brake
-struct BrakeInput {
+struct PotInput {
   EventID event;
-  struct IOMap mech;
   struct {
     uint16_t high;
     uint16_t low;
   } calibration;
-  ADC12Index regen;
-  bool regen_state; // Last state of regen brake
+  ADC12Index input;
+  bool state;
 };
 
-struct ThrottleInput {
-  EventID event;
-  struct {
-    uint16_t high;
-    uint16_t low;
-  } calibration;
-  ADC12Index throttle;
-  bool state;
+struct BrakeInput {
+  struct PotInput regen;
+  struct IOMap mech;
 };
 
 struct DirectionInput {
@@ -71,7 +67,7 @@ struct InputConfig {
   struct Input polled[NUM_POLLED_INPUTS];
   struct Input isr[NUM_ISR_INPUTS];
   struct BrakeInput brake;
-  struct ThrottleInput throttle;
+  struct PotInput throttle;
   struct DirectionInput direction;
 };
 
