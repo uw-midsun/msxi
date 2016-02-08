@@ -1,22 +1,31 @@
+#include <misc/ratio.h>
 #include "input.h"
 #include "drivers/led.h"
 
 typedef void (*PotHandler)(struct InputConfig *);
 
 // Scale from [low, high] to [0, scale]
-static uint32_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot, float scale) {
+// Return [63-32]: Velocity, [31-0]: Current
+static uint64_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot,
+                              const struct Ratio *scale, float velocity) {
   uint16_t pot_value = adc12_sample(input->adc, pot->input);
   union {
-    float f;
-    uint32_t i;
-  } scaled;
+    uint64_t data;
+    struct {
+      float velocity;
+      float current;
+    };
+  } drive;
 
-  scaled.f = ((float)(pot_value - pot->calibration.low) /
-              (pot->calibration.high - pot->calibration.low)) * scale;
-  return scaled.i;
+  drive.velocity = velocity;
+  const struct Ratio percent = {pot_value - pot->calibration.low,
+                                pot->calibration.high - pot->calibration.low};
+  const struct Ratio current = ratio32_mult(&percent, scale);
+  drive.current = ratio_to(&current);
+  return drive.data;
 }
 
-static float prv_scale_gain(struct BrakeInput *brake) {
+static struct Ratio prv_scale_gain(struct BrakeInput *brake) {
   uint8_t numerator;
   for (numerator = 0; numerator < REGEN_GAIN_RESOLUTION; numerator++) {
     // Active-low: Only one can be active at a time
@@ -25,76 +34,66 @@ static float prv_scale_gain(struct BrakeInput *brake) {
     }
   }
 
-  return (float)(numerator + 1) / (REGEN_GAIN_RESOLUTION + 1);
+  return (struct Ratio){numerator + 1, REGEN_GAIN_RESOLUTION + 1};
 }
 
-// Called on edges of mechanical and regen brakes.
-// Also called repeatedly when regen braking is active
+// Handles both regen and mechanical braking
+// Regen braking: 0m/s velocity, [0, 1]% current
 static void prv_handle_brake(struct InputConfig *input) {
   struct BrakeInput *brake = &input->brake;
   bool mech_active = (io_get_state(&brake->mech) == IO_LOW),
-       regen_active = brake->regen.state;
+       regen_active = brake->regen.state,
+       brake_active = mech_active || regen_active;
 
-  if (mech_active || regen_active) {
-    // raise brake event
-    // [63-32]: mechanical (bool), [31-0]: regen (float)
-    // Scale from [0, GAIN_MAX]
-    uint32_t regen = prv_scale_pot(input, &brake->regen, prv_scale_gain(brake));
-    event_raise(brake->regen.event, ((uint64_t)mech_active << 32) | regen);
-  } else {
-    // raise no brake event
-    event_raise(brake->regen.event, 0);
+  if (brake_active != brake->active) {
+    brake->active = brake_active;
+    // Raise edge event - 0 = falling, 1 = rising
+    event_raise(brake->edge, brake->active);
   }
+
+  // Limit max regen current with regen gain
+  struct Ratio regen_gain = prv_scale_gain(brake);
+  event_raise(brake->regen.event, prv_scale_pot(input, &brake->regen, &regen_gain, 0.0f));
 }
 
 static void prv_handle_throttle(struct InputConfig *input) {
-  struct PotInput *throttle = &input->throttle;
+  static const float dir_velocity[3] = { 0.0f, 100.0f, -100.0f };
+  static const struct Ratio one = {1, 1};
+  struct ThrottleInput *throttle = &input->throttle;
 
-  event_raise(throttle->event, prv_scale_pot(input, throttle, 1.0f));
+  // TODO: do we need a throttle edge event?
+
+  // 0: Neutral, 1: Forward, 2: Backward
+  uint8_t dir_index = ((io_get_state(&throttle->dir.backward) << 1) |
+                       io_get_state(&throttle->dir.forward));
+  uint64_t command = prv_scale_pot(input, &throttle->pot, &one, dir_velocity[dir_index]);
+  event_raise(throttle->pot.event, command);
 }
 
-static void prv_check_pot(struct InputConfig *input, struct PotInput *pot, PotHandler update_fn) {
+static void prv_check_pot(struct InputConfig *input, struct PotInput *pot, PotHandler handle_fn) {
   uint16_t pot_value = adc12_sample(input->adc, pot->input);
 
   if ((pot->state && (pot_value <= pot->calibration.low)) ||
       (!pot->state && (pot_value >= pot->calibration.high))) {
     // Pot edge
     pot->state = !pot->state;
-    update_fn(input);
-  } else if (pot->state) {
-    // Continued pot updates
-    update_fn(input);
   }
-}
 
-static void prv_check_direction(struct DirectionInput *dir) {
-  // 0000 00xy: x = backward, y = forward -> 0: neutral, 1: forward, 2: reverse
-  uint8_t state = (io_get_state(&dir->backward) << 1) | io_get_state(&dir->forward);
-
-  if (state != dir->state) {
-    dir->state = state;
-    event_raise(dir->event, state);
-  }
+  handle_fn(input);
 }
 
 void input_init(struct InputConfig *input) {
-  int i;
+  uint8_t i;
   for (i = 0; i < NUM_POLLED_INPUTS; i++) {
-    if (input->polled[i].led.port != NO_LED_PORT) {
-      led_init(&input->polled[i].led);
-    }
     io_set_dir(&input->polled[i].input, PIN_IN);
   }
 
   for (i = 0; i < NUM_ISR_INPUTS; i++) {
-    if (input->isr[i].led.port != NO_LED_PORT) {
-      led_init(&input->isr[i].led);
-    }
     io_set_dir(&input->isr[i].input, PIN_IN);
   }
 
-  io_set_dir(&input->direction.forward, PIN_IN);
-  io_set_dir(&input->direction.backward, PIN_IN);
+  io_set_dir(&input->throttle.dir.forward, PIN_IN);
+  io_set_dir(&input->throttle.dir.backward, PIN_IN);
 
   io_set_dir(&input->brake.mech, PIN_IN);
   for (i = 0; i < REGEN_GAIN_RESOLUTION; i++) {
@@ -103,7 +102,7 @@ void input_init(struct InputConfig *input) {
 }
 
 void input_poll(struct InputConfig *input) {
-  int i;
+  uint8_t i;
   for (i = 0; i < NUM_POLLED_INPUTS; i++) {
     struct Input *in = &input->polled[i];
     if (io_get_state(&in->input) != in->state) {
@@ -112,8 +111,7 @@ void input_poll(struct InputConfig *input) {
     }
   }
 
-  prv_check_direction(&input->direction);
-  prv_check_pot(input, &input->throttle, prv_handle_throttle);
+  prv_check_pot(input, &input->throttle.pot, prv_handle_throttle);
   prv_check_pot(input, &input->brake.regen, prv_handle_brake);
 }
 
@@ -123,10 +121,6 @@ void input_process(struct InputConfig *input) {
     struct Input *in = &input->isr[i];
     if (io_process_interrupt(&in->input)) {
       IOState state = io_get_state(&in->input);
-      if (&in->led.port != NO_LED_PORT) {
-        // Inputs are active-low
-        led_set_state(&in->led, (LEDState)state);
-      }
       event_raise(in->event, state);
     }
   }
