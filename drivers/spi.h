@@ -13,6 +13,7 @@ typedef enum {
   SPI_A0 = 0,
   SPI_A1,
   SPI_B0,
+  SPI_B1,
 #if defined(__MSP430_HAS_USCI_B3__)
   SPI_B3,
 #endif
