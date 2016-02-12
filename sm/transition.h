@@ -25,7 +25,7 @@ void transitions_init(void);
 
 // Processes all the transition rules in the list, executing the first rule that matches.
 // Returns true if a rule was matched, false if not.
-bool transitions_process(struct Transitions *transitions, struct StateMachine *sm, struct Event e);
+bool transitions_process(struct Transitions *transitions, struct StateMachine *sm, struct Event *e);
 
 // Returns a pointer-based transition rule.
 struct TransitionRule *transitions_make_pointer_rule(uint16_t event, Guard guard,

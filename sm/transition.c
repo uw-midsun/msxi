@@ -52,17 +52,17 @@ void transitions_init(void) {
 
 // Note that actions can either have integer, pointer, or event data.
 bool transitions_process(struct Transitions *transitions, struct StateMachine *sm,
-                         struct Event e) {
+                         struct Event *e) {
   struct TransitionRule *rule = transitions->root;
   while (rule != NULL) {
-    if (rule->event == e.id &&
-      (rule->guard == NO_GUARD || rule->guard(e.data))) {
+    if (rule->event == e->id &&
+      (rule->guard == NO_GUARD || rule->guard(e->data))) {
       if (rule->action.type == POINTER) {
         rule->action.fn_pointer(sm, rule->action.pointer);
       } else if (rule->action.type == DATA){
         rule->action.fn_data(sm, rule->action.data);
       } else if (rule->action.type == EVENT_DATA) {
-        rule->action.fn_edata(sm, e.data);
+        rule->action.fn_edata(sm, e->data);
       }
       return true;
     }

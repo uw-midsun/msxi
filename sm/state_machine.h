@@ -49,7 +49,7 @@ void state_init(struct State *state, EntryFunc entry_fn);
 // Initializes the state as a composite state with sm as its sub-state machine.
 void state_init_composite(struct State *state, struct StateMachine *sm);
 
-void sm_process_event(struct StateMachine *sm, struct Event e);
+void sm_process_event(struct StateMachine *sm, struct Event *e);
 
 // Adds a custom transition rule to the given state.
 void state_add_transition(struct State *state, struct TransitionRule *rule);

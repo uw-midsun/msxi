@@ -48,7 +48,7 @@ void state_init_composite(struct State *state, struct StateMachine *sm) {
 // This means that events will only ever call one action each.
 // If the current state is composite, then events will be processed using its state machine
 //   after its transition rules are checked.
-void sm_process_event(struct StateMachine *sm, struct Event e) {
+void sm_process_event(struct StateMachine *sm, struct Event *e) {
   struct State *current_state = sm->current_state;
   bool matched = transitions_process(&current_state->transitions, sm, e);
   if (!matched && current_state->sub_sm != NULL) {
