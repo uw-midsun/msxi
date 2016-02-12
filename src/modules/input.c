@@ -49,20 +49,18 @@ static void prv_handle_brake(struct InputConfig *input) {
   if (brake_active != brake->active) {
     brake->active = brake_active;
     // Raise edge event - 0 = falling, 1 = rising
-    event_raise(brake->edge, brake->active);
+    event_raise_isr(brake->edge, brake->active);
   }
 
   // Limit max regen current with regen gain
   struct Ratio regen_gain = prv_scale_gain(brake);
-  event_raise(brake->regen.event, prv_scale_pot(input, &brake->regen, &regen_gain, 0.0f));
+  event_raise_isr(brake->regen.event, prv_scale_pot(input, &brake->regen, &regen_gain, 0.0f));
 }
 
 static void prv_handle_throttle(struct InputConfig *input) {
   static const float dir_velocity[3] = { 0.0f, 100.0f, -100.0f };
   static const struct Ratio one = {1, 1};
   struct ThrottleInput *throttle = &input->throttle;
-
-  // TODO: do we need a throttle edge event?
 
   // 0: Neutral, 1: Forward, 2: Backward
   uint8_t dir_index = ((io_get_state(&throttle->dir.backward) << 1) |
@@ -127,7 +125,7 @@ void input_process(struct InputConfig *input) {
       IOState state = io_get_state(&in->input);
       io_toggle_interrupt_edge(&in->input);
       // Active-low switches -> convert to conventional logic (i.e. active = 1)
-      event_raise(in->event, (state == IO_LOW));
+      event_raise_isr(in->event, (state == IO_LOW));
     }
   }
 

@@ -2,6 +2,7 @@
 #include "drivers/io_map.h"
 #include "drivers/adc12.h"
 #include "sm/event_queue.h"
+#include "sm_config.h"
 
 // Controls input - event generator
 // Note that this generates brake and throttle events with formed drive commands as data values.
@@ -11,7 +12,7 @@
 #define REGEN_GAIN_RESOLUTION 6
 
 typedef enum {
-  POLLED_INPUT_OFFSET,
+  POLLED_INPUT_OFFSET = SM_EVENT_OFFSET(POLLED_INPUT),
   CRUISE_DIR_POS,
   CRUISE_DIR_NEG,
   POLLED_INPUT_MAX
@@ -19,7 +20,7 @@ typedef enum {
 #define NUM_POLLED_INPUTS (POLLED_INPUT_MAX - POLLED_INPUT_OFFSET - 1)
 
 typedef enum {
-  ISR_INPUT_OFFSET,
+  ISR_INPUT_OFFSET = SM_EVENT_OFFSET(ISR_INPUT),
   SIG_L_TOGGLE,
   SIG_R_TOGGLE,
   HAZARD_TOGGLE,
@@ -31,7 +32,7 @@ typedef enum {
 #define NUM_ISR_INPUTS (ISR_INPUT_MAX - ISR_INPUT_OFFSET - 1)
 
 typedef enum {
-  BRAKE_CHANGE, // This is both interrupt (mechanical) and polled (regen)
+  BRAKE_CHANGE = SM_EVENT_OFFSET(SPECIAL_INPUT), // Regen (polled) and mechanical (interrupt)
   BRAKE_EDGE,
   THROTTLE_CHANGE,
 } SpecialInputEvent;

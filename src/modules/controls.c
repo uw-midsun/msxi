@@ -50,7 +50,7 @@ static bool prv_override_cruise(uint64_t data) {
   throttle.data = data;
 
   // TODO: Check if this works - goal: if requested throttle > current speed, pass through
-  return (throttle.current > *mc_state_value(&mc_state, MC_CURRENT));
+  return (throttle.current > mc_state_value(&mc_state, MC_AVERAGE, MC_CURRENT));
 }
 
 static void prv_cruise_increment(struct StateMachine *sm, void *ignored) {

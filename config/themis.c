@@ -136,4 +136,25 @@ const struct SignalConfig signals = {
   }
 };
 
-struct MCStateConfig mc_state = { 0 };
+struct MCStateConfig mc_state = {
+  .can = &can,
+  .mc = {
+    {
+      .packet = {
+        {
+          .id = LEFT_MC_VELOCITY
+        }, {
+          .id = LEFT_MC_BUS
+        }
+      }
+    }, {
+      .packet = {
+        {
+          .id = RIGHT_MC_VELOCITY
+        }, {
+          .id = RIGHT_MC_BUS
+        }
+      }
+    }
+  }
+};
