@@ -8,6 +8,8 @@ struct Ratio {
   uint16_t denom;
 };
 
+struct Ratio ratio32_add(const struct Ratio *x, const struct Ratio *y);
+
 struct Ratio ratio32_mult(const struct Ratio *x, const struct Ratio *y);
 
 float ratio_to(const struct Ratio *x);

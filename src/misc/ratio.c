@@ -1,7 +1,7 @@
-#include <misc/ratio.h>
+#include "ratio.h"
 
 struct Ratio ratio32_mult(const struct Ratio *x, const struct Ratio *y) {
-  struct Ratio r = (struct Ratio) {
+  struct Ratio r = {
     .num = x->num * y->num,
     .denom = x->denom
   };

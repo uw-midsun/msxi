@@ -16,7 +16,7 @@ typedef enum {
   CRUISE_DIR_NEG,
   POLLED_INPUT_MAX
 } PolledInputEvent;
-#define NUM_POLLED_INPUTS (POLLED_INPUT_MAX - POLLED_INPUT_OFFSET)
+#define NUM_POLLED_INPUTS (POLLED_INPUT_MAX - POLLED_INPUT_OFFSET - 1)
 
 typedef enum {
   ISR_INPUT_OFFSET,
@@ -28,7 +28,7 @@ typedef enum {
   CRUISE_TOGGLE,
   ISR_INPUT_MAX
 } InterruptInputEvent;
-#define NUM_ISR_INPUTS (ISR_INPUT_MAX - ISR_INPUT_OFFSET)
+#define NUM_ISR_INPUTS (ISR_INPUT_MAX - ISR_INPUT_OFFSET - 1)
 
 typedef enum {
   BRAKE_CHANGE, // This is both interrupt (mechanical) and polled (regen)
@@ -69,7 +69,7 @@ struct ThrottleInput {
 };
 
 struct InputConfig {
-  struct ADC12Config *adc;
+  const struct ADC12Config *adc;
   struct Input polled[NUM_POLLED_INPUTS];
   struct Input isr[NUM_ISR_INPUTS];
   struct BrakeInput brake;
@@ -82,3 +82,7 @@ void input_init(struct InputConfig *input);
 void input_poll(struct InputConfig *input);
 
 void input_process(struct InputConfig *input);
+
+bool input_rising_edge(uint64_t data);
+
+bool input_falling_edge(uint64_t data);

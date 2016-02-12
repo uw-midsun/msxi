@@ -8,7 +8,7 @@ typedef void (*PotHandler)(struct InputConfig *);
 // Return [63-32]: Velocity, [31-0]: Current
 static uint64_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot,
                               const struct Ratio *scale, float velocity) {
-  uint16_t pot_value = adc12_sample(input->adc, pot->input);
+  const uint16_t pot_value = adc12_sample(input->adc, pot->input);
   union {
     uint64_t data;
     struct {
@@ -25,6 +25,7 @@ static uint64_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot,
   return drive.data;
 }
 
+// TODO: use interrupts instead?
 static struct Ratio prv_scale_gain(struct BrakeInput *brake) {
   uint8_t numerator;
   for (numerator = 0; numerator < REGEN_GAIN_RESOLUTION; numerator++) {
@@ -90,12 +91,14 @@ void input_init(struct InputConfig *input) {
 
   for (i = 0; i < NUM_ISR_INPUTS; i++) {
     io_set_dir(&input->isr[i].input, PIN_IN);
+    io_configure_interrupt(&input->isr[i].input, true, EDGE_FALLING); // Active-low switches
   }
 
   io_set_dir(&input->throttle.dir.forward, PIN_IN);
   io_set_dir(&input->throttle.dir.backward, PIN_IN);
 
   io_set_dir(&input->brake.mech, PIN_IN);
+  io_configure_interrupt(&input->isr[i].input, true, EDGE_FALLING); // Active-low switch
   for (i = 0; i < REGEN_GAIN_RESOLUTION; i++) {
     io_set_dir(&input->brake.gain[i], PIN_IN);
   }
@@ -107,7 +110,8 @@ void input_poll(struct InputConfig *input) {
     struct Input *in = &input->polled[i];
     if (io_get_state(&in->input) != in->state) {
       in->state = io_get_state(&in->input);
-      event_raise(in->event, in->state);
+      // Active-low switches -> convert to conventional logic (i.e. active = 1)
+      event_raise(in->event, (in->state == IO_LOW));
     }
   }
 
@@ -121,11 +125,22 @@ void input_process(struct InputConfig *input) {
     struct Input *in = &input->isr[i];
     if (io_process_interrupt(&in->input)) {
       IOState state = io_get_state(&in->input);
-      event_raise(in->event, state);
+      io_toggle_interrupt_edge(&in->input);
+      // Active-low switches -> convert to conventional logic (i.e. active = 1)
+      event_raise(in->event, (state == IO_LOW));
     }
   }
 
   if (io_process_interrupt(&input->brake.mech)) {
+    io_toggle_interrupt_edge(&input->brake.mech);
     prv_handle_brake(input);
   }
+}
+
+bool input_rising_edge(uint64_t data) {
+  return data == 1;
+}
+
+bool input_falling_edge(uint64_t data) {
+  return data == 0;
 }
