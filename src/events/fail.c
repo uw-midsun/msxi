@@ -23,7 +23,7 @@ void fail_add_rule(struct State *state, EventID e, EventDataFunc fn) {
 
 static void prv_handle_fail(uint32_t id, uint64_t code) {
   struct CANMessage msg = {
-    .id = CHAOS_FAIL,
+    .id = CHAOS_FAIL_OCCURRED,
     .data_u32 = { // Little endian - id | code
       (uint32_t)code,
       id

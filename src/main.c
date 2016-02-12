@@ -20,6 +20,6 @@ int main() {
 
   while (true) {
     e = event_get_next();
-    sm_process_event(main_get_sm(), e);
+    sm_process_event(main_get_sm(), &e);
   }
 }

@@ -23,13 +23,8 @@ const struct CANConfig can = {
     }
   },
   .rxb1 = {
-    .mask = CAN_FULL_MASK,
-    .filter = {
-      CAN_FULL_MASK,
-      CAN_FULL_MASK,
-      CAN_FULL_MASK,
-      CAN_FULL_MASK
-    }
+    .mask = CAN_IGNORE_ALL,
+    .filter = { }
   }
 };
 
