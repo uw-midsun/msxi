@@ -220,7 +220,6 @@ uint32_t afe_read_register(struct AFEConfig *afe, uint16_t device_addr, uint16_t
   return 0;
 }
 
-
 bool afe_set_cbx(struct AFEConfig *afe, uint16_t device_addr, uint8_t cells) {
   uint32_t tmp = prv_write(afe, device_addr, AFE_CELL_BALANCE, false, cells);
 
@@ -228,7 +227,7 @@ bool afe_set_cbx(struct AFEConfig *afe, uint16_t device_addr, uint8_t cells) {
   return true;
 }
 
-
+// set CBX using the timer feature
 bool afe_set_cbx_timer(struct AFEConfig *afe, uint16_t device_addr, uint8_t cbx_timer, uint8_t duration) {
   // uses a 71.5s resolution CBx timer
   prv_write(afe, device_addr, cbx_timer, false, duration);
@@ -237,19 +236,25 @@ bool afe_set_cbx_timer(struct AFEConfig *afe, uint16_t device_addr, uint8_t cbx_
   return true;
 }
 
+// set AFE thresholds using predefined values, depending on whether charging/discharging
+bool afe_set_thresh(struct AFEConfig *afe, bool charge) {
+  int high, low;
+  if (charge) {
+    low = afe->v_charge.low;
+    high = afe->v_charge.high;
+  } else {
+    low = afe->v_discharge.low;
+    high = afe->v_discharge.high;
+  }
 
-bool afe_set_thresh(struct AFEConfig *afe, struct Threshold *thresh) {
-  // write undervoltage threshold
-  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_UNDERVOLTAGE, true, thresh->voltage_low / CELL_THRESH_RES);
-
-  // write overvoltage threshold
-  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_OVERVOLTAGE, true, thresh->voltage_high / CELL_THRESH_RES);
+  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_UNDERVOLTAGE, true, low / CELL_THRESH_RES);
+  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_OVERVOLTAGE, true, high / CELL_THRESH_RES);
 
   // set adc under-temperature threshold
-  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_AUX_ADC_UNDERVOLTAGE, true, thresh->temp_low / AUX_THRESH_RES);
+  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_AUX_ADC_UNDERVOLTAGE, true, afe->temp.low / AUX_THRESH_RES);
 
   // set adc over-temperature threshold
-  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_AUX_ADC_OVERVOLTAGE, true, thresh->temp_high / AUX_THRESH_RES);
+  prv_write(afe, AFE_DEVICEADDR_ALL, AFE_AUX_ADC_OVERVOLTAGE, true, afe->temp.high / AUX_THRESH_RES);
   return true;
 }
 

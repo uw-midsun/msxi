@@ -6,12 +6,12 @@
 // driver for the AD7280A Lithium Ion Battery Monitoring System
 
 // register map
-#define INPUT_1                         0x00
-#define INPUT_2                         0x01
-#define INPUT_3                         0x02
-#define INPUT_4                         0x03
-#define INPUT_5                         0x04
-#define INPUT_6                         0x05
+#define INPUT_1                         0x04
+#define INPUT_2                         0x08
+#define INPUT_3                         0x10
+#define INPUT_4                         0x20
+#define INPUT_5                         0x30
+#define INPUT_6                         0x40
 
 // cell balance
 #define AFE_CB1_TIMER                   0x15            // D7 to D0,  read/write
@@ -54,12 +54,8 @@
 
 // structures
 struct Threshold {
-  uint16_t voltage_high;
-  uint16_t voltage_low;
-  //int current_high;
-  //int current_low;
-  uint16_t temp_high;
-  uint16_t temp_low;
+  int high;
+  int low;
 };
 
 
@@ -69,8 +65,9 @@ struct AFEConfig {
   const uint8_t devices;                // devices in daisy chain (1 - 8)
   uint8_t crc_table[256];               // crc-8 lookup table
   bool crc_error;                       // crc read calculation status
-  const struct Threshold charge;
-  const struct Threshold discharge;
+  const struct Threshold v_charge;
+  const struct Threshold v_discharge;
+  const struct Threshold temp;
 };
 
 
@@ -96,13 +93,10 @@ uint16_t afe_voltage_conversion(struct AFEConfig *afe, uint16_t device_addr, uin
 // enable/disable balancing for the cells specified
 bool afe_set_cbx(struct AFEConfig *afe, uint16_t device_addr, uint8_t cells);
 
-
-// set the CBX timer for cell-balancing
+// set CBX using timers
 bool afe_set_cbx_timer(struct AFEConfig *afe, uint16_t device_addr, uint8_t cbx_timer, uint8_t duration);
 
-
-// set the thresholds to the AFE registers
-bool afe_set_thresh(struct AFEConfig *afe, struct Threshold *thresh);
+bool afe_set_thresh(struct AFEConfig *afe, bool charge);
 
 
 // apply a known voltage to verify the operation of the ADC and reference buffer
