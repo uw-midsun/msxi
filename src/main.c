@@ -1,5 +1,6 @@
 #include <msp430.h>
 #include <stdbool.h>
+#include "lights.h"
 
 
 int main(void) {
