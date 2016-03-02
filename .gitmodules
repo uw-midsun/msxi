@@ -1,0 +1,6 @@
+[submodule "config/can"]
+	path = config/can
+	url = https://github.com/uw-midsun/can-config
+[submodule "src/lib"]
+	path = src/lib
+	url = https://github.com/uw-midsun/ms-lib
