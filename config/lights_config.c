@@ -45,7 +45,7 @@ const struct IOMap running_lights[MAX_LIGHTS] = {
   {GPIO_PORT_P1, GPIO_PIN6},
 };
 
-const struct IOMap break_lights[MAX_LIGHTS] = {
+const struct IOMap brake_lights[MAX_LIGHTS] = {
   {GPIO_PORT_P1, GPIO_PIN0},
   {GPIO_PORT_P1, GPIO_PIN2},
 };

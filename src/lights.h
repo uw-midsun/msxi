@@ -1,5 +1,5 @@
 #pragma once
-#include "driver/can.h"
+#include "drivers/can.h"
 
 void lights_init(const struct CANConfig *can);
 

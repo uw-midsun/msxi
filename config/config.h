@@ -16,4 +16,4 @@ extern const struct IOMap right_turn_lights[MAX_LIGHTS];
 
 extern const struct IOMap running_lights[MAX_LIGHTS];
 
-extern const struct IOMap break_lights[MAX_LIGHTS];
+extern const struct IOMap brake_lights[MAX_LIGHTS];

@@ -1,6 +1,7 @@
 #include <msp430.h>
 #include <stdbool.h>
 #include "lights.h"
+#include "config.h"
 
 
 int main(void) {
@@ -8,6 +9,7 @@ int main(void) {
   // TODO Actually use watchdog for what it's designed for
   WDTCTL = WDTPW | WDTHOLD;
   
+  lights_init(&can);
   
   while(true) {
     lights_process_message();
