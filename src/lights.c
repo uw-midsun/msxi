@@ -16,7 +16,7 @@ static const struct CANConfig *can_cfg = NULL;
 static enum LightState current_state = LIGHT_RUNNING; 
 
 static void prv_start_timer() {
-  // Start timer the counts to BLINK_CYCLES
+  // Start timer that counts to BLINK_CYCLES
   TACTL |= TASSEL_2 | MC_2 | ID_3;
   TACCTL0 |= CCIE;
   TACCR0 = BLINK_CYCLES;
