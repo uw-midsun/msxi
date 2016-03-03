@@ -33,7 +33,7 @@ static void prv_stop_timer() {
  */
 static void prv_handle_message(struct CANMessage *msg) {
   IOState state = msg->data == 0 ? IO_LOW : IO_HIGH;
-  int i;
+  uint8_t i;
   switch(msg->id) {
     case THEMIS_SIG_LEFT:
       current_state = msg->data == 0 ? LIGHT_RUNNING : LIGHT_LEFT_TURN;
@@ -64,7 +64,7 @@ static void prv_handle_message(struct CANMessage *msg) {
 
 void lights_init(const struct CANConfig *can) {
   can_cfg = can;
-  int i;
+  uint8_t i;
   
   // Initalize all inital light states
   for(i=0; i < MAX_LIGHTS; ++i) {
@@ -98,7 +98,7 @@ void lights_process_message(void) {
 
 #pragma vector = TIMER0_A0_VECTOR
 __interrupt void TIMER_A0_ISR(void) {
-  int i;
+  uint8_t i;
   // Blink the appropriate lights based on the state
   switch(current_state) {
     case LIGHT_LEFT_TURN:
