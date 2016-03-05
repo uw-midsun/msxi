@@ -26,8 +26,8 @@ struct SPIModule {
 #if defined(__MSP430F247__)
 static const struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
   { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&IFG2, UCA0RXIFG}, {&IE2, UCA0RXIE}, &UCA0TXBUF },
-  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&IFG2, UCA1RXIFG}, {&IE2, UCA1RXIE}, &UCA1TXBUF },
-  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&UC1IFG, UCB0RXIFG}, {&UC1IE, UCB0RXIE}, &UCB0TXBUF },
+  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&UC1IFG, UCA1RXIFG}, {&UC1IE, UCA1RXIE}, &UCA1TXBUF },
+  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&IFG2, UCB0RXIFG}, {&IE2, UCB0RXIE}, &UCB0TXBUF },
   { &UCB1CTL0, &UCB1CTL1, &UCB1BR0, &UCB1BR1, {&UC1IFG, UCB1RXIFG}, {&UC1IE, UCB1RXIE}, &UCB1TXBUF }
 };
 #elif defined(__MSP430F5529__) || defined(__MSP430F5438A__)
@@ -116,9 +116,6 @@ void spi_select(const struct SPIConfig *spi) {
 
 void spi_deselect(const struct SPIConfig *spi) {
   io_set_state(&spi->cs, IO_HIGH);
-
-  // Give some time between SPI commands?
-  // _delay_cycles(50);
 }
 
 static prv_update_data(const uint8_t port, const uint8_t data) {

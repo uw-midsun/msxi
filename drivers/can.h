@@ -4,9 +4,12 @@
 // CAN driver
 // Look at the protocol doc for an explanation of our ID system.
 
+#define NO_RESET_PIN { 0, 0 }
+
 struct CANConfig {
   const struct SPIConfig *spi;
   struct IOMap interrupt_pin;
+  struct IOMap reset_pin; // Optional reset pin
   struct {
     uint16_t mask;
     uint16_t filter[2];
