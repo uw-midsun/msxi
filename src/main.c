@@ -9,7 +9,7 @@ int main(void) {
   // TODO Actually use watchdog for what it's designed for
   WDTCTL = WDTPW | WDTHOLD;
   
-  lights_init(&can);
+  lights_init();
   
   while(true) {
     lights_process_message();
