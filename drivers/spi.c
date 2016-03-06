@@ -26,14 +26,16 @@ struct SPIModule {
 #if defined(__MSP430F247__)
 static const struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
   { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&IFG2, UCA0RXIFG}, {&IE2, UCA0RXIE}, &UCA0TXBUF },
-  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&IFG2, UCA1RXIFG}, {&IE2, UCA1RXIE}, &UCA1TXBUF },
-  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&IFG2, UCB0RXIFG}, {&IE2, UCB0RXIE}, &UCB0TXBUF }
+  { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&UC1IFG, UCA1RXIFG}, {&UC1IE, UCA1RXIE}, &UCA1TXBUF },
+  { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&IFG2, UCB0RXIFG}, {&IE2, UCB0RXIE}, &UCB0TXBUF },
+  { &UCB1CTL0, &UCB1CTL1, &UCB1BR0, &UCB1BR1, {&UC1IFG, UCB1RXIFG}, {&UC1IE, UCB1RXIE}, &UCB1TXBUF }
 };
 #elif defined(__MSP430F5529__) || defined(__MSP430F5438A__)
 static const struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
   { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&UCA0IFG, UCRXIFG}, {&UCA0IE, UCRXIE}, &UCA0TXBUF },
   { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&UCA1IFG, UCRXIFG}, {&UCA1IE, UCRXIE}, &UCA1TXBUF },
   { &UCB0CTL0, &UCB0CTL1, &UCB0BR0, &UCB0BR1, {&UCB0IFG, UCRXIFG}, {&UCB0IE, UCRXIE}, &UCB0TXBUF },
+  { &UCB1CTL0, &UCB1CTL1, &UCB1BR0, &UCB1BR1, {&UCB1IFG, UCRXIFG}, {&UCB1IE, UCRXIE}, &UCB1TXBUF },
 #if defined(__MSP430_HAS_USCI_B3__)
   { &UCB3CTL0, &UCB3CTL1, &UCB3BR0, &UCB3BR1, {&UCB3IFG, UCRXIFG}, {&UCB3IE, UCRXIE}, &UCB3TXBUF }
 #endif
@@ -114,9 +116,6 @@ void spi_select(const struct SPIConfig *spi) {
 
 void spi_deselect(const struct SPIConfig *spi) {
   io_set_state(&spi->cs, IO_HIGH);
-
-  // Give some time between SPI commands?
-  // _delay_cycles(50);
 }
 
 static prv_update_data(const uint8_t port, const uint8_t data) {
@@ -125,16 +124,20 @@ static prv_update_data(const uint8_t port, const uint8_t data) {
 }
 
 // Add a new interrupt vector for each SPI port you want to handle.
-#if defined(__MSP430F247__)
-#pragma vector = USCIAB0RX_VECTOR
-__interrupt void USCIAB0RX_ISR(void) {
-  prv_update_data(SPI_B0, UCB0RXBUF);
-
-  // Exit LPM3 after interrupt processes
-  __bic_SR_register_on_exit(LPM3_bits);
-}
-#elif defined(__MSP430F5529__) || defined(__MSP430F5438A__)
 #define STRINGIFY(str) #str
+#if defined(__MSP430F247__)
+#define SPI_INTERRUPT(x) \
+_Pragma(STRINGIFY(vector=USCIAB##x##RX_VECTOR)) \
+__interrupt void USCIAB##x##RX_ISR(void) { \
+  prv_update_data(SPI_A##x, UCA##x##RXBUF); \
+  prv_update_data(SPI_B##x, UCB##x##RXBUF); \
+  __bic_SR_register_on_exit(LPM3_bits); \
+}
+
+SPI_INTERRUPT(0)
+SPI_INTERRUPT(1)
+
+#elif defined(__MSP430F5529__) || defined(__MSP430F5438A__)
 #define SPI_INTERRUPT(port) \
 _Pragma(STRINGIFY(vector=USCI_##port##_VECTOR)) \
 __interrupt void USCI_##port##_ISR(void) { \
@@ -146,6 +149,7 @@ __interrupt void USCI_##port##_ISR(void) { \
 SPI_INTERRUPT(A0)
 SPI_INTERRUPT(A1)
 SPI_INTERRUPT(B0)
+SPI_INTERRUPT(B1)
 #if defined(__MSP430_HAS_USCI_B3__)
 SPI_INTERRUPT(B3)
 #endif

@@ -64,13 +64,20 @@ static void prv_write_id(const struct CANConfig *can, uint8_t address, uint16_t 
 void can_init(const struct CANConfig *can) {
   spi_init(can->spi);
 
+  if (can->reset_pin.port != 0) {
+    // Reset pin - Active-low
+    io_set_dir(&can->reset_pin, PIN_OUT);
+    io_set_state(&can->reset_pin, IO_HIGH);
+  }
+
   prv_reset(can);
 
   // Set to Config mode, CLKOUT /4
   prv_bit_modify(can, CANCTRL, OPMODE_MASK | CLKOUT_MASK, OPMODE_CONFIG | CLKPRE_4);
 
   // TODO: rewrite with bit_modify?
-  uint8_t registers[] = {
+
+  static const uint8_t registers[] = {
     0x05, // CNF3: 250 kbps -> PS2 Length = 5
     BTLMODE_CNF3 | SAMPLE_3X | (0x06 << 3) | 0x01, // PS1 Length = 6, PRSEG Length = 1
     0x01, // CNF1: BRP = 1
@@ -94,9 +101,8 @@ void can_init(const struct CANConfig *can) {
   // Normal mode
   prv_bit_modify(can, CANCTRL, OPMODE_MASK, OPMODE_NORMAL);
 
-  // TODO: how can we use the interrupt pin?
   io_set_dir(&can->interrupt_pin, PIN_IN);
-  //io_configure_interrupt(&can->interrupt, true, EDGE_FALLING);
+  io_configure_interrupt(&can->interrupt_pin, true, EDGE_FALLING);
 
   // For debug
   uint8_t control_registers[8] = { 0 };
@@ -232,17 +238,17 @@ void can_receive(const struct CANConfig *can, struct CANMessage *msg) {
 
   uint8_t status = prv_read_status(can);
 
+  // Clear the message (in case of error)
+  msg->id = 0x00;
+  msg->data = 0x00;
+  msg->rtr = false;
+
   if (status & STATUS_RX0IF) {
     // RX0 has a message
     prv_receive_buffer(can, &rxb0, msg);
   } else if (status & STATUS_RX1IF) {
     // RX1 has a message
     prv_receive_buffer(can, &rxb1, msg);
-  } else {
-    // wat? Clear the message.
-    msg->id = 0x00;
-    msg->data = 0x00;
-    msg->rtr = false;
   }
 }
 
@@ -257,14 +263,19 @@ void can_check_error(const struct CANConfig *can, struct CANError *error) {
   prv_write(can, REC, &clear, 1);
 }
 
-void can_process_interrupt(const struct CANConfig *can,
+bool can_process_interrupt(const struct CANConfig *can,
                            struct CANMessage *msg, struct CANError *error) {
+  // TODO: flag checking is already handled in can_receive. Can we remove it from here?
   uint8_t flags;
   prv_read(can, CANINTF, &flags, 1);
 
   if (flags & EFLAG) {
     can_check_error(can, error);
-  } else if (flags & (RX0IE | RX1IE)) {
+  }
+
+  if (flags & (RX0IE | RX1IE)) {
     can_receive(can, msg);
   }
+
+  return (flags & (EFLAG | RX0IE | RX1IE)) != 0;
 }

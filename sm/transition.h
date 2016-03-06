@@ -10,23 +10,39 @@
 struct StateMachine;
 struct TransitionRule;
 
+struct Transitions {
+  struct TransitionRule *root;
+  struct TransitionRule *last;
+};
+
 typedef void(*DataFunc)(struct StateMachine *, uint16_t);
 typedef void(*PointerFunc)(struct StateMachine *, void *);
-typedef bool(*Guard)();
+typedef void(*EventDataFunc)(struct StateMachine *, uint64_t);
+typedef bool(*Guard)(uint64_t);
 
-// init_transitions() initalizes the transition framework.
-void transitions_init();
+// Initalizes the transition framework
+void transitions_init(void);
 
 // Processes all the transition rules in the list, executing the first rule that matches.
 // Returns true if a rule was matched, false if not.
-bool transitions_process(struct TransitionRule *transitions, struct StateMachine *sm, Event e);
+bool transitions_process(struct Transitions *transitions, struct StateMachine *sm, struct Event *e);
 
 // Returns a pointer-based transition rule.
-struct TransitionRule *transitions_make_pointer_rule(Event e, Guard guard, PointerFunc fn, void *pointer);
+struct TransitionRule *transitions_make_pointer_rule(uint16_t event, Guard guard,
+                                                     PointerFunc fn, void *pointer);
 
 // Returns an integer-based transition rule.
-struct TransitionRule *transitions_make_data_rule(Event e, Guard guard, DataFunc fn, uint16_t data);
+struct TransitionRule *transitions_make_data_rule(uint16_t event, Guard guard,
+                                                  DataFunc fn, uint16_t data);
 
-// Adds the rule to the list of transition rules, returning the new list pointer.
-// Note that rules will be processed in reverse order: that is, rules are processed in LIFO order.
-struct TransitionRule *transitions_add_rule(struct TransitionRule *transitions, struct TransitionRule *next_rule);
+// Returns an event data-based transition rule.
+struct TransitionRule *transitions_make_event_data_rule(uint16_t event, Guard guard,
+                                                        EventDataFunc fn);
+
+// Adds the rule to the list of transition rules
+void transitions_add_rule(struct Transitions *transitions, struct TransitionRule *next_rule);
+
+// Generic Guards
+bool guard_is_zero(uint64_t data);
+
+bool guard_is_one(uint64_t data);

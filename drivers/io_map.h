@@ -21,6 +21,12 @@ typedef enum {
 } IODirection;
 
 typedef enum {
+  RESISTOR_NONE,
+  RESISTOR_PULLUP,
+  RESISTOR_PULLDOWN
+} IOResistor;
+
+typedef enum {
   EDGE_RISING,
   EDGE_FALLING
 } IOInterruptEdge;
@@ -30,6 +36,9 @@ void io_set_dir(const struct IOMap *map, IODirection direction);
 // Enables the pin's secondary function.
 void io_set_peripheral_dir(const struct IOMap *map, IODirection direction);
 
+// Enables the pin's pullup/down resistor.
+void io_set_resistor_dir(const struct IOMap *map, IODirection direction, IOResistor resistor);
+
 void io_set_state(const struct IOMap *map, const IOState state);
 
 void io_toggle(const struct IOMap *map);
@@ -37,3 +46,9 @@ void io_toggle(const struct IOMap *map);
 IOState io_get_state(const struct IOMap *map);
 
 void io_configure_interrupt(const struct IOMap *map, bool enabled, IOInterruptEdge edge);
+
+// Returns whether the specified pin has its interrupt flag set and clears it.
+bool io_process_interrupt(const struct IOMap *map);
+
+// Flips the interrupt edge
+void io_toggle_interrupt_edge(const struct IOMap *map);

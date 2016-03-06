@@ -4,13 +4,12 @@
 // CAN driver
 // Look at the protocol doc for an explanation of our ID system.
 
-#define CAN_DEVICE_MASK 0x7E0
-#define CAN_MESSAGE_MASK 0x1F
-#define CAN_ID(device, message) (((device) << 5) | (message))
+#define NO_RESET_PIN { 0, 0 }
 
 struct CANConfig {
-  struct SPIConfig *spi;
+  const struct SPIConfig *spi;
   struct IOMap interrupt_pin;
+  struct IOMap reset_pin; // Optional reset pin
   struct {
     uint16_t mask;
     uint16_t filter[2];
@@ -27,6 +26,7 @@ struct CANMessage {
     uint32_t data_u32[2];
     uint16_t data_u16[4];
     uint8_t data_u8[8];
+    float data_f[2];
   };
   uint16_t id;
   bool rtr;
@@ -35,7 +35,7 @@ struct CANMessage {
 struct CANError {
   union {
     uint8_t flags;
-    struct { // Little endian ???
+    struct { // Little endian
       bool error_warning:1;
       bool rx_warning:1;
       bool tx_warning:1;
@@ -58,5 +58,6 @@ void can_receive(const struct CANConfig *can, struct CANMessage *msg);
 
 void can_check_error(const struct CANConfig *can, struct CANError *error);
 
-void can_process_interrupt(const struct CANConfig *can,
+// Returns whether we processed anything
+bool can_process_interrupt(const struct CANConfig *can,
                            struct CANMessage *msg, struct CANError *error);
