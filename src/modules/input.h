@@ -46,7 +46,7 @@ struct Input {
 struct PotInput {
   EventID event;
   struct {
-    uint16_t high;
+    uint16_t high; // In mV (0 to 3300)
     uint16_t low;
   } calibration;
   ADC12Index input;
@@ -79,9 +79,10 @@ struct InputConfig {
 
 void input_init(struct InputConfig *input);
 
-// Call at least once every 250ms to generate drive commands within the motor controller's watchdog
+// Call at least once every 250ms within an interrupt
 void input_poll(struct InputConfig *input);
 
+// Call within the appropriate IO interrupts
 void input_process(struct InputConfig *input);
 
 bool input_rising_edge(uint64_t data);

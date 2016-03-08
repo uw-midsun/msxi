@@ -34,7 +34,7 @@ static float target_velocity = 0.0f;
 static void prv_cruise_command(struct StateMachine *sm, uint64_t data) {
   struct CANMessage msg = {
     .id = THEMIS_DRIVE,
-    .data_f = { 1.0f, target_velocity }
+    .data_f = { target_velocity, 1.0f }
   };
 
   can_transmit(&can, &msg);

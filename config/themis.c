@@ -18,6 +18,7 @@ static const struct SPIConfig spi_b0 = {
 const struct CANConfig can = {
   .spi = &spi_b0,
   .interrupt_pin = { GPIO_PORT_P2, GPIO_PIN7 },
+  .reset_pin = NO_RESET_PIN,
   .rxb0 = {
     .mask = CAN_DEVICE_MASK,
     .filter = {
@@ -92,7 +93,7 @@ struct InputConfig input = {
     .regen = {
       .event = BRAKE_CHANGE,
       .calibration = { // TODO
-        .high = 4095,
+        .high = 3300,
         .low = 0
       },
       .input = ADC12_MEM0
@@ -102,7 +103,7 @@ struct InputConfig input = {
     .pot = {
       .event = THROTTLE_CHANGE,
       .calibration = { // TODO
-        .high = 4095,
+        .high = 3300,
         .low = 0
       },
       .input = ADC12_MEM1

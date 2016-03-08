@@ -1,4 +1,4 @@
-#include <misc/ratio.h>
+#include "misc/fraction.h"
 #include "input.h"
 #include "drivers/led.h"
 
@@ -7,7 +7,7 @@ typedef void (*PotHandler)(struct InputConfig *);
 // Scale from [low, high] to [0, scale]
 // Return [63-32]: Velocity, [31-0]: Current
 static uint64_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot,
-                              const struct Ratio *scale, float velocity) {
+                              const Fraction scale, float velocity) {
   const uint16_t pot_value = adc12_sample(input->adc, pot->input);
   union {
     uint64_t data;
@@ -18,15 +18,15 @@ static uint64_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot,
   } drive;
 
   drive.velocity = velocity;
-  const struct Ratio percent = {pot_value - pot->calibration.low,
-                                pot->calibration.high - pot->calibration.low};
-  const struct Ratio current = ratio32_mult(&percent, scale);
-  drive.current = ratio_to(&current);
+  const Fraction percent = fraction_from(pot_value - pot->calibration.low,
+                                         pot->calibration.high - pot->calibration.low);
+  const Fraction current = fraction_mult(percent, scale);
+  drive.current = fraction_to(current);
   return drive.data;
 }
 
 // TODO: use interrupts instead?
-static struct Ratio prv_scale_gain(struct BrakeInput *brake) {
+static Fraction prv_scale_gain(struct BrakeInput *brake) {
   uint8_t numerator;
   for (numerator = 0; numerator < REGEN_GAIN_RESOLUTION; numerator++) {
     // Active-low: Only one can be active at a time
@@ -35,7 +35,7 @@ static struct Ratio prv_scale_gain(struct BrakeInput *brake) {
     }
   }
 
-  return (struct Ratio){numerator + 1, REGEN_GAIN_RESOLUTION + 1};
+  return fraction_from(numerator + 1, REGEN_GAIN_RESOLUTION + 1);
 }
 
 // Handles both regen and mechanical braking
@@ -53,19 +53,19 @@ static void prv_handle_brake(struct InputConfig *input) {
   }
 
   // Limit max regen current with regen gain
-  struct Ratio regen_gain = prv_scale_gain(brake);
-  event_raise_isr(brake->regen.event, prv_scale_pot(input, &brake->regen, &regen_gain, 0.0f));
+  Fraction regen_gain = prv_scale_gain(brake);
+  event_raise_isr(brake->regen.event, prv_scale_pot(input, &brake->regen, regen_gain, 0.0f));
 }
 
 static void prv_handle_throttle(struct InputConfig *input) {
   static const float dir_velocity[3] = { 0.0f, 100.0f, -100.0f };
-  static const struct Ratio one = {1, 1};
   struct ThrottleInput *throttle = &input->throttle;
+  Fraction one = fraction_from_i(1);
 
   // 0: Neutral, 1: Forward, 2: Backward
   uint8_t dir_index = ((io_get_state(&throttle->dir.backward) << 1) |
                        io_get_state(&throttle->dir.forward));
-  uint64_t command = prv_scale_pot(input, &throttle->pot, &one, dir_velocity[dir_index]);
+  uint64_t command = prv_scale_pot(input, &throttle->pot, one, dir_velocity[dir_index]);
   event_raise(throttle->pot.event, command);
 }
 
@@ -118,7 +118,7 @@ void input_poll(struct InputConfig *input) {
 }
 
 void input_process(struct InputConfig *input) {
-  int i;
+  uint16_t i;
   for (i = 0; i < NUM_ISR_INPUTS; i++) {
     struct Input *in = &input->isr[i];
     if (io_process_interrupt(&in->input)) {

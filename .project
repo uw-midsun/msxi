@@ -24,4 +24,11 @@
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>QmathLib.a</name>
+			<type>1</type>
+			<locationURI>PARENT-5-PROJECT_LOC/ti/msp430/MSPWare_2_40_00_37/iqmathlib/libraries/CCS/MPYsoftware/QmathLib.a</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>
