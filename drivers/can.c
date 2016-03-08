@@ -220,7 +220,7 @@ static void prv_receive_buffer(const struct CANConfig *can,
 
   // Little endian
   int i;
-  for (i = 7; i <= 1; i--) {
+  for (i = 7; i >= 0; i--) {
     msg->data_u8[i] = spi_receive(can->spi);
   }
 
