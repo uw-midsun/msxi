@@ -91,7 +91,7 @@ void spi_transmit(const struct SPIConfig *spi, uint8_t data) {
 }
 
 void spi_transmit_array(const struct SPIConfig *spi, const uint8_t *data, uint8_t length) {
-  int i;
+  uint16_t i;
   for (i = 0; i < length; i++) {
     spi_transmit(spi, data[i]);
   }

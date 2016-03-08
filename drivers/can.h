@@ -2,6 +2,7 @@
 #include "spi.h"
 
 // CAN driver
+// This uses an interrupt-driven SPI driver, so CAN messages cannot be processed in an ISR.
 // Look at the protocol doc for an explanation of our ID system.
 
 #define NO_RESET_PIN { 0, 0 }
