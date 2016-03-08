@@ -88,6 +88,7 @@ void lights_init() {
   
   // Initalize all inital light states
   for(i=0; i < MAX_LIGHTS; ++i) {
+	io_set_state(&brake_lights[i], IO_LOW);
     io_set_dir(&brake_lights[i], PIN_OUT);
     io_set_dir(&left_turn_lights[i], PIN_OUT);
     io_set_dir(&right_turn_lights[i], PIN_OUT);
@@ -98,7 +99,7 @@ void lights_init() {
     io_set_state(&running_lights[i], IO_HIGH);
   }
   
-  io_set_dir(&can_interrupt, PIN_IN);
+  io_set_dir(&can.interrupt_pin, PIN_IN);
   
   can_init(&can);
 
@@ -113,7 +114,7 @@ void lights_process_message(void) {
   if(io_get_state(&can.interrupt_pin) == IO_LOW) {
     struct CANMessage msg = {0};
     struct CANError error = {0};
-    while(can_process_interrupt(can_cfg, &msg, &error)) {
+    while(can_process_interrupt(&can, &msg, &error)) {
       prv_handle_message(&msg);
     }
   }

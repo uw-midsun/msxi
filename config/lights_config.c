@@ -2,9 +2,9 @@
 #include "config.h"
 
 const struct SPIConfig spi_b1 = {
-  .data_out = { GPIO_PORT_P5, GPIO_PIN4 },
-  .data_in = { GPIO_PORT_P5, GPIO_PIN5 },
-  .clock_out = { GPIO_PORT_P5, GPIO_PIN0 },
+  .data_out = { GPIO_PORT_P5, GPIO_PIN1 },
+  .data_in = { GPIO_PORT_P5, GPIO_PIN2 },
+  .clock_out = { GPIO_PORT_P5, GPIO_PIN3 },
   .cs = { GPIO_PORT_P5, GPIO_PIN0 },
   .clock_freq = 500000,
   .port = SPI_B1
@@ -13,6 +13,7 @@ const struct SPIConfig spi_b1 = {
 const struct CANConfig can = {
   .spi = &spi_b1,
   .interrupt_pin = { GPIO_PORT_P4, GPIO_PIN7 },
+  .reset_pin = {GPIO_PORT_P4, GPIO_PIN6},
   .rxb0 = {
     .mask = CAN_DEVICE_MASK,
     .filter = {
