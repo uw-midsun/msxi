@@ -1,18 +1,10 @@
 #include <msp430.h>
 #include <stdlib.h>
 #include "lights.h"
-#include "config.h"
 #include "can/config.h"
 #define BLINK_CYCLES 65535
 
-enum LightState {
-  LIGHT_LEFT_TURN,
-  LIGHT_RIGHT_TURN,
-  LIGHT_HAZARD,
-  LIGHT_RUNNING,
-};
-
-static enum LightState current_state = LIGHT_RUNNING;
+static struct LightConfig *config;
 
 static void prv_start_timer() {
   // Start timer that counts to BLINK_CYCLES
@@ -32,76 +24,65 @@ static void prv_stop_timer() {
  */
 static void prv_handle_message(struct CANMessage *msg) {
   IOState state = msg->data == 0 ? IO_LOW : IO_HIGH;
-  uint8_t i;
-  switch(msg->id) {
-    case THEMIS_SIG_LEFT:
-      current_state = msg->data == 0 ? LIGHT_RUNNING : LIGHT_LEFT_TURN;
-      for(i=0; i < MAX_LIGHTS; ++i) {
-        io_set_state(&left_turn_lights[i], state);
-        
-        // Turn on brake signals
-        io_set_state(&left_brake_signal[i], state);
-        io_set_state(&brake_lights[i], state);
+  uint16_t i, j;
+  bool update_brakes = false;
+
+  for (i = 0; i < MAX_SIGNALS; ++i) {
+    if (config->signals[i].can_msg_id == msg->id) {
+      for (j = 0; j < MAX_LIGHTS; ++j) {
+        io_set_state(&config->signals[i].signal_pins[j], state);
       }
-      break;
-    case THEMIS_SIG_RIGHT:
-      current_state = msg->data == 0 ? LIGHT_RUNNING : LIGHT_RIGHT_TURN;
-      for(i=0; i < MAX_LIGHTS; ++i) {
-        io_set_state(&right_turn_lights[i], state);
-        
-        // Turn on brake signals
-        io_set_state(&right_brake_signal[i], state);
-        io_set_state(&brake_lights[i], state);
-      }
-      break;
-    case THEMIS_SIG_HAZARD:
-      current_state = msg->data == 0 ? LIGHT_RUNNING : LIGHT_HAZARD;
-      for(i=0; i < MAX_LIGHTS; ++i) {
-        io_set_state(&left_turn_lights[i], state);
-        io_set_state(&left_turn_lights[i], state);
-        
-        // Turn on brake signals
-        io_set_state(&right_turn_lights[i], state);
-        io_set_state(&right_brake_signal[i], state);
-        io_set_state(&brake_lights[i], state);
-      }
-      break;
-    case THEMIS_SIG_BRAKE:
-      for(i=0; i < MAX_LIGHTS; ++i) {
-        io_set_state(&brake_lights[i], state);
-        
-        // Turn signals take priority over braking
-        // It's in the regulations
-        if(current_state != LIGHT_LEFT_TURN) {
-          io_set_state(&left_brake_signal[i], state);
+
+      if(state == IO_LOW) {
+        /*
+         * When a blinking light turns off we set a flag to update the brake lights
+         * The is required for MSXI since the brake lights are also the rear turn
+         * signals for the car.
+         */
+        if(config->signals[i].type == LIGHT_BLINK) {
+          update_brakes = true;
         }
-        if(current_state != LIGHT_RIGHT_TURN) {
-          io_set_state(&right_brake_signal[i], state);
+        config->signal_states &= ~(1 << i);
+      } else {
+        config->signal_states |= (1 << i);
+      }
+    }
+  }
+
+  /*
+   * If we have been told update the brakes, go through all signals in the
+   * lights config and find any brakes that are supposed to be on right now
+   * and turn the back on so that they stay on when the turn signal turns
+   * off.
+   */
+  if (update_brakes) {
+    for (i = 0; i < MAX_SIGNALS; ++i) {
+      bool signal_state = (config->signal_states >> i) & 0x1;
+      if (config->signals[i].type == LIGHT_BRAKE && signal_state) {
+        for (j = 0; j < MAX_LIGHTS; ++j) {
+          io_set_state(&config->signals[i].signal_pins[j], IO_HIGH);
         }
       }
-      break;
+    }
   }
 }
 
-void lights_init() {
-  uint8_t i;
+void lights_init(struct LightConfig *light_config) {
+  uint16_t i, j;
   
+  config = light_config;
+
   // Initalize all inital light states
-  for(i=0; i < MAX_LIGHTS; ++i) {
-	io_set_state(&brake_lights[i], IO_LOW);
-    io_set_dir(&brake_lights[i], PIN_OUT);
-    io_set_dir(&left_turn_lights[i], PIN_OUT);
-    io_set_dir(&right_turn_lights[i], PIN_OUT);
-    io_set_dir(&running_lights[i], PIN_OUT);
-    io_set_dir(&left_brake_signal[i], PIN_OUT);
-    io_set_dir(&right_brake_signal[i], PIN_OUT);
-    
-    io_set_state(&running_lights[i], IO_HIGH);
+  for (i = 0; i < MAX_SIGNALS; ++i) {
+    for (j = 0; j < MAX_LIGHTS; ++j) {
+    	io_set_state(&config->signals[i].signal_pins[j], IO_LOW);
+    	io_set_dir(&config->signals[i].signal_pins[j], PIN_OUT);
+    }
   }
   
-  io_set_dir(&can.interrupt_pin, PIN_IN);
+  io_set_dir(&config->can.interrupt_pin, PIN_IN);
   
-  can_init(&can);
+  can_init(&config->can);
 
   // Start timer that is used for light blinking
   prv_start_timer();
@@ -111,10 +92,10 @@ void lights_process_message(void) {
   // Check interrupt pin for active low to see if
   // if we have a message.
 
-  if(io_get_state(&can.interrupt_pin) == IO_LOW) {
+  if (io_get_state(&config->can.interrupt_pin) == IO_LOW) {
     struct CANMessage msg = {0};
     struct CANError error = {0};
-    while(can_process_interrupt(&can, &msg, &error)) {
+    while (can_process_interrupt(&config->can, &msg, &error)) {
       prv_handle_message(&msg);
     }
   }
@@ -122,29 +103,15 @@ void lights_process_message(void) {
 
 #pragma vector = TIMER0_A0_VECTOR
 __interrupt void TIMER_A0_ISR(void) {
-  uint8_t i;
+  uint16_t i, j;
   // Blink the appropriate lights based on the state
-  switch(current_state) {
-    case LIGHT_LEFT_TURN:
-      for(i = 0; i < MAX_LIGHTS; ++i) {
-        io_toggle(&left_turn_lights[i]);
-        io_toggle(&left_brake_signal[i]);
+  for (i = 0; i < MAX_SIGNALS; ++i) {
+    bool signal_state = (config->signal_states >> i) & 0x1;
+    // If this light blinks and light is on
+    if (config->signals[i].type == LIGHT_BLINK && signal_state) {
+      for (j = 0; j < MAX_LIGHTS; ++j) {
+        io_toggle(&config->signals[i].signal_pins[j]);
       }
-      break;
-    case LIGHT_RIGHT_TURN:
-      for(i = 0; i < MAX_LIGHTS; ++i) {
-        io_toggle(&right_turn_lights[i]);
-        io_toggle(&right_brake_signal[i]);
-      }
-      break;
-    case LIGHT_HAZARD:
-      for(i = 0; i < MAX_LIGHTS; ++i) {
-        io_toggle(&left_turn_lights[i]);
-        io_toggle(&right_turn_lights[i]);
-        
-        io_toggle(&left_brake_signal[i]);
-        io_toggle(&left_brake_signal[i]);
-      }
-      break;
+    }
   }
 }

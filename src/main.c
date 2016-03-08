@@ -11,7 +11,7 @@ int main(void) {
   
   __enable_interrupt();
 
-  lights_init();
+  lights_init(&light_config);
   
   while(true) {
     lights_process_message();
