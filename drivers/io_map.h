@@ -41,6 +41,9 @@ void io_set_resistor_dir(const struct IOMap *map, IODirection direction, IOResis
 
 void io_set_state(const struct IOMap *map, const IOState state);
 
+// Set the specified port state, masked by the port's pins.
+void io_set_port(const struct IOMap *map, const uint8_t state);
+
 void io_toggle(const struct IOMap *map);
 
 IOState io_get_state(const struct IOMap *map);

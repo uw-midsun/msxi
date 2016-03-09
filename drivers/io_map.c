@@ -74,6 +74,11 @@ void io_set_state(const struct IOMap *map, const IOState state) {
   }
 }
 
+void io_set_port(const struct IOMap *map, const uint8_t state) {
+  *GPIO[map->port].out &= ~map->pins; // Clear affected pins
+  *GPIO[map->port].out |= (state & map->pins); // Set affects pins to state
+}
+
 void io_toggle(const struct IOMap *map) {
   *GPIO[map->port].out ^= map->pins;
 }
