@@ -15,7 +15,7 @@ int main() {
   struct AFEConfig afe = {
     .spi_config = &spi,
     .cnvst = { GPIO_PORT_P10, GPIO_PIN0 },
-    .devices = 6,
+    .slaves = 5,
     .v_charge = { 4224, 2700 },
     .v_discharge = { 4224, 2700 },
     .temp = { -20, 60 }
@@ -102,7 +102,5 @@ int main() {
   }
 }
 
-#pragma vector=TIMER0_A0_VECTOR
-  __interrupt void function(void) {
+#pragma vector=
 
-}
