@@ -176,7 +176,7 @@ uint32_t afe_init(struct AFEConfig *afe) {
 
   // read back all slave device ids
   int i;
-  for (i = 0; i < afe->devices; ++i) {
+  for (i = 0; i < afe->slaves; ++i) {
     reply = prv_write(afe, AFE_DEVICEADDR_ALL, AFE_CELL_VOLTAGE_1, false, READ_CELL_VOLTAGE_1);
   }
 

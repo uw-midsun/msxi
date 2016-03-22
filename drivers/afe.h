@@ -54,17 +54,17 @@
 
 // structures
 struct Threshold {
-  int high;
-  int low;
+  uint16_t high;
+  uint16_t low;
 };
 
 
 struct AFEConfig {
-  struct SPIConfig *spi_config;         // spi configuration
-  const struct IOMap cnvst;             // pin configuration
-  const uint8_t devices;                // devices in daisy chain (1 - 8)
-  uint8_t crc_table[256];               // crc-8 lookup table
-  bool crc_error;                       // crc read calculation status
+  const struct SPIConfig *spi_config;     // spi configuration
+  const struct IOMap cnvst;               // pin configuration
+  const uint8_t slaves;                   // slave devices in daisy chain
+  uint8_t crc_table[256];                 // crc-8 lookup table
+  bool crc_error;                         // crc read calculation status
   const struct Threshold v_charge;
   const struct Threshold v_discharge;
   const struct Threshold temp;
