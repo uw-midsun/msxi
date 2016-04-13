@@ -1,39 +1,43 @@
 #pragma once
 
-// Register map
-// cell voltage
-#define AFE_CELL_VOLTAGE_1              0x00            // D11 to D0, read
-#define AFE_CELL_VOLTAGE_2              0x01            // D11 to D0, read
-#define AFE_CELL_VOLTAGE_3              0x02            // D11 to D0, read
-#define AFE_CELL_VOLTAGE_4              0x03            // D11 to D0, read
-#define AFE_CELL_VOLTAGE_5              0x04            // D11 to D0, read
-#define AFE_CELL_VOLTAGE_6              0x05            // D11 to D0, read
-// adc
-#define AFE_AUX_ADC_1                   0x06            // D11 to D0, read
-#define AFE_AUX_ADC_2                   0x07            // D11 to D0, read
-#define AFE_AUX_ADC_3                   0x08            // D11 to D0, read
-#define AFE_AUX_ADC_4                   0x09            // D11 to D0, read
-#define AFE_AUX_ADC_5                   0x0A            // D11 to D0, read
-#define AFE_AUX_ADC_6                   0x0B            // D11 to D0, read
-#define AFE_SELF_TEST                   0x0C            // D11 to D0, read
-#define AFE_CONTROL_HB                  0x0D            // D15 to D8, read/write
-#define AFE_CONTROL_LB                  0x0E            // D7 to D0,  read/write
-#define AFE_CELL_OVERVOLTAGE            0x0F            // D7 to D0,  read/write
-#define AFE_CELL_UNDERVOLTAGE           0x10            // D7 to D0,  read/write
-#define AFE_AUX_ADC_OVERVOLTAGE         0x11            // D7 to D0,  read/write
-#define AFE_AUX_ADC_UNDERVOLTAGE        0x12            // D7 to D0,  read/write
-#define AFE_ALERT                       0x13            // D7 to D0,  read/write
-#define AFE_CELL_BALANCE                0x14            // D7 to D0,  read/write
-#define AFE_PD_TIMER                    0x1B            // D7 to D0,  read/write
-#define AFE_READ                        0x1C            // D7 to D0,  read/write
-#define AFE_CNVST_CONTROL               0x1D            // D7 to D0,  read/write
+// register name                                    value           position in message, read/write
+#define AFE_CELL_VOLTAGE_1                          0x00            // D11 to D0, read
+#define AFE_CELL_VOLTAGE_2                          0x01            // D11 to D0, read
+#define AFE_CELL_VOLTAGE_3                          0x02            // D11 to D0, read
+#define AFE_CELL_VOLTAGE_4                          0x03            // D11 to D0, read
+#define AFE_CELL_VOLTAGE_5                          0x04            // D11 to D0, read
+#define AFE_CELL_VOLTAGE_6                          0x05            // D11 to D0, read
 
-// Since AFE_CELL_VOLTAGE and AFE_AUX_ADC are offset by 6, we'll use this offset
-#define AFE_ADC_OFFSET                  6
+#define AFE_AUX_ADC_1                               0x06            // D11 to D0, read
+#define AFE_AUX_ADC_2                               0x07            // D11 to D0, read
+#define AFE_AUX_ADC_3                               0x08            // D11 to D0, read
+#define AFE_AUX_ADC_4                               0x09            // D11 to D0, read
+#define AFE_AUX_ADC_5                               0x0A            // D11 to D0, read
+#define AFE_AUX_ADC_6                               0x0B            // D11 to D0, read
+
+#define AFE_SELF_TEST                               0x0C            // D11 to D0, read
+
+#define AFE_CONTROL_HB                              0x0D            // D15 to D8, read/write
+#define AFE_CONTROL_LB                              0x0E            // D7 to D0,  read/write
+
+#define AFE_CELL_OVERVOLTAGE                        0x0F            // D7 to D0,  read/write
+#define AFE_CELL_UNDERVOLTAGE                       0x10            // D7 to D0,  read/write
+
+#define AFE_AUX_ADC_OVERVOLTAGE                     0x11            // D7 to D0,  read/write
+#define AFE_AUX_ADC_UNDERVOLTAGE                    0x12            // D7 to D0,  read/write
+
+#define AFE_ALERT                                   0x13            // D7 to D0,  read/write
+
+#define AFE_CELL_BALANCE                            0x14            // D7 to D0,  read/write
+
+#define AFE_PD_TIMER                                0x1B            // D7 to D0,  read/write
+
+#define AFE_READ                                    0x1C            // D7 to D0,  read/write
+
+#define AFE_CNVST_CONTROL                           0x1D            // D7 to D0,  read/write
 
 // control registers
-// lower 8 bits
-#define CTRL_LB_DSY_CHN_RDBCK_ENBL                  (1 << 0)    // D0
+#define CTRL_LB_DAISY_CHAIN_RB_ENB                  (1 << 0)    // D0
 
 #define CTRL_LB_INCREM_DEVICE_ADDR                  (1 << 1)    // D1
 
@@ -66,10 +70,10 @@
 #define CTRL_HB_CONV_RSLT_READ_6CELL                (2 << 4)    // D12 to D13
 #define CTRL_HB_CONV_RSLT_READ_DSBL                 (3 << 4)    // D12 to D13
 
-#define CTRL_HB_CONV_IN_ALL                         (0 << 6)    // D14 to D15
-#define CTRL_HB_CONV_IN_6CELL_AUX1_3_4              (1 << 6)    // D14 to D15
-#define CTRL_HB_CONV_IN_6CELL                       (2 << 6)    // D14 to D15
-#define CTRL_HB_CONV_IN_SELF_TEST                   (3 << 6)    // D14 to D15
+#define CTRL_HB_CONV_INPUT_ALL                      (0 << 6)    // D14 to D15
+#define CTRL_HB_CONV_INPUT_6CELL_AUX1_3_4           (1 << 6)    // D14 to D15
+#define CTRL_HB_CONV_INPUT_6CELL                    (2 << 6)    // D14 to D15
+#define CTRL_HB_CONV_INPUT_SELF_TEST                (3 << 6)    // D14 to D15
 
 
 // cnvst (conversions) control registers
@@ -86,29 +90,40 @@
 #define READ_CELL_VOLTAGE_4                         (AFE_CELL_VOLTAGE_4 << 2)   // D11 to D0, read
 #define READ_CELL_VOLTAGE_5                         (AFE_CELL_VOLTAGE_5 << 2)   // D11 to D0, read
 #define READ_CELL_VOLTAGE_6                         (AFE_CELL_VOLTAGE_6 << 2)   // D11 to D0, read
+
 #define READ_AUX_ADC_1                              (AFE_AUX_ADC_1 << 2)        // D11 to D0, read
 #define READ_AUX_ADC_2                              (AFE_AUX_ADC_2 << 2)        // D11 to D0, read
 #define READ_AUX_ADC_3                              (AFE_AUX_ADC_3 << 2)        // D11 to D0, read
 #define READ_AUX_ADC_4                              (AFE_AUX_ADC_4 << 2)        // D11 to D0, read
 #define READ_AUX_ADC_5                              (AFE_AUX_ADC_5 << 2)        // D11 to D0, read
 #define READ_AUX_ADC_6                              (AFE_AUX_ADC_6 << 2)        // D11 to D0, read
+
 #define READ_SELF_TEST                              (AFE_SELF_TEST << 2)        // D11 to D0, read
+
 #define READ_CONTROL_HB                             (AFE_CONTROL_HB << 2)       // D15 to D8, read/write
 #define READ_CONTROL_LB                             (AFE_CONTROL_LB << 2)       // D7 to D0,  read/write
+
 #define READ_CELL_OVERVOLTAGE                       (AFE_CELL_OVERVOLTAGE << 2)    // D7 to D0,  read/write
 #define READ_CELL_UNDERVOLTAGE                      (AFE_CELL_UNDERVOLTAGE << 2)    // D7 to D0,  read/write
+
 #define READ_AUX_ADC_OVERVOLTAGE                    (AFE_AUX_ADC_OVERVOLTAGE << 2)    // D7 to D0,  read/write
 #define READ_AUX_ADC_UNDERVOLTAGE                   (AFE_AUX_ADC_UNDERVOLTAGE << 2)    // D7 to D0,  read/write
+
 #define READ_ALERT                                  (AFE_ALERT << 2)    // D7 to D0,  read/write
+
 #define READ_CELL_BALANCE                           (AFE_CELL_BALANCE << 2)    // D7 to D0,  read/write
+
 #define READ_CB1_TIMER                              (AFE_CB1_TIMER << 2)    // D7 to D0,  read/write
 #define READ_CB2_TIMER                              (AFE_CB2_TIMER << 2)    // D7 to D0,  read/write
 #define READ_CB3_TIMER                              (AFE_CB3_TIMER << 2)    // D7 to D0,  read/write
 #define READ_CB4_TIMER                              (AFE_CB4_TIMER << 2)    // D7 to D0,  read/write
 #define READ_CB5_TIMER                              (AFE_CB5_TIMER << 2)    // D7 to D0,  read/write
 #define READ_CB6_TIMER                              (AFE_CB6_TIMER << 2)    // D7 to D0,  read/write
+
 #define READ_PD_TIMER                               (AFE_PD_TIMER << 2)    // D7 to D0,  read/write
+
 #define READ_READ                                   (AFE_READ << 2)    // D7 to D0,  read/write
+
 #define READ_CNVST_CONTROL                          (AFE_CNVST_CONTROL << 2)    // D7 to D0,  read/write
 
 // number of bits that CRC-8 uses when computing a checksum
@@ -120,23 +135,18 @@
 //   P(x) = x^8 + x^5 + x^3 + x^2 + x^1 + x^0
 //        = 0b100101111
 //        = 0x2F
-#define AFE_CRC_POLYNOMIAL_ORDER        8
-#define AFE_CRC_POLYNOMIAL              0x2F
-#define AFE_HIGHBIT                     (1 << (AFE_CRC_POLYNOMIAL_ORDER - 1))
+#define AFE_CRC_POLYNOMIAL_ORDER                    8
+#define AFE_CRC_POLYNOMIAL                          0x2F
+#define AFE_HIGHBIT                                 (1 << (AFE_CRC_POLYNOMIAL_ORDER - 1))
 
 
 // misc bits
-#define AFE_WRITE_BIT_PATTERN           0x2             // required Bits[D2:D0]
-#define AFE_ADC_12_BIT_RES              4095            // AD7280A uses a 12 bit ADC
+#define AFE_WRITE_BIT_PATTERN                       0x2             // required Bits[D2:D0]
+#define AFE_ADC_12_BIT_RES                          4095            // AD7280A uses a 12 bit ADC
 
 // SPI configuration
 // recommended SCLK to ensure correct operation of daisy-chain interface is 1MHz
 //   when reading back from a single device, the SCLK must be lower than 1 MHz
 //   to read back register data up the chain
-#define AFE_SPI_MAX_CLK                 1000000         // clock speed in Hz
-
-// other configuration
-
-
-
-
+#define AFE_SPI_MAX_CLK                             1000000         // clock speed in Hz
+#define AFE_MAX_DAISY_CHAIN                         8               // we can have maximum 8 devices in daisy chain
