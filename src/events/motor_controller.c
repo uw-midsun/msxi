@@ -25,8 +25,8 @@ void mc_init(const struct MCConfig *config) {
   }
 
   // Don't enable the charge pump circuitry until we need it
-  io_set_dir(&config->enable_measure, PIN_OUT);
   mc_set_transducer_state(config, TRANSDUCER_DISABLED);
+  io_set_dir(&config->enable_measure, PIN_OUT);
 }
 
 void mc_process(const struct MCConfig *config, SuccessFunc fn,
