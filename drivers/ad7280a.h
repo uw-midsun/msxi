@@ -1,20 +1,6 @@
 #pragma once
 
 // register name                                    value           position in message, read/write
-#define AFE_CELL_VOLTAGE_1                          0x00            // D11 to D0, read
-#define AFE_CELL_VOLTAGE_2                          0x01            // D11 to D0, read
-#define AFE_CELL_VOLTAGE_3                          0x02            // D11 to D0, read
-#define AFE_CELL_VOLTAGE_4                          0x03            // D11 to D0, read
-#define AFE_CELL_VOLTAGE_5                          0x04            // D11 to D0, read
-#define AFE_CELL_VOLTAGE_6                          0x05            // D11 to D0, read
-
-#define AFE_AUX_ADC_1                               0x06            // D11 to D0, read
-#define AFE_AUX_ADC_2                               0x07            // D11 to D0, read
-#define AFE_AUX_ADC_3                               0x08            // D11 to D0, read
-#define AFE_AUX_ADC_4                               0x09            // D11 to D0, read
-#define AFE_AUX_ADC_5                               0x0A            // D11 to D0, read
-#define AFE_AUX_ADC_6                               0x0B            // D11 to D0, read
-
 #define AFE_SELF_TEST                               0x0C            // D11 to D0, read
 
 #define AFE_CONTROL_HB                              0x0D            // D15 to D8, read/write
