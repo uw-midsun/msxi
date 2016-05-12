@@ -20,12 +20,18 @@ typedef enum {
   SPI_NUM_PORTS
 } SPIPort;
 
+typedef enum {
+  SPI_PARITY_ACTIVE_LOW = 0,
+  SPI_PARITY_ACTIVE_HIGH
+} SPIParity;
+
 struct SPIConfig {
   struct IOMap data_out;  // SIMO
   struct IOMap data_in;   // SOMI
   struct IOMap clock_out; // SCLK
   struct IOMap cs;
   uint32_t clock_freq;
+  SPIParity parity;
   SPIPort port;
 };
 

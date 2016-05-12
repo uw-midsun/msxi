@@ -15,11 +15,6 @@ void sm_init(struct StateMachine *sm) {
     sm->initialized = true;
   }
   sm_change_state(sm, sm->default_state);
-
-  if (sm_debug != NULL) {
-    // Call the debug function if it exists, passing the state machine (for its ID)
-    sm_debug(sm);
-  }
 }
 
 void state_init(struct State *state, EntryFunc entry_fn) {
@@ -51,8 +46,15 @@ void state_init_composite(struct State *state, struct StateMachine *sm) {
 void sm_process_event(struct StateMachine *sm, struct Event *e) {
   struct State *current_state = sm->current_state;
   bool matched = transitions_process(&current_state->transitions, sm, e);
-  if (!matched && current_state->sub_sm != NULL) {
-    sm_process_event(current_state->sub_sm, e);
+  if (current_state->sub_sm != NULL) {
+    if (matched) {
+      if (sm_debug != NULL) {
+        // Event processed - run debug function
+        sm_debug(sm);
+      }
+    } else {
+      sm_process_event(current_state->sub_sm, e);
+    }
   }
 }
 
