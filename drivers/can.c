@@ -25,7 +25,7 @@ static void prv_read(const struct CANConfig *can, uint8_t address, uint8_t *data
   spi_transmit(can->spi, MCP_READ);
   spi_transmit(can->spi, address);
 
-  int i;
+  uint16_t i;
   for (i = 0; i < bytes; i++) {
     data[i] = spi_receive(can->spi);
   }
@@ -220,7 +220,7 @@ static void prv_receive_buffer(const struct CANConfig *can,
 
   // Little endian
   int i;
-  for (i = 7; i <= 1; i--) {
+  for (i = 7; i >= 0; i--) {
     msg->data_u8[i] = spi_receive(can->spi);
   }
 

@@ -56,10 +56,10 @@ bool spi_init(const struct SPIConfig *spi) {
   io_set_peripheral_dir(&spi->data_in, PIN_IN);
   io_set_peripheral_dir(&spi->clock_out, PIN_IN);
 
-  // Stop the module for configuration
-  // Active-low, MSB-first, Master, Synchronous
+  // Stop the module for configuration (MSB-first, master, synchronous)
+  // Default parity is active-low.
   *SPI_MODULE[spi->port].ctl1 |= UCSWRST;
-  *SPI_MODULE[spi->port].ctl0 = UCCKPL | UCMSB | UCMST | UCSYNC;
+  *SPI_MODULE[spi->port].ctl0 = (!spi->parity << 6) | UCMSB | UCMST | UCSYNC;
   *SPI_MODULE[spi->port].ctl1 |= UCSSEL_2; // SMCLK
 
   // Baud Rate Prescaler = /(br0 + br1 * 256)
@@ -91,7 +91,7 @@ void spi_transmit(const struct SPIConfig *spi, uint8_t data) {
 }
 
 void spi_transmit_array(const struct SPIConfig *spi, const uint8_t *data, uint8_t length) {
-  int i;
+  uint16_t i;
   for (i = 0; i < length; i++) {
     spi_transmit(spi, data[i]);
   }

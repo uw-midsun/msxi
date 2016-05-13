@@ -38,7 +38,8 @@ struct StateMachine {
 
 typedef void(*SMDebugFunc)(const struct StateMachine *);
 
-// The debug function will be called whenever a state machine is entered.
+// The debug function will be called when an event is processed. It is passed the state machine
+//  that handled the event.
 void sm_framework_init(SMDebugFunc debug_fn);
 
 // Initializes a state machine by populating it and then switching it to its default state.
