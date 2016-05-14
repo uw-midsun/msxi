@@ -130,6 +130,8 @@
 #define AFE_WRITE_BIT_PATTERN                       0x2             // required Bits[D2:D0]
 #define AFE_ADC_12_BIT_RES                          4095            // AD7280A uses a 12 bit ADC
 
+#define AFE_READ_TRANSFER_VALUE                     0xF800030A
+
 // SPI configuration
 // recommended SCLK to ensure correct operation of daisy-chain interface is 1MHz
 //   when reading back from a single device, the SCLK must be lower than 1 MHz

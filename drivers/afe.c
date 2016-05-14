@@ -92,8 +92,7 @@ static void prv_write(struct AFEConfig *afe,
 
 static uint32_t prv_read_32_bits(struct AFEConfig *afe) {
   // to read data back, we send the 0xF800030A command
-  // prv_write(afe, 0x1F, READ_CELL_VOLTAGE_1, false, )
-  return prv_transfer_32_bits(afe, 0xF800030A);
+  return prv_transfer_32_bits(afe, AFE_READ_TRANSFER_VALUE);
 }
 
 // device addresses are 5 bits configured LSB first
