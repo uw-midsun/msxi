@@ -123,7 +123,7 @@ static uint8_t prv_reverse_bits(uint8_t devaddr) {
 }
 
 static uint16_t prv_convert_voltage(uint32_t msg) {
-  uint16_t adcval = (msg >> 11) & 0xFFF;
+  uint32_t adcval = (msg >> 11) & 0xFFF;
 
   // table 7: adc returns value in [1000mV, 5000mV]
   return ((adcval * 4000) / 4095) + 1000;
@@ -232,8 +232,8 @@ bool afe_set_cbx(struct AFEConfig *afe, uint16_t devaddr, uint8_t cells) {
   return afe->crc_error;
 }
 
-// read back all VIN and AUX inputs
-uint32_t afe_read_all_conversions(struct AFEConfig *afe, uint16_t *vin, uint16_t *aux) {
+// read back all VIN and AUX inputs on all channels
+uint32_t afe_read_all_conversions(struct AFEConfig *afe, struct ConversionResult *cr) {
   // see Example 2 in datasheet
   // prv_transfer_32_bits(afe, 0x038011CA);
   prv_write(afe, AFE_DEVADDR_MASTER, AFE_READ, true, READ_CELL_VOLTAGE_1);
@@ -251,15 +251,15 @@ uint32_t afe_read_all_conversions(struct AFEConfig *afe, uint16_t *vin, uint16_t
 
   // read VIN
   // even if every value is 13 bits, then we need at most
-  // (1 + 8) * (6 * 2^13) => 19 bits of storage
+  // 8 * (6 * 2^13) => 19 bits of storage
   uint8_t dev, input;
   uint32_t reply, vtotal;
   for (dev = 0; dev < afe->devices; ++dev) {
     for (input = 0; input < 6; ++input) {
       reply = prv_read_32_bits(afe);
 
-      vin[dev * 6 + input] = prv_convert_voltage(reply);
-      vtotal += vin[dev * 6 + input];
+      cr->vin[dev * 6 + input] = prv_convert_voltage(reply);
+      vtotal += cr->vin[dev * 6 + input];
     }
   }
   // read AUX
@@ -267,7 +267,7 @@ uint32_t afe_read_all_conversions(struct AFEConfig *afe, uint16_t *vin, uint16_t
     for (input = 0; input < 6; ++input) {
       reply = prv_read_32_bits(afe);
 
-      aux[dev * 6 + input] = prv_convert_temp(reply);
+      cr->aux[dev * 6 + input] = prv_convert_temp(reply);
     }
   }
 

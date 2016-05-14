@@ -30,8 +30,8 @@
 
 
 struct Threshold {
-  uint16_t high;
-  uint16_t low;
+  const uint16_t high;
+  const uint16_t low;
 };
 
 struct AFEConfig {
@@ -39,7 +39,13 @@ struct AFEConfig {
   const struct IOMap *cnvst;
   uint8_t crc_table[256];                 // set by afe_init
   uint8_t devices;                        // set by afe_init
+  const struct Threshold temp;
   bool crc_error;                         // crc read calculation status
+};
+
+struct ConversionResult {
+  uint16_t vin[48];
+  uint16_t aux[48];
 };
 
 uint8_t afe_init(struct AFEConfig *ac);
@@ -48,4 +54,4 @@ uint8_t afe_read_register(struct AFEConfig *afe, uint8_t devaddr, uint8_t regadd
 
 bool afe_set_cbx(struct AFEConfig *afe, uint16_t devaddr, uint8_t cells);
 
-uint32_t afe_read_all_conversions(struct AFEConfig *afe, uint16_t *vin, uint16_t *aux);
+uint32_t afe_read_all_conversions(struct AFEConfig *afe, struct ConversionResult *cr);
