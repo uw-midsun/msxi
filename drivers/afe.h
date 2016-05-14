@@ -48,4 +48,4 @@ uint8_t afe_read_register(struct AFEConfig *afe, uint8_t devaddr, uint8_t regadd
 
 bool afe_set_cbx(struct AFEConfig *afe, uint16_t devaddr, uint8_t cells);
 
-uint8_t afe_read_conversion(struct AFEConfig *afe, uint8_t devaddr, uint8_t regaddr);
+uint32_t afe_read_all_conversions(struct AFEConfig *afe, uint16_t *vin, uint16_t *aux);
