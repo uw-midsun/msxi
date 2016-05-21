@@ -20,7 +20,6 @@
 #define AFE_AUX_ADC_6                               0x0B            // D11 to D0, read
 
 // cell balance registers
-// D0 is a reserved bit
 #define CB1_OUTPUT_ENBL                             (1 << 2)        // D02
 #define CB2_OUTPUT_ENBL                             (1 << 3)        // D03
 #define CB3_OUTPUT_ENBL                             (1 << 4)        // D04

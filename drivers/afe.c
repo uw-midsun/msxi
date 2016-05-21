@@ -243,27 +243,26 @@ uint32_t afe_read_all_conversions(struct AFEConfig *afe, struct ConversionResult
             CTRL_HB_CONV_RSLT_READ_ALL | CTRL_HB_CONV_INPUT_ALL);
 
   // prv_transfer_32_bits(afe, 0x03A0546A);
-  prv_write(afe, AFE_DEVADDR_MASTER, AFE_CNVST_CONTROL, false, CNVST_IN_PULSE);
+  prv_write(afe, AFE_DEVADDR_MASTER, AFE_CNVST_CONTROL, true, CNVST_IN_PULSE);
 
   io_set_state(afe->cnvst, IO_LOW);
   __delay_cycles(50000);
   io_set_state(afe->cnvst, IO_HIGH);
 
-  // read VIN
-  // even if every value is 13 bits, then we need at most
-  // 8 * (6 * 2^13) => 19 bits of storage
   uint8_t dev, input;
   uint32_t reply, vtotal;
   for (dev = 0; dev < afe->devices; ++dev) {
+    // read VIN
+    // even if every value is 13 bits, then we need at most
+    // 8 * (6 * 2^13) => 19 bits of storage
     for (input = 0; input < 6; ++input) {
       reply = prv_read_32_bits(afe);
 
       cr->vin[dev * 6 + input] = prv_convert_voltage(reply);
       vtotal += cr->vin[dev * 6 + input];
     }
-  }
-  // read AUX
-  for (dev = 0; dev < afe->devices; ++dev) {
+
+    // read AUX
     for (input = 0; input < 6; ++input) {
       reply = prv_read_32_bits(afe);
 
