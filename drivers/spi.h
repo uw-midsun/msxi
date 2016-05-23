@@ -21,9 +21,9 @@ typedef enum {
 } SPIPort;
 
 typedef enum {
-  SPI_PARITY_ACTIVE_LOW = 0,
-  SPI_PARITY_ACTIVE_HIGH
-} SPIParity;
+  SPI_POLARITY_ACTIVE_LOW = 0,
+  SPI_POLARITY_ACTIVE_HIGH
+} SPIPolarity;
 
 struct SPIConfig {
   struct IOMap data_out;  // SIMO
@@ -31,7 +31,7 @@ struct SPIConfig {
   struct IOMap clock_out; // SCLK
   struct IOMap cs;
   uint32_t clock_freq;
-  SPIParity parity;
+  SPIPolarity polarity;
   SPIPort port;
 };
 
