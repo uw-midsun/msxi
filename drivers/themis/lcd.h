@@ -19,7 +19,7 @@ typedef enum {
   LINE_3 = 84
 } LCDLine;
 
-void lcd_init(struct LCDConfig *lcd);
+void lcd_init(const struct LCDConfig *lcd);
 
 // Prints the 20-character line on the specified line
 void lcd_println(const struct LCDConfig *lcd, LCDLine line, char *data);

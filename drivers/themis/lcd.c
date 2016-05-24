@@ -1,5 +1,5 @@
-#include "lcd.h"
-#include "st7066.h"
+#include <drivers/themis/lcd.h>
+#include <drivers/themis/st7066.h>
 
 static void prv_clock(const struct LCDConfig *lcd) {
   io_set_state(&lcd->enable, IO_HIGH);
@@ -26,7 +26,7 @@ static void prv_write(const struct LCDConfig *lcd, uint8_t character) {
   prv_clock(lcd);
 }
 
-void lcd_init(struct LCDConfig *lcd) {
+void lcd_init(const struct LCDConfig *lcd) {
   const struct IOMap *io[5] = { &lcd->backlight, &lcd->rs, &lcd->rw, &lcd->enable, &lcd->data };
   uint16_t i;
   for (i = 0; i < 5; i++) {
