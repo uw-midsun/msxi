@@ -11,4 +11,6 @@
 // Returns the target cruise speed in the specified units (See speed.h)
 uint8_t controls_cruise_target(void);
 
+bool controls_cruise_active(void);
+
 struct StateMachine *controls_sm(void);

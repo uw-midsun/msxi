@@ -31,6 +31,7 @@ static void prv_drive_command(struct StateMachine *sm, uint64_t data) {
 // Cruise related functions ->
 static float target_velocity = 0.0f;
 
+#pragma CODE_SECTION(prv_cruise_command, ".run_from_ram")
 static void prv_cruise_command(struct StateMachine *sm, uint64_t data) {
   struct CANMessage msg = {
     .id = THEMIS_DRIVE,
@@ -40,6 +41,7 @@ static void prv_cruise_command(struct StateMachine *sm, uint64_t data) {
   can_transmit(&can, &msg);
 }
 
+#pragma CODE_SECTION(prv_override_cruise, ".run_from_ram")
 static bool prv_override_cruise(uint64_t data) {
   union {
     uint32_t data;
@@ -53,10 +55,12 @@ static bool prv_override_cruise(uint64_t data) {
   return (throttle.current > mc_state_value(&mc_state, MC_AVERAGE, MC_CURRENT));
 }
 
+#pragma CODE_SECTION(prv_cruise_increment, ".run_from_ram")
 static void prv_cruise_increment(struct StateMachine *sm, void *ignored) {
   target_velocity += speed_to(CRUISE_CONTROL_INTERVAL);
 }
 
+#pragma CODE_SECTION(prv_cruise_decrement, ".run_from_ram")
 static void prv_cruise_decrement(struct StateMachine *sm, void *ignored) {
   target_velocity -= speed_to(CRUISE_CONTROL_INTERVAL);
   if (target_velocity < 0) {
@@ -70,6 +74,10 @@ uint8_t controls_cruise_target() {
 }
 
 // <- End cruise
+
+bool controls_cruise_active() {
+  return sm.current_state == &cruise;
+}
 
 // Run SM
 static void prv_init_run_sm() {

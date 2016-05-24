@@ -159,3 +159,18 @@ struct MCStateConfig mc_state = {
     }
   }
 };
+
+
+static const struct LCDConfig lcd = {
+  .backlight = { GPIO_PORT_P3, GPIO_PIN4 },
+  .rs = { GPIO_PORT_P3, GPIO_PIN5 },
+  .rw = { GPIO_PORT_P3, GPIO_PIN6 },
+  .enable = { GPIO_PORT_P3, GPIO_PIN7 },
+  .data = { GPIO_PORT_P4, GPIO_PIN_ALL }
+};
+
+const struct DisplayConfig display = {
+  .lcd = &lcd,
+  .mc_state = &mc_state
+};
+

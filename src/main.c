@@ -4,25 +4,40 @@
 #include "modules/controls.h"
 #include "modules/mc_state.h"
 #include "modules/signals.h"
+#include "modules/display.h"
+#include "drivers/timer.h"
 #include "config.h"
 #include "can/config.h"
+
+static void prv_input_poll(uint16_t elapsed_ms, void *context) {
+  input_poll(&input);
+}
+
+static void prv_display_update(uint16_t elapsed_ms, void *context) {
+  display_update(&display);
+}
 
 int main(void) {
   WDTCTL = WDTPW | WDTHOLD; // Stop watchdog timer
 
   __enable_interrupt();
+  timer_init();
   can_init(&can);
   input_init(&input);
+  display_init(&display);
 
   sm_framework_init(NULL);
   sm_init(controls_sm());
 
-  while (true) {
-    // TODO: Limit update rate to ~100ms?
-    // TODO: Add LCD support
-    input_poll(&input);
+  // Motor controllers expect a command every 250ms
+  timer_delay_periodic(200, prv_input_poll, NULL);
+  // Update the LCD every second
+  timer_delay_periodic(1000, prv_display_update, NULL);
 
-    struct Event e = event_get_next(); // TODO: add LPM support to events
+  while (true) {
+    timer_process();
+
+    struct Event e = event_get_next();
 
     mc_state_update(&mc_state, e.id);
 
@@ -33,7 +48,6 @@ int main(void) {
 
 #pragma vector=PORT1_VECTOR
 __interrupt void PORT1_ISR(void) {
-  // TODO: Figure out brake event generation - possible for both events to happen at the same time
   input_process(&input);
 }
 

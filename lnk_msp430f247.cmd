@@ -56,12 +56,14 @@ MEMORY
     SFR                     : origin = 0x0000, length = 0x0010
     PERIPHERALS_8BIT        : origin = 0x0010, length = 0x00F0
     PERIPHERALS_16BIT       : origin = 0x0100, length = 0x0100
-    RAM                     : origin = 0x1100, length = 0x1000
+    RAM                     : origin = 0x1100, length = 0x0E00
+    RAM_EXEC								: origin = 0x1F00, length = 0x0200
     INFOA                   : origin = 0x10C0, length = 0x0040
     INFOB                   : origin = 0x1080, length = 0x0040
     INFOC                   : origin = 0x1040, length = 0x0040
     INFOD                   : origin = 0x1000, length = 0x0040
-    FLASH                   : origin = 0x8000, length = 0x7FC0
+    FLASH                   : origin = 0x8000, length = 0x7DC0
+    FLASH_EXEC							: origin = 0xFDC0, length = 0x0200
     BSLSIGNATURE            : origin = 0xFFDE, length = 0x0002, fill = 0xFFFF
     INT00                   : origin = 0xFFC0, length = 0x0002
     INT01                   : origin = 0xFFC2, length = 0x0002
@@ -107,8 +109,10 @@ SECTIONS
     .TI.noinit  : {} > RAM                  /* For #pragma noinit                */
     .sysmem     : {} > RAM                  /* Dynamic memory allocation area    */
     .stack      : {} > RAM (HIGH)           /* Software system stack             */
+    .run_from_ram : load = FLASH_EXEC, run = RAM_EXEC
 
     .text       : {} > FLASH                /* Code                              */
+    .text:rts430
     .cinit      : {} > FLASH                /* Initialization tables             */
     .const      : {} > FLASH                /* Constant data                     */
     .bslsignature  : {} > BSLSIGNATURE      /* BSL Signature                     */

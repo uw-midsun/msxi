@@ -12,6 +12,8 @@ typedef enum {
 // Sets the unit to do conversions in
 void speed_set_unit(SpeedUnit unit);
 
+SpeedUnit speed_get_unit(void);
+
 // Returns the provided speed (in m/s) in the specified units (rounded to the nearest integer)
 uint8_t speed_convert(const float *speed_ms);
 

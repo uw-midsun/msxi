@@ -25,7 +25,6 @@ static uint64_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot,
   return drive.data;
 }
 
-// TODO: use interrupts instead?
 static Fraction prv_scale_gain(struct BrakeInput *brake) {
   uint8_t numerator;
   for (numerator = 0; numerator < REGEN_GAIN_RESOLUTION; numerator++) {
@@ -49,12 +48,12 @@ static void prv_handle_brake(struct InputConfig *input) {
   if (brake_active != brake->active) {
     brake->active = brake_active;
     // Raise edge event - 0 = falling, 1 = rising
-    event_raise_isr(brake->edge, brake->active);
+    event_raise(brake->edge, brake->active);
   }
 
   // Limit max regen current with regen gain
   Fraction regen_gain = prv_scale_gain(brake);
-  event_raise_isr(brake->regen.event, prv_scale_pot(input, &brake->regen, regen_gain, 0.0f));
+  event_raise(brake->regen.event, prv_scale_pot(input, &brake->regen, regen_gain, 0.0f));
 }
 
 static void prv_handle_throttle(struct InputConfig *input) {
@@ -127,11 +126,6 @@ void input_process(struct InputConfig *input) {
       // Active-low switches -> convert to conventional logic (i.e. active = 1)
       event_raise_isr(in->event, (state == IO_LOW));
     }
-  }
-
-  if (io_process_interrupt(&input->brake.mech)) {
-    io_toggle_interrupt_edge(&input->brake.mech);
-    prv_handle_brake(input);
   }
 }
 

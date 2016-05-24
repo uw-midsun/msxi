@@ -32,7 +32,7 @@ typedef enum {
 #define NUM_ISR_INPUTS (ISR_INPUT_MAX - ISR_INPUT_OFFSET - 1)
 
 typedef enum {
-  BRAKE_CHANGE = SM_EVENT_OFFSET(SPECIAL_INPUT), // Regen (polled) and mechanical (interrupt)
+  BRAKE_CHANGE = SM_EVENT_OFFSET(SPECIAL_INPUT), // Regen (polled) and mechanical (polled)
   BRAKE_EDGE,
   THROTTLE_CHANGE,
 } SpecialInputEvent;
