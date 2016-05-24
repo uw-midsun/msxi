@@ -95,7 +95,6 @@ void input_init(struct InputConfig *input) {
   io_set_dir(&input->throttle.dir.backward, PIN_IN);
 
   io_set_dir(&input->brake.mech, PIN_IN);
-  io_configure_interrupt(&input->isr[i].input, true, EDGE_FALLING); // Active-low switch
   for (i = 0; i < REGEN_GAIN_RESOLUTION; i++) {
     io_set_dir(&input->brake.gain[i], PIN_IN);
   }
