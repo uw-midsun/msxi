@@ -19,6 +19,6 @@ void main(void) {
   volatile double dc;
   while (true) {
 	  dc = pwm_calculate_duty_cycle();
-	  __delay_cycles(1000000);
+	  __delay_cycles(1500000);
   }
 }

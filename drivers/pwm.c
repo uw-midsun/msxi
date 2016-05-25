@@ -3,8 +3,8 @@
 #include "ring_buffer.h"
 #include "pwm.h"
 
-struct RingBuffer falling = {0};
-struct RingBuffer rising = {0};
+volatile struct RingBuffer falling = {0};
+volatile struct RingBuffer rising = {0};
 
 void pwm_init(const struct PWMConfig *pwm)
 {
@@ -41,8 +41,14 @@ double pwm_calculate_duty_cycle(void)
 
   // Prevent conflicting data from being entered during the read process
   __disable_interrupt();
-  ring_buffer_read(&rising, rising_values);
-  ring_buffer_read(&falling, falling_values);
+  //memcpy(rising_values, &rising.head, (rising.buffer_end - rising.head));
+  //memcpy((void *) rising_values[(rising.buffer_end - rising.head) / 2], &rising.buffer, BUFFER_SIZE * 2 - (rising.buffer_end - rising.head));
+  //memcpy(falling_values, &falling.head, (falling.buffer_end - falling.head));
+  //memcpy((void *) falling_values[(falling.buffer_end - falling.head) / 2], &falling.buffer, BUFFER_SIZE * 2 - (falling.buffer_end - falling.head));
+  memcpy(rising_values, &rising.buffer, 16 * sizeof(uint16_t));
+  memcpy(falling_values, &falling.buffer, 16 * sizeof(uint16_t));
+  //ring_buffer_read(&rising, rising_values);
+  //ring_buffer_read(&falling, falling_values);
   __enable_interrupt();
 
   // calculate the wavelength and amplitude and divide to get the duty cycle
