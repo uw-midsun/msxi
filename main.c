@@ -16,13 +16,9 @@ void main(void) {
 
   __bis_SR_register(GIE);
 
-  double dc;
-  int a;
+  volatile double dc;
   while (true) {
 	  dc = pwm_calculate_duty_cycle();
-	  a = dc + 1;
-	  if (a > 10) {
-		  pwm_init(&pwm);
-	  }
+	  __delay_cycles(1000000);
   }
 }

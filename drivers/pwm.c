@@ -37,9 +37,7 @@ double pwm_calculate_duty_cycle(void)
   uint16_t high_amplitude;
 
   //TODO: Replace with Qmath
-  double duty_cycle;
-
-  int8_t buffer_offset = falling.inserts - rising.inserts;
+  double duty_cycle = 0;
 
   // Prevent conflicting data from being entered during the read process
   __disable_interrupt();
@@ -48,36 +46,28 @@ double pwm_calculate_duty_cycle(void)
   __enable_interrupt();
 
   // calculate the wavelength and amplitude and divide to get the duty cycle
-  for (i = 1 + buffer_offset; i < BUFFER_SIZE - 1; i++) {
-      if (*(rising_values + i + 1) > *(rising_values + i) &&
-        *(falling_values + i + 1 - buffer_offset) > *(falling_values + i - buffer_offset)) {
-        wavelengths = *(rising_values + i + 1) - *(rising_values + i);
-        high_amplitude = *(falling_values + i - buffer_offset) - *(rising_values + i);
-        duty_cycle += high_amplitude / wavelengths;
-      } else if(rising.curr_size == BUFFER_SIZE) {
-        clock_reset = 1;
+  for (i = 1; i < BUFFER_SIZE - 1; i++) {
+      if (rising_values[i + 1] > rising_values[i] &&
+        falling_values[i + 1] > falling_values[i] ) {
+        wavelengths = rising_values[i + 1] - rising_values[i];
+        high_amplitude = falling_values[i] - rising_values[i];
+        duty_cycle += (double) high_amplitude / wavelengths;
+      } else {
+        clock_reset += 1;
       }
     }
-    if (falling.curr_size > 1 && falling.curr_size < BUFFER_SIZE) {
-      duty_cycle = duty_cycle / (rising.curr_size - 1 - clock_reset - buffer_offset);
-    } else if (falling.curr_size > 2){
-      duty_cycle = duty_cycle / (rising.curr_size - 2 - clock_reset - buffer_offset);
-    } else {
-      duty_cycle = 65535;
-    }
+    duty_cycle = duty_cycle / (BUFFER_SIZE - 2 - clock_reset);
     return duty_cycle;
 }
 
 #pragma vector=TIMER0_A1_VECTOR
 __interrupt void TIMER0_A1_ISR(void) {
-  __disable_interrupt();
   if (TA0IV == 0x02) {
     ring_buffer_push(&rising, TA0CCR1);
-  } else if (TA0IV == 0x04) {
+  } else {
     ring_buffer_push(&falling, TA0CCR2);
   }
   TA0IV = 0x00;
-  __enable_interrupt();
 }
 
 /*

@@ -7,7 +7,6 @@ void ring_buffer_init(struct RingBuffer *ring_buffer)
   memset(ring_buffer, 0, sizeof(*ring_buffer));
   ring_buffer->buffer_end = ring_buffer->buffer + BUFFER_SIZE;
   ring_buffer->head = ring_buffer->buffer;
-  ring_buffer->curr_size = 0;
   ring_buffer->inserts = 0;
 };
 
@@ -15,11 +14,8 @@ void ring_buffer_push(struct RingBuffer *ring_buffer, uint16_t data)
 {
   *ring_buffer->head = data;
   ring_buffer->head++;
-  if (ring_buffer->curr_size < BUFFER_SIZE) {
-    ring_buffer->curr_size++;
-  }
+  ring_buffer->inserts += 1;
 
-  ring_buffer->inserts++;
   if (ring_buffer->head == ring_buffer->buffer_end){
     ring_buffer->head = ring_buffer->buffer;
   }

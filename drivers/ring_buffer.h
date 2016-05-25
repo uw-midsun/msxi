@@ -3,13 +3,12 @@
 //#include <stdbool.h>
 #include "msp430.h"
 
-#define BUFFER_SIZE 12
+#define BUFFER_SIZE 16
 
 struct RingBuffer {
   uint16_t buffer[BUFFER_SIZE];
   uint16_t *buffer_end;
   uint16_t *head;
-  uint16_t curr_size;
   uint16_t inserts;
 };
 
