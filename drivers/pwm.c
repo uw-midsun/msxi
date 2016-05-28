@@ -1,5 +1,5 @@
 #include "msp430.h"
-//#include "QmathLib.h"
+#include "QmathLib.h"
 #include "ring_buffer.h"
 #include "pwm.h"
 
@@ -25,6 +25,11 @@ void pwm_init(const struct PWMConfig *pwm)
   // Start the clock use 8 divisions to improve reliability
   //TB0CTL = TBSSEL_2 | MC_2 | TBCLR | ID_3;
   TA0CTL = TASSEL_2 | MC_2 | TACLR | ID_3;
+
+  P1SEL = BIT2 | BIT3;
+  __enable_interrupt();
+
+  __bis_SR_register(GIE);
 }
 
 double pwm_calculate_duty_cycle(void)
@@ -40,7 +45,7 @@ double pwm_calculate_duty_cycle(void)
   double duty_cycle = 0;
 
   // Prevent conflicting data from being entered during the read process
-  __disable_interrupt();
+  //__disable_interrupt();
   //memcpy(rising_values, &rising.head, (rising.buffer_end - rising.head));
   //memcpy((void *) rising_values[(rising.buffer_end - rising.head) / 2], &rising.buffer, BUFFER_SIZE * 2 - (rising.buffer_end - rising.head));
   //memcpy(falling_values, &falling.head, (falling.buffer_end - falling.head));
@@ -49,7 +54,7 @@ double pwm_calculate_duty_cycle(void)
   memcpy(falling_values, &falling.buffer, 16 * sizeof(uint16_t));
   //ring_buffer_read(&rising, rising_values);
   //ring_buffer_read(&falling, falling_values);
-  __enable_interrupt();
+  //__enable_interrupt();
 
   // calculate the wavelength and amplitude and divide to get the duty cycle
   for (i = 1; i < BUFFER_SIZE - 1; i++) {
@@ -73,7 +78,6 @@ __interrupt void TIMER0_A1_ISR(void) {
   } else {
     ring_buffer_push(&falling, TA0CCR2);
   }
-  TA0IV = 0x00;
 }
 
 /*
