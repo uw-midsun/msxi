@@ -1,6 +1,5 @@
 #pragma once
 #include <stdint.h>
-//#include <stdbool.h>
 #include "msp430.h"
 
 #define BUFFER_SIZE 16
