@@ -10,7 +10,7 @@ void ring_buffer_init(volatile struct RingBuffer *ring_buffer)
   ring_buffer->inserts = 0;
 };
 
-void ring_buffer_push(volatile struct RingBuffer *ring_buffer, uint16_t data)
+inline void ring_buffer_push(volatile struct RingBuffer *ring_buffer, uint16_t data)
 {
   *ring_buffer->head = data;
   ring_buffer->head++;
