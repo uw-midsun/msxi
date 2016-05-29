@@ -18,6 +18,6 @@ int16_t current_sensor_read(void)
 {
   volatile int16_t dc = 0;
   dc = pwm_calculate_duty_cycle();
-  dc = (dc - 50) * 2;
+  dc = (dc - 50 * SCALING_FACTOR) * 2;
   return dc;
 }

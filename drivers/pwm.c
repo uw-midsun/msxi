@@ -43,37 +43,27 @@ uint16_t pwm_calculate_duty_cycle(void)
   uint32_t wavelengths = 0;
   uint32_t high_amplitude = 0;
 
-  //TODO: Replace with Qmath
-  //double duty_cycle = 0;
   volatile uint32_t duty_cycle = 0;
 
   // Read using memcpy to maximize speed
-  //__disable_interrupt();
   memcpy(rising_values, &rising.buffer, 16 * sizeof(uint16_t));
   memcpy(falling_values, &falling.buffer, 16 * sizeof(uint16_t));
-  //ring_buffer_read(&rising, rising_values);
-  //ring_buffer_read(&falling, falling_values);
-  //__enable_interrupt();
 
   // calculate the wavelength and amplitude and divide to get the duty cycle
   for (i = 1; i < BUFFER_SIZE - 1; i++) {
     if (rising_values[i + 1] > rising_values[i] &&
       falling_values[i + 1] > falling_values[i] ) {
-      //wavelengths = rising_values[i + 1] - rising_values[i];
       wavelengths += (uint32_t) rising_values[i + 1] - (uint32_t) rising_values[i];
-      //high_amplitude = falling_values[i] - rising_values[i];
       high_amplitude += (uint32_t) falling_values[i] - (uint32_t) rising_values[i];
-      //duty_cycle += (double) high_amplitude / wavelengths;
     } else {
       clock_reset += 1;
     }
   }
-  //duty_cycle = duty_cycle / (BUFFER_SIZE - 2 - clock_reset) * 100;
-  //high_amplitude = high_amplitude * 100;
-  duty_cycle = (high_amplitude * 100) / wavelengths;
+  duty_cycle = (high_amplitude * 100 * SCALING_FACTOR) / wavelengths;
   return duty_cycle;
 }
 
+// ISR Timer on launchpad
 #pragma vector=TIMER0_A1_VECTOR
 __interrupt void TIMER0_A1_ISR(void) {
   if (TA0IV == 0x02) {
