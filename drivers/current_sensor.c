@@ -13,7 +13,8 @@ void current_sensor_init(void)
   pwm_init(&pwm);
 }
 
-// Call this to get the current value
+// Call this to get the current value in cA (10^-2)
+// Output is in cA due to int16 overflow size
 int16_t current_sensor_read(void)
 {
   volatile int16_t dc = 0;
