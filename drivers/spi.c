@@ -57,9 +57,9 @@ bool spi_init(const struct SPIConfig *spi) {
   io_set_peripheral_dir(&spi->clock_out, PIN_IN);
 
   // Stop the module for configuration (MSB-first, master, synchronous)
-  // Default parity is active-low.
+  // Default clock polarity is active-low.
   *SPI_MODULE[spi->port].ctl1 |= UCSWRST;
-  *SPI_MODULE[spi->port].ctl0 = (!spi->parity << 6) | UCMSB | UCMST | UCSYNC;
+  *SPI_MODULE[spi->port].ctl0 = (!spi->polarity << 6) | UCMSB | UCMST | UCSYNC;
   *SPI_MODULE[spi->port].ctl1 |= UCSSEL_2; // SMCLK
 
   // Baud Rate Prescaler = /(br0 + br1 * 256)
