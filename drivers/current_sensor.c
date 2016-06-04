@@ -1,5 +1,4 @@
 #include "msp430.h"
-#include "QmathLib.h"
 #include "pwm.h"
 #include "current_sensor.h"
 
@@ -7,7 +6,7 @@
 // Merge this into peripheral init
 void current_sensor_init(const struct PWMConfig *pwm)
 {
-  pwm_init(&pwm);
+  pwm_init(pwm);
 }
 
 // Call this to get the current value in cA (10^-2)

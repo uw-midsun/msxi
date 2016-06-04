@@ -1,5 +1,4 @@
 #include "msp430.h"
-#include "QmathLib.h"
 #include "ring_buffer.h"
 #include "pwm.h"
 
