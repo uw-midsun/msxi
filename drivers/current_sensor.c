@@ -3,13 +3,11 @@
 #include "pwm.h"
 #include "current_sensor.h"
 
-// Merge this into peripheral init
-void current_sensor_init(void)
-{
-  // First is for plutus, second is for launchpad
-  //const struct PWMConfig pwm = {{4, 0}, {4, 1}};
-  const struct PWMConfig pwm = {{1, 2}, {1, 3}};
 
+
+// Merge this into peripheral init
+void current_sensor_init(const struct PWMConfig *pwm)
+{
   pwm_init(&pwm);
 }
 

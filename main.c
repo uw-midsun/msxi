@@ -5,8 +5,8 @@
 void main(void) {
   WDTCTL = WDTPW | WDTHOLD;
   uint8_t i = 0;
-
-  current_sensor_init();
+  const struct PWMConfig pwm = {{4, 0}, {4, 1}};
+  current_sensor_init(&pwm);
 
   volatile int16_t A;
   while (true) {

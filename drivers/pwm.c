@@ -17,18 +17,17 @@ void pwm_init(const struct PWMConfig *pwm)
   // Second line of the next few blocks are for launchpad
 
   // Timer B capture to CCR0 on rising max priority
-  //TB0CCTL0 = CCIE | CAP | CM_1 | SCS | CCIS_0;
-  TA0CCTL1 = CCIE | CAP | CM_1 | SCS | CCIS_0;
+  TB0CCTL0 = CCIE | CAP | CM_1 | SCS | CCIS_0;
+  //TA0CCTL1 = CCIE | CAP | CM_1 | SCS | CCIS_0;
 
   // Timer B capture to CCR1 on falling 2nd highest priority
-  //TB0CCTL1 = CCIE | CAP | CM_2 | SCS | CCIS_0;
-  TA0CCTL2 = CCIE | CAP | CM_2 | SCS | CCIS_0;
+  TB0CCTL1 = CCIE | CAP | CM_2 | SCS | CCIS_0;
+  //TA0CCTL2 = CCIE | CAP | CM_2 | SCS | CCIS_0;
 
   // Start the clock use 8 divisions to improve reliability
-  //TB0CTL = TBSSEL_2 | MC_2 | TBCLR | ID_3;
-  TA0CTL = TASSEL_2 | MC_2 | TACLR | ID_3;
+  TB0CTL = TBSSEL_2 | MC_2 | TBCLR | ID_3;
+  //TA0CTL = TASSEL_2 | MC_2 | TACLR | ID_3;
 
-  P1SEL = BIT2 | BIT3;
   __enable_interrupt();
 
   __bis_SR_register(GIE);
@@ -62,7 +61,7 @@ uint16_t pwm_calculate_duty_cycle(void)
   duty_cycle = (high_amplitude * 100 * SCALING_FACTOR) / wavelengths;
   return duty_cycle;
 }
-
+/*
 // ISR Timer on launchpad
 #pragma vector=TIMER0_A1_VECTOR
 __interrupt void TIMER0_A1_ISR(void) {
@@ -72,10 +71,8 @@ __interrupt void TIMER0_A1_ISR(void) {
     ring_buffer_push(&falling, TA0CCR2);
   }
 }
-
+*/
 // ISR for Timer B on Plutus
-
-/*
 #pragma vector=TIMER0_B0_VECTOR
 __interrupt void TB0CCR0_ISR(void) {
   ring_buffer_push(&rising, TB0CCR0);
@@ -85,4 +82,4 @@ __interrupt void TB0CCR0_ISR(void) {
 __interrupt void TB0CCR1_ISR(void) {
   ring_buffer_push(&falling, TB0CCR1);
 }
-*/
+
