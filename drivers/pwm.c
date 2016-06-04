@@ -17,6 +17,7 @@ void pwm_init(const struct PWMConfig *pwm)
   // Second line of the next few blocks are for launchpad
 
   // Timer B capture to CCR0 on rising max priority
+
   TB0CCTL0 = CCIE | CAP | CM_1 | SCS | CCIS_0;
   //TA0CCTL1 = CCIE | CAP | CM_1 | SCS | CCIS_0;
 
@@ -61,7 +62,11 @@ uint16_t pwm_calculate_duty_cycle(void)
   duty_cycle = (high_amplitude * 100 * SCALING_FACTOR) / wavelengths;
   return duty_cycle;
 }
+<<<<<<< HEAD
 /*
+=======
+
+>>>>>>> 55d30b7c6e77d37ca6e9a6c973e036d87a7fb5a6
 // ISR Timer on launchpad
 #pragma vector=TIMER0_A1_VECTOR
 __interrupt void TIMER0_A1_ISR(void) {
@@ -71,8 +76,15 @@ __interrupt void TIMER0_A1_ISR(void) {
     ring_buffer_push(&falling, TA0CCR2);
   }
 }
+<<<<<<< HEAD
 */
 // ISR for Timer B on Plutus
+=======
+
+// ISR for Timer B on Plutus
+
+/*
+>>>>>>> 55d30b7c6e77d37ca6e9a6c973e036d87a7fb5a6
 #pragma vector=TIMER0_B0_VECTOR
 __interrupt void TB0CCR0_ISR(void) {
   ring_buffer_push(&rising, TB0CCR0);
@@ -82,4 +94,8 @@ __interrupt void TB0CCR0_ISR(void) {
 __interrupt void TB0CCR1_ISR(void) {
   ring_buffer_push(&falling, TB0CCR1);
 }
+<<<<<<< HEAD
 
+=======
+*/
+>>>>>>> 55d30b7c6e77d37ca6e9a6c973e036d87a7fb5a6

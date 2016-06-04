@@ -4,7 +4,6 @@
 #include "current_sensor.h"
 
 
-
 // Merge this into peripheral init
 void current_sensor_init(const struct PWMConfig *pwm)
 {
