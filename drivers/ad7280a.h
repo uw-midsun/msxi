@@ -48,16 +48,16 @@
 #define CTRL_HB_CONV_AVG_4                          (2 << 1)    // D9 to D10
 #define CTRL_HB_CONV_AVG_8                          (3 << 1)    // D9 to D10
 
-#define CTRL_HB_CONV_CNVST                          (0 << 3)    // D11
-#define CTRL_HB_CONV_CS                             (1 << 3)    // D11
+#define CTRL_HB_CONV_START_CNVST                    (0 << 3)    // D11
+#define CTRL_HB_CONV_START_CS                       (1 << 3)    // D11
 
 #define CTRL_HB_CONV_RSLT_READ_ALL                  (0 << 4)    // D12 to D13
-#define CTRL_HB_CONV_RSLT_READ_6CELL_AUX1_3_4       (1 << 4)    // D12 to D13
+#define CTRL_HB_CONV_RSLT_READ_6CELL_AUX1_3_5       (1 << 4)    // D12 to D13
 #define CTRL_HB_CONV_RSLT_READ_6CELL                (2 << 4)    // D12 to D13
 #define CTRL_HB_CONV_RSLT_READ_DSBL                 (3 << 4)    // D12 to D13
 
 #define CTRL_HB_CONV_INPUT_ALL                      (0 << 6)    // D14 to D15
-#define CTRL_HB_CONV_INPUT_6CELL_AUX1_3_4           (1 << 6)    // D14 to D15
+#define CTRL_HB_CONV_INPUT_6CELL_AUX1_3_5           (1 << 6)    // D14 to D15
 #define CTRL_HB_CONV_INPUT_6CELL                    (2 << 6)    // D14 to D15
 #define CTRL_HB_CONV_INPUT_SELF_TEST                (3 << 6)    // D14 to D15
 

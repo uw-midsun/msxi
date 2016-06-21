@@ -29,22 +29,30 @@
 
 
 struct Threshold {
-  const uint16_t high;
   const uint16_t low;
+  const uint16_t high;
+};
+
+struct TempThreshold {
+  int16_t high;
+  int16_t low;
 };
 
 struct AFEConfig {
   const struct SPIConfig *spi_config;     // spi configuration
-  const struct IOMap *cnvst;
+  const int thermistor[4096];             // thermistor[adcval] = temp
+  const struct IOMap *cnvst;              // conversion start
+  const struct IOMap *pd;                 // power down pin
   uint8_t crc_table[256];                 // set by afe_init
   uint8_t devices;                        // set by afe_init
-  const struct Threshold temp;
+  struct TempThreshold d_temp;
+  struct TempThreshold c_temp;
   bool crc_error;                         // crc read calculation status
 };
 
 struct ConversionResult {
   uint16_t vin[48];
-  uint16_t aux[48];
+  int16_t aux[48];
 };
 
 uint8_t afe_init(struct AFEConfig *ac);

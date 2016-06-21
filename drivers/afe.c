@@ -3,7 +3,7 @@
 #include "spi.h"
 
 // helper function to propagate crc8 lookup table
-void prv_crc8_build_table(struct AFEConfig *afe) {
+static void prv_crc8_build_table(struct AFEConfig *afe) {
   uint16_t i, k;
 
   for (i = 0; i < 256; ++i) {
@@ -129,10 +129,13 @@ static uint16_t prv_convert_voltage(uint32_t msg) {
   return ((adcval * 4000) / 4095) + 1000;
 }
 
-static uint16_t prv_convert_temp(uint32_t msg) {
+// return a temperature in C
+// note: 0 and 4095 aren't reliable due to the division by zero
+//  in the Steinhart-Hart and Voltage Divider equations
+static int prv_convert_temp(struct AFEConfig *afe, uint32_t msg) {
   uint16_t adcval = (msg >> 11) & 0xFFF;
 
-  return adcval;
+  return afe->thermistor[adcval];
 }
 
 // initialize daisy chain
@@ -140,6 +143,12 @@ uint8_t afe_init(struct AFEConfig *afe) {
   //assert(afe->spi_config->clock_freq <= AFE_SPI_MAX_CLK);
 
   prv_crc8_build_table(afe);
+
+  io_set_dir(afe->cnvst, PIN_OUT);
+  io_set_state(afe->cnvst, IO_HIGH);
+
+  io_set_dir(afe->pd, PIN_OUT);
+  io_set_state(afe->pd, IO_HIGH);
 
   spi_init(afe->spi_config);
 
@@ -152,7 +161,8 @@ uint8_t afe_init(struct AFEConfig *afe) {
   // lock to the new device addresses
   // prv_transfer_32_bits(afe, 0x01C2B6E2);
   prv_write(afe, AFE_DEVADDR_MASTER, AFE_CONTROL_LB, true,
-            CTRL_LB_DAISY_CHAIN_RB_ENB | CTRL_LB_LOCK_DEVICE_ADDR);
+            CTRL_LB_DAISY_CHAIN_RB_ENB | CTRL_LB_LOCK_DEVICE_ADDR |
+            CTRL_LB_ACQSTN_TIME_400ns);
 
   // set the read register to CONTROL_LB
   // prv_transfer_32_bits(afe, 0x038716CA);
@@ -240,11 +250,13 @@ uint32_t afe_read_all_conversions(struct AFEConfig *afe, struct ConversionResult
 
   // prv_transfer_32_bits(afe, 0x01A0131A);
   prv_write(afe, AFE_DEVADDR_MASTER, AFE_CONTROL_HB, true,
-            CTRL_HB_CONV_RSLT_READ_ALL | CTRL_HB_CONV_INPUT_ALL);
+            CTRL_HB_CONV_START_CNVST | CTRL_HB_CONV_RSLT_READ_6CELL_AUX1_3_5 |
+            CTRL_HB_CONV_INPUT_6CELL_AUX1_3_5);
 
   // prv_transfer_32_bits(afe, 0x03A0546A);
   prv_write(afe, AFE_DEVADDR_MASTER, AFE_CNVST_CONTROL, true, CNVST_IN_PULSE);
 
+  // initiate conversions through falling edge of CNVST
   io_set_state(afe->cnvst, IO_LOW);
   __delay_cycles(50000);
   io_set_state(afe->cnvst, IO_HIGH);
@@ -263,10 +275,10 @@ uint32_t afe_read_all_conversions(struct AFEConfig *afe, struct ConversionResult
     }
 
     // read AUX
-    for (input = 0; input < 6; ++input) {
+    for (input = 0; input < 3; ++input) {
       reply = prv_read_32_bits(afe);
 
-      cr->aux[dev * 6 + input] = prv_convert_temp(reply);
+      cr->aux[dev * 6 + input] = prv_convert_temp(afe, reply);
     }
   }
 
