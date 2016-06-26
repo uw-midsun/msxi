@@ -2,7 +2,7 @@
 #include <msp430.h>
 #include "adc12_f247_shim.h"
 
-#define ADC_SCALE(x) (uint16_t)(((x)*(uint32_t)3300)/4096) //0 to 4095 -> 0 to 3300mV
+#define ADC_SCALE(x) (uint16_t)(((x)*(uint32_t)3300)/4095) //0 to 4095 -> 0 to 3300mV
 #define LAST_INDEX (ADC12_MEM_MAX - 1)
 #define ADC12_INTERRUPT (1 << (LAST_INDEX)) // ADC12IEx
 #define ADC12_INTERRUPT_VECTOR (((LAST_INDEX) * 2) + 6) // ADC12IFGx
@@ -60,6 +60,20 @@ uint16_t adc12_sample(const struct ADC12Config *adc, const ADC12Index pin) {
   uint16_t pin_voltage = ADC_SCALE(results[pin]);
 
   return pin_voltage;
+}
+
+uint16_t adc12_raw(const struct ADC12Config *adc, const ADC12Index pin) {
+  if (!adc->continuous) {
+      ADC12CTL0 |= ADC12SC;
+
+      // Enter LPM4 while waiting for interrupt
+      __bis_SR_register(LPM4_bits);
+    }
+
+    // TODO: do we really need to toggle interrupts? Seems to be the correct size for atomic access
+    uint16_t pin_voltage = results[pin];
+
+    return pin_voltage;
 }
 
 #pragma vector=ADC12_VECTOR

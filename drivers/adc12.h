@@ -27,3 +27,5 @@ struct ADC12Config {
 void adc12_init(const struct ADC12Config *adc);
 
 uint16_t adc12_sample(const struct ADC12Config *adc, const ADC12Index pin);
+
+uint16_t adc12_raw(const struct ADC12Config *adc, const ADC12Index pin);
