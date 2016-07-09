@@ -3,15 +3,17 @@
 #include "sm_config.h"
 
 void mc_state_update(struct MCStateConfig *state, EventID e) {
-  if (e != CAN_INTERRUPT) {
-    return;
-  }
+//  if (e != CAN_INTERRUPT) {
+//    return;
+//  }
 
   struct CANMessage msg = { 0 };
   struct CANError error = { 0 };
 
   // Not sure if we care about CAN errors, but this clears any that may have occurred.
-  while (can_process_interrupt(state->can, &msg, &error)) {
+//  while (can_process_interrupt(state->can, &msg, &error)) {
+  if (io_get_state(&state->can->interrupt_pin) == IO_LOW) {
+    can_receive(state->can, &msg);
     uint8_t i;
     for (i = 0; i < MC_COUNT; i++) {
       if (msg.id == state->mc[i].packet[0].id) {
@@ -22,12 +24,13 @@ void mc_state_update(struct MCStateConfig *state, EventID e) {
         break;
       }
     }
+    _nop();
   }
 }
 
 float mc_state_value(struct MCStateConfig *state, MotorController mc, MCStateValue val) {
-  uint8_t packet = (val & 0x02),
-          data = (val & 0x01);
+  uint8_t packet = (val >> 1) & 0x01,
+          data = val & 0x01;
 
   if (mc == MC_AVERAGE) {
     float total = 0.0f;

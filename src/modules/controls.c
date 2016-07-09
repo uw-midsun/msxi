@@ -8,6 +8,9 @@
 
 // Off => [Drive (=> CC) => Brake => Drive] (=> Off)
 
+// Limit cruise control at 150 kph
+#define CONTROLS_MAX_SPEED 41.6667f
+
 static void prv_init_sm(void);
 static void prv_init_run_sm(void);
 static struct State off, run, drive, cruise, brake;
@@ -31,7 +34,6 @@ static void prv_drive_command(struct StateMachine *sm, uint64_t data) {
 // Cruise related functions ->
 static float target_velocity = 0.0f;
 
-#pragma CODE_SECTION(prv_cruise_command, ".run_from_ram")
 static void prv_cruise_command(struct StateMachine *sm, uint64_t data) {
   struct CANMessage msg = {
     .id = THEMIS_DRIVE,
@@ -41,7 +43,6 @@ static void prv_cruise_command(struct StateMachine *sm, uint64_t data) {
   can_transmit(&can, &msg);
 }
 
-#pragma CODE_SECTION(prv_override_cruise, ".run_from_ram")
 static bool prv_override_cruise(uint64_t data) {
   union {
     uint32_t data;
@@ -55,12 +56,14 @@ static bool prv_override_cruise(uint64_t data) {
   return (throttle.current > mc_state_value(&mc_state, MC_AVERAGE, MC_CURRENT));
 }
 
-#pragma CODE_SECTION(prv_cruise_increment, ".run_from_ram")
 static void prv_cruise_increment(struct StateMachine *sm, void *ignored) {
   target_velocity += speed_to(CRUISE_CONTROL_INTERVAL);
+
+  if (target_velocity >= CONTROLS_MAX_SPEED) {
+    target_velocity = CONTROLS_MAX_SPEED;
+  }
 }
 
-#pragma CODE_SECTION(prv_cruise_decrement, ".run_from_ram")
 static void prv_cruise_decrement(struct StateMachine *sm, void *ignored) {
   target_velocity -= speed_to(CRUISE_CONTROL_INTERVAL);
   if (target_velocity < 0) {
@@ -76,7 +79,7 @@ uint8_t controls_cruise_target() {
 // <- End cruise
 
 bool controls_cruise_active() {
-  return sm.current_state == &cruise;
+  return run_sm.current_state == &cruise;
 }
 
 // Run SM
@@ -88,7 +91,7 @@ static void prv_init_run_sm() {
   state_add_transition(&drive, transitions_make_event_data_rule(THROTTLE_CHANGE, NO_GUARD,
                                                                 prv_drive_command));
   state_add_guarded_state_transition(&drive, BRAKE_EDGE, input_rising_edge, &brake);
-  state_add_guarded_state_transition(&drive, CRUISE_TOGGLE, input_rising_edge, &cruise);
+  state_add_guarded_state_transition(&drive, CRUISE_TOGGLE, input_falling_edge, &cruise);
 
   // Brake: Process brake events
   // If brake is no longer activated, switch to drive

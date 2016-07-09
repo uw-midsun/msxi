@@ -11,7 +11,7 @@ static const struct SPIConfig spi_b0 = {
   .data_in = { GPIO_PORT_P3, GPIO_PIN2 },
   .clock_out = { GPIO_PORT_P3, GPIO_PIN3 },
   .cs = { GPIO_PORT_P3, GPIO_PIN0 },
-  .clock_freq = 500000,
+  .clock_freq = 1000000,
   .port = SPI_B0
 };
 
@@ -20,15 +20,16 @@ const struct CANConfig can = {
   .interrupt_pin = { GPIO_PORT_P2, GPIO_PIN7 },
   .reset_pin = NO_RESET_PIN,
   .rxb0 = {
-    .mask = CAN_DEVICE_MASK,
+    .mask = CAN_FULL_MASK,
     .filter = {
-      DEVICE_LEFT_MC,
-      DEVICE_RIGHT_MC
+      0x43
     }
   },
   .rxb1 = {
-    .mask = CAN_IGNORE_ALL,
-    .filter = { }
+    .mask = CAN_FULL_MASK,
+    .filter = {
+      0x42
+    }
   }
 };
 
@@ -77,11 +78,14 @@ struct InputConfig input = {
     }, {
       .event = CRUISE_TOGGLE,
       .input = { GPIO_PORT_P1, GPIO_PIN5 }
+    }, {
+      .event = HEADLIGHTS_TOGGLE,
+      .input = { GPIO_PORT_P2, GPIO_PIN6 }
     }
   },
   .brake = {
     .edge = BRAKE_EDGE,
-    .mech = { GPIO_PORT_P2, GPIO_PIN6 },
+    .mech = { GPIO_PORT_P5, GPIO_PIN6 },
     .gain = {
       { GPIO_PORT_P2, GPIO_PIN0 },
       { GPIO_PORT_P2, GPIO_PIN1 },
@@ -92,9 +96,9 @@ struct InputConfig input = {
     },
     .regen = {
       .event = BRAKE_CHANGE,
-      .calibration = { // TODO
-        .high = 3300,
-        .low = 0
+      .calibration = {
+        .high = 3250, // 3250 actual
+        .low = 2880 // 2849 actual // 2881 actual
       },
       .input = ADC12_MEM0
     }
@@ -102,15 +106,15 @@ struct InputConfig input = {
   .throttle = {
     .pot = {
       .event = THROTTLE_CHANGE,
-      .calibration = { // TODO
-        .high = 3300,
-        .low = 0
+      .calibration = {
+        .high = 3265, // 3240, // 3265 actual
+        .low = 2955 // 2930 // 2897 actual
       },
       .input = ADC12_MEM1
     },
     .dir = {
-      .forward = { GPIO_PORT_P6, GPIO_PIN5 },
-      .backward = { GPIO_PORT_P6, GPIO_PIN4 }
+      .forward = { GPIO_PORT_P6, GPIO_PIN4 },
+      .backward = { GPIO_PORT_P6, GPIO_PIN5 }
     }
   }
 };
@@ -120,19 +124,25 @@ const struct SignalConfig signals = {
   .packets = {
     {
       .e = SIG_L_TOGGLE,
-      .can_id = THEMIS_SIG_LEFT
+      .can_id = THEMIS_SIG_LEFT,
+      .led = { GPIO_PORT_P1, GPIO_PIN6 }
     }, {
       .e = SIG_R_TOGGLE,
-      .can_id = THEMIS_SIG_RIGHT
+      .can_id = THEMIS_SIG_RIGHT,
+      .led = { GPIO_PORT_P6, GPIO_PIN6 }
     }, {
       .e = HAZARD_TOGGLE,
-      .can_id = THEMIS_SIG_HAZARD
+      .can_id = THEMIS_SIG_HAZARD,
+      .led = { GPIO_PORT_P1, GPIO_PIN2 }
     }, {
       .e = BRAKE_EDGE,
       .can_id = THEMIS_SIG_BRAKE
     }, {
       .e = HORN_TOGGLE,
       .can_id = THEMIS_HORN
+    }, {
+      .e = HEADLIGHTS_TOGGLE,
+      .can_id = THEMIS_SIG_RUNNING
     }
   }
 };
@@ -142,19 +152,13 @@ struct MCStateConfig mc_state = {
   .mc = {
     {
       .packet = {
-        {
-          .id = LEFT_MC_VELOCITY
-        }, {
-          .id = LEFT_MC_BUS
-        }
+        { .id = LEFT_MC_VELOCITY },
+        { .id = LEFT_MC_BUS }
       }
     }, {
       .packet = {
-        {
-          .id = RIGHT_MC_VELOCITY
-        }, {
-          .id = RIGHT_MC_BUS
-        }
+        { .id = RIGHT_MC_VELOCITY },
+        { .id = RIGHT_MC_BUS }
       }
     }
   }

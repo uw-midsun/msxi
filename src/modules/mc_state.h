@@ -5,20 +5,20 @@
 // Motor controller info struct
 
 typedef enum {
-  MC_VELOCITY = 0,  // state 0 data 0
-  MC_RPM,           // state 0 data 1
-  MC_CURRENT,       // state 1 data 0
-  MC_VOLTAGE        // state 1 data 1
+  MC_RPM = 0,   // state 0 data 0
+  MC_VELOCITY,  // state 0 data 1
+  MC_VOLTAGE,   // state 1 data 0
+  MC_CURRENT    // state 1 data 1
 } MCStateValue;
 
 typedef enum {
   MC_LEFT,
-  MC_RIGHT,
+  //MC_RIGHT,
   MC_COUNT,
   MC_AVERAGE
 } MotorController;
 
-// packet[0] = Velocity, packet[1] = Bus
+// packet[0] = Velocity, packet[1] = Power Info
 struct MCConfig {
   struct {
     uint16_t id;

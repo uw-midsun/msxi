@@ -20,29 +20,36 @@ static void prv_display_update(uint16_t elapsed_ms, void *context) {
 int main(void) {
   WDTCTL = WDTPW | WDTHOLD; // Stop watchdog timer
 
+  sm_framework_init(NULL);
+
   __enable_interrupt();
-  timer_init();
   can_init(&can);
   input_init(&input);
+  signals_init(&signals);
   display_init(&display);
 
-  sm_framework_init(NULL);
+  timer_init();
+
   sm_init(controls_sm());
 
   // Motor controllers expect a command every 250ms
-  timer_delay_periodic(200, prv_input_poll, NULL);
-  // Update the LCD every second
-  timer_delay_periodic(1000, prv_display_update, NULL);
+  timer_delay_periodic(40, prv_input_poll, NULL);
+  // Update the LCD every second at a minimum
+  timer_delay_periodic(500, prv_display_update, NULL);
 
   while (true) {
     timer_process();
 
     struct Event e = event_get_next();
 
-    mc_state_update(&mc_state, e.id);
+    if (e.id != 65535) {
+      mc_state_update(&mc_state, e.id);
 
-    signals_process(&signals, &e);
-    sm_process_event(controls_sm(), &e);
+      signals_process(&signals, &e);
+      sm_process_event(controls_sm(), &e);
+
+      //display_update(&display);
+    }
   }
 }
 

@@ -4,25 +4,41 @@
 
 typedef void (*PotHandler)(struct InputConfig *);
 
-// Scale from [low, high] to [0, scale]
+#include "config.h"
+#include <stdio.h>
+
 // Return [63-32]: Velocity, [31-0]: Current
-static uint64_t prv_scale_pot(struct InputConfig *input, struct PotInput *pot,
-                              const Fraction scale, float velocity) {
-  const uint16_t pot_value = adc12_sample(input->adc, pot->input);
+static uint64_t prv_build_payload(const float velocity, const float current) {
   union {
     uint64_t data;
     struct {
       float velocity;
       float current;
     };
-  } drive;
+  } payload;
 
-  drive.velocity = velocity;
-  const Fraction percent = fraction_from(pot_value - pot->calibration.low,
+  payload.velocity = velocity;
+  payload.current = current;
+
+  return payload.data;
+}
+
+// Scale from [high, low] to [0, scale]
+static Fraction prv_scale_pot(struct InputConfig *input, struct PotInput *pot,
+                              const Fraction scale) {
+  const uint16_t pot_value = adc12_sample(input->adc, pot->input);
+  const Fraction percent = fraction_from(pot->calibration.high - pot_value,
                                          pot->calibration.high - pot->calibration.low);
-  const Fraction current = fraction_mult(percent, scale);
-  drive.current = fraction_to(current);
-  return drive.data;
+  const Fraction scaled_percent = fraction_mult(percent, scale),
+                 min = fraction_from_i(0);
+
+  if (scaled_percent < min) {
+    return min;
+  } else if (scaled_percent >= scale) {
+    return scale;
+  } else {
+    return scaled_percent;
+  }
 }
 
 static Fraction prv_scale_gain(struct BrakeInput *brake) {
@@ -34,14 +50,18 @@ static Fraction prv_scale_gain(struct BrakeInput *brake) {
     }
   }
 
-  return fraction_from(numerator + 1, REGEN_GAIN_RESOLUTION + 1);
+  if (numerator >= REGEN_GAIN_RESOLUTION) {
+    numerator = 0;
+  }
+
+  return fraction_from(numerator + 1, REGEN_GAIN_RESOLUTION);
 }
 
 // Handles both regen and mechanical braking
 // Regen braking: 0m/s velocity, [0, 1]% current
 static void prv_handle_brake(struct InputConfig *input) {
   struct BrakeInput *brake = &input->brake;
-  bool mech_active = (io_get_state(&brake->mech) == IO_LOW),
+  bool mech_active = io_get_state(&brake->mech),
        regen_active = brake->regen.state,
        brake_active = mech_active || regen_active;
 
@@ -52,35 +72,53 @@ static void prv_handle_brake(struct InputConfig *input) {
   }
 
   // Limit max regen current with regen gain
-  Fraction regen_gain = prv_scale_gain(brake);
-  event_raise(brake->regen.event, prv_scale_pot(input, &brake->regen, regen_gain, 0.0f));
+  const Fraction regen_gain = prv_scale_gain(brake),
+                 regen_percent = prv_scale_pot(input, &brake->regen, regen_gain);
+
+  static char display_buffer[20];
+  snprintf(display_buffer, 20, "B: %.4f / %.4f", fraction_to(regen_percent), 0.0f);
+  lcd_println(display.lcd, LINE_2, display_buffer);
+
+  event_raise(brake->regen.event, prv_build_payload(0, fraction_to(regen_percent)));
 }
 
 static void prv_handle_throttle(struct InputConfig *input) {
-  static const float dir_velocity[3] = { 0.0f, 100.0f, -100.0f };
+  static const float dir_velocity[] = {
+    0.0f,
+    100.0f,
+    -100.0f
+  };
   struct ThrottleInput *throttle = &input->throttle;
-  Fraction one = fraction_from_i(1);
 
   // 0: Neutral, 1: Forward, 2: Backward
   uint8_t dir_index = ((io_get_state(&throttle->dir.backward) << 1) |
                        io_get_state(&throttle->dir.forward));
-  uint64_t command = prv_scale_pot(input, &throttle->pot, one, dir_velocity[dir_index]);
-  event_raise(throttle->pot.event, command);
+
+  float current = 0;
+  // Freewheel unless a direction is specified
+  if (dir_index != 0) {
+    const Fraction scale = fraction_from_i(1);
+    current = fraction_to(prv_scale_pot(input, &throttle->pot, scale));
+  }
+
+  static char display_buffer[20];
+  snprintf(display_buffer, 20, "T: %.4f / %.4f", current, dir_velocity[dir_index]);
+  lcd_println(display.lcd, LINE_1, display_buffer);
+
+  event_raise(throttle->pot.event, prv_build_payload(dir_velocity[dir_index], current));
 }
 
 static void prv_check_pot(struct InputConfig *input, struct PotInput *pot, PotHandler handle_fn) {
   uint16_t pot_value = adc12_sample(input->adc, pot->input);
-
-  if ((pot->state && (pot_value <= pot->calibration.low)) ||
-      (!pot->state && (pot_value >= pot->calibration.high))) {
-    // Pot edge
-    pot->state = !pot->state;
-  }
+//  pot->state = (pot_value <= pot->calibration.high);
+  pot->state = 0;
 
   handle_fn(input);
 }
 
 void input_init(struct InputConfig *input) {
+  adc12_init(input->adc);
+
   uint8_t i;
   for (i = 0; i < NUM_POLLED_INPUTS; i++) {
     io_set_dir(&input->polled[i].input, PIN_IN);
@@ -88,7 +126,7 @@ void input_init(struct InputConfig *input) {
 
   for (i = 0; i < NUM_ISR_INPUTS; i++) {
     io_set_dir(&input->isr[i].input, PIN_IN);
-    io_configure_interrupt(&input->isr[i].input, true, EDGE_FALLING); // Active-low switches
+    io_configure_interrupt(&input->isr[i].input, true, EDGE_RISING); // Active-high switches
   }
 
   io_set_dir(&input->throttle.dir.forward, PIN_IN);
@@ -106,8 +144,8 @@ void input_poll(struct InputConfig *input) {
     struct Input *in = &input->polled[i];
     if (io_get_state(&in->input) != in->state) {
       in->state = io_get_state(&in->input);
-      // Active-low switches -> convert to conventional logic (i.e. active = 1)
-      event_raise(in->event, (in->state == IO_LOW));
+      // Active-high switches
+      event_raise(in->event, in->state);
     }
   }
 
@@ -122,8 +160,8 @@ void input_process(struct InputConfig *input) {
     if (io_process_interrupt(&in->input)) {
       IOState state = io_get_state(&in->input);
       io_toggle_interrupt_edge(&in->input);
-      // Active-low switches -> convert to conventional logic (i.e. active = 1)
-      event_raise_isr(in->event, (state == IO_LOW));
+      // Active-high switches
+      event_raise_isr(in->event, state);
     }
   }
 }
