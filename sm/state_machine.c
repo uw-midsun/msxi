@@ -46,15 +46,14 @@ void state_init_composite(struct State *state, struct StateMachine *sm) {
 void sm_process_event(struct StateMachine *sm, struct Event *e) {
   struct State *current_state = sm->current_state;
   bool matched = transitions_process(&current_state->transitions, sm, e);
-  if (current_state->sub_sm != NULL) {
-    if (matched) {
-      if (sm_debug != NULL) {
-        // Event processed - run debug function
-        sm_debug(sm);
-      }
-    } else {
-      sm_process_event(current_state->sub_sm, e);
+  if (matched) {
+    _nop();
+    if (sm_debug != NULL) {
+      // Event processed - run debug function
+      sm_debug(sm);
     }
+  } else if (current_state->sub_sm != NULL) {
+    sm_process_event(current_state->sub_sm, e);
   }
 }
 

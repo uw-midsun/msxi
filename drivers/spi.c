@@ -87,7 +87,7 @@ void spi_transmit(const struct SPIConfig *spi, uint8_t data) {
   *SPI_MODULE[spi->port].txbuf = data;
 
   // Enter LPM3 and wait for byte to be recieved -> TX cleared
-  __bis_SR_register(LPM3_bits);
+  __bis_SR_register(LPM0_bits);
 }
 
 void spi_transmit_array(const struct SPIConfig *spi, const uint8_t *data, uint8_t length) {
@@ -131,7 +131,7 @@ _Pragma(STRINGIFY(vector=USCIAB##x##RX_VECTOR)) \
 __interrupt void USCIAB##x##RX_ISR(void) { \
   prv_update_data(SPI_A##x, UCA##x##RXBUF); \
   prv_update_data(SPI_B##x, UCB##x##RXBUF); \
-  __bic_SR_register_on_exit(LPM3_bits); \
+  __bic_SR_register_on_exit(LPM0_bits); \
 }
 
 SPI_INTERRUPT(0)

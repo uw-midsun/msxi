@@ -2,8 +2,8 @@
 #include "msp430.h"
 #include <stddef.h>
 
-#define ACLK_FREQ 32768
-#define CYCLES_IN_MS ((ACLK_FREQ) / 1000)
+#define SMCLK_FREQ 1048574
+#define CYCLES_IN_MS ((SMCLK_FREQ) / 1000)
 #define NUM_TIMERS 4
 
 typedef enum {
@@ -25,7 +25,7 @@ static struct Timer timers[NUM_TIMERS];
 void timer_init() {
   TBCCTL0 = CCIE;
   TBCCR0 = CYCLES_IN_MS;
-  TBCTL = TBSSEL_1 | MC_1 | TBCLR; // ACLK, Up mode
+  TBCTL = TBSSEL_2 | MC_1 | TBCLR; // SMCLK, Up mode
 }
 
 void timer_process() {
@@ -86,4 +86,5 @@ __interrupt void TIMERB0_ISR(void) {
     // Doesn't actually matter if the timer is inactive
     timers[i].elapsed_ms++;
   }
+  TBIV = 0;
 }

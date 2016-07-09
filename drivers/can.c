@@ -131,11 +131,7 @@ static void prv_transmit_buffer(const struct CANConfig *can,
   spi_select(can->spi);
   spi_transmit(can->spi, MCP_LOAD_TX | buffer->data);
 
-  // Can't use transmit_array due to endianness
-  int i;
-  for (i = 7; i >= 0; i--) {
-    spi_transmit(can->spi, msg->data_u8[i]);
-  }
+  spi_transmit_array(can->spi, msg->data_u8, 8);
 
   spi_deselect(can->spi);
 
@@ -218,9 +214,8 @@ static void prv_receive_buffer(const struct CANConfig *can,
   spi_select(can->spi);
   spi_transmit(can->spi, MCP_READ_RX | buffer->data);
 
-  // Little endian
   int i;
-  for (i = 7; i >= 0; i--) {
+  for (i = 0; i < 8; i++) {
     msg->data_u8[i] = spi_receive(can->spi);
   }
 
