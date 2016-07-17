@@ -13,5 +13,5 @@ struct PWMConfig {
 
 void pwm_init(const struct PWMConfig *pwm);
 
-uint16_t pwm_calculate_duty_cycle(void);
+int32_t pwm_calculate_duty_cycle(void);
 
