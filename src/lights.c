@@ -79,9 +79,7 @@ void lights_init(struct LightConfig *light_config) {
     	io_set_dir(&config->signals[i].signal_pins[j], PIN_OUT);
     }
   }
-  
-  io_set_dir(&config->can.interrupt_pin, PIN_IN);
-  
+
   can_init(&config->can);
 
   // Start timer that is used for light blinking
@@ -105,13 +103,19 @@ void lights_process_message(void) {
 __interrupt void TIMER_A0_ISR(void) {
   uint16_t i, j;
   // Blink the appropriate lights based on the state
+  config->active = !config->active;
   for (i = 0; i < MAX_SIGNALS; ++i) {
     bool signal_state = (config->signal_states >> i) & 0x1;
     // If this light blinks and light is on
     if (config->signals[i].type == LIGHT_BLINK && signal_state) {
       for (j = 0; j < MAX_LIGHTS; ++j) {
-        io_toggle(&config->signals[i].signal_pins[j]);
+        io_set_state(&config->signals[i].signal_pins[j], config->active);
       }
     }
   }
+}
+
+#pragma vector = PORT2_VECTOR
+__interrupt void PORT2_ISR(void) {
+  io_process_interrupt(&config->can.interrupt_pin);
 }

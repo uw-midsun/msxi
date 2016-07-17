@@ -21,6 +21,7 @@ struct LightConfig {
   struct CANConfig can;
   uint16_t signal_states;
   struct LightSignal signals[MAX_SIGNALS];
+  bool active;
 };
 
 void lights_init(struct LightConfig *light_config);

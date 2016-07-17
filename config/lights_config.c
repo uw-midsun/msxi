@@ -3,20 +3,20 @@
 
 struct LightConfig light_config = {
   .spi = {
-    .data_out = { GPIO_PORT_P5, GPIO_PIN1 },
-    .data_in = { GPIO_PORT_P5, GPIO_PIN2 },
-    .clock_out = { GPIO_PORT_P5, GPIO_PIN3 },
-    .cs = { GPIO_PORT_P5, GPIO_PIN0 },
+    .data_out = { GPIO_PORT_P3, GPIO_PIN1 },
+    .data_in = { GPIO_PORT_P3, GPIO_PIN2 },
+    .clock_out = { GPIO_PORT_P3, GPIO_PIN3 },
+    .cs = { GPIO_PORT_P3, GPIO_PIN0 },
     .clock_freq = 500000,
-    .port = SPI_B1
+    .port = SPI_B0
   },
   .can =
   {
     .spi = &light_config.spi,
-    .interrupt_pin = { GPIO_PORT_P4, GPIO_PIN7 },
-    .reset_pin = {GPIO_PORT_P4, GPIO_PIN6},
+    .interrupt_pin = { GPIO_PORT_P2, GPIO_PIN7 },
+    .reset_pin = NO_RESET_PIN,
     .rxb0 = {
-      .mask = CAN_DEVICE_MASK,
+      .mask = 0,
       .filter = {
         DEVICE_THEMIS,
         CAN_FULL_MASK
@@ -68,7 +68,7 @@ struct LightConfig light_config = {
       .can_msg_id = THEMIS_SIG_RUNNING,
       .type = LIGHT_RUNNING,
       .signal_pins = {
-        {GPIO_PORT_P1, GPIO_PIN6},
+        {GPIO_PORT_P1, GPIO_PIN6}
       },
     },
     {
@@ -81,6 +81,7 @@ struct LightConfig light_config = {
           {GPIO_PORT_P1, GPIO_PIN5}, // Front right
           {GPIO_PORT_P1, GPIO_PIN2}, // Brake right
           {GPIO_PORT_P1, GPIO_PIN3},
+          {GPIO_PORT_P1, GPIO_PIN4}
       },
     },
   },
