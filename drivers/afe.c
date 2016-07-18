@@ -133,7 +133,7 @@ static uint16_t prv_convert_voltage(uint32_t msg) {
 // note: 0 and 4095 aren't reliable due to the division by zero
 //  in the Steinhart-Hart and Voltage Divider equations
 static int prv_convert_temp(struct AFEConfig *afe, uint32_t msg) {
-  uint16_t adcval = (msg >> 11) & 0xFFF;
+  uint32_t adcval = (msg >> 11) & 0xFFF;
 
   return afe->thermistor[adcval];
 }
@@ -262,7 +262,7 @@ uint32_t afe_read_all_conversions(struct AFEConfig *afe, struct ConversionResult
   io_set_state(afe->cnvst, IO_HIGH);
 
   uint8_t dev, input;
-  uint32_t reply, vtotal;
+  uint32_t reply = 0, vtotal = 0;
   for (dev = 0; dev < afe->devices; ++dev) {
     // read VIN
     // even if every value is 13 bits, then we need at most
