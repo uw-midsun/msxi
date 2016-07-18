@@ -9,7 +9,7 @@
 static void prv_init_sm(void);
 static struct State off, running, charging, failure;
 static struct StateMachine sm = {
-  .default_state = &running,
+  .default_state = &off,
   .init = prv_init_sm,
   .id = SM_MAIN
 };
