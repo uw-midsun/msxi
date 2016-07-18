@@ -23,7 +23,7 @@ struct SPIModule {
 
 // Since the F247 doesn't support driverlib, this is a static array of all the SPI registers
 // we use across our boards. This emulates what driverlib does.
-#if defined(__MSP430F247__)
+#if defined(__MSP430F247__) || defined(__MSP430F2471__)
 static const struct SPIModule SPI_MODULE[SPI_NUM_PORTS] = {
   { &UCA0CTL0, &UCA0CTL1, &UCA0BR0, &UCA0BR1, {&IFG2, UCA0RXIFG}, {&IE2, UCA0RXIE}, &UCA0TXBUF },
   { &UCA1CTL0, &UCA1CTL1, &UCA1BR0, &UCA1BR1, {&UC1IFG, UCA1RXIFG}, {&UC1IE, UCA1RXIE}, &UCA1TXBUF },
@@ -125,7 +125,7 @@ static prv_update_data(const uint8_t port, const uint8_t data) {
 
 // Add a new interrupt vector for each SPI port you want to handle.
 #define STRINGIFY(str) #str
-#if defined(__MSP430F247__)
+#if defined(__MSP430F247__) || defined(__MSP430F2471__)
 #define SPI_INTERRUPT(x) \
 _Pragma(STRINGIFY(vector=USCIAB##x##RX_VECTOR)) \
 __interrupt void USCIAB##x##RX_ISR(void) { \
