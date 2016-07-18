@@ -15,6 +15,7 @@ const struct SPIConfig spi_a0 = {
 const struct CANConfig can = {
   .spi = &spi_a0,
   .interrupt_pin = { GPIO_PORT_P1, GPIO_PIN1 },
+  .reset_pin = { GPIO_PORT_P1, GPIO_PIN2 },
   .rxb0 = {
     .mask = CAN_DEVICE_MASK,
     .filter = {
