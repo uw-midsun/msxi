@@ -1,6 +1,5 @@
 #include "precharge.h"
 #include "config.h"
-#include "drivers/delay.h"
 #include "events/motor_controller.h"
 #include "events/fail.h"
 
@@ -24,8 +23,6 @@ static void prv_begin_precharge() {
 }
 
 static void prv_check_precharge() {
-  delay_seconds(1); // TODO: tune delay
-
   mc_process(&mc_config, mc_precharge_power, PRECHARGE_SUCCESS, PRECHARGE_TIMEOUT);
 }
 

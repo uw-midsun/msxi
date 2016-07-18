@@ -14,8 +14,15 @@ static struct StateMachine sm = {
 
 static void prv_kill() {
   // Does it really make sense to fail in shutdown?
-  relay_set_state(&relay_battery, RELAY_OPEN);
+
+  // Disable in specific order: MPPT -> Solar -> Battery
+  io_set_state(&mppt_enable, IO_LOW);
   relay_set_state(&relay_solar, RELAY_OPEN);
+
+  relay_set_state(&relay_battery, RELAY_OPEN);
+
+
+  relay_set_state(&relay_battery, RELAY_OPEN);
 
   // Kill LV power
   power_set_lv(&enable_lv, LV_DISABLED);

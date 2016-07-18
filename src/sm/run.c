@@ -23,13 +23,17 @@ static struct StateMachine sm = {
   .id = SM_RUN
 };
 
+static void prv_debug(void) {
+  __no_operation();
+}
+
 static void prv_init_sm() {
   state_init_composite(&startup, startup_get_sm());
   fail_add_rule(&startup, EMERGENCY_STOP, fail_handle_killswitch);
-  fail_add_rule(&running, HEARTBEAT_BAD, fail_handle_heartbeat);
+  fail_add_rule(&startup, HEARTBEAT_BAD, fail_handle_heartbeat);
   state_add_state_transition(&startup, startup_get_exit_event(), &running);
 
-  state_init(&running, NO_ENTRY_FN);
+  state_init(&running, prv_debug);
   state_add_transition(&running, transitions_make_data_rule(CAN_INTERRUPT, NO_GUARD,
                                                             horn_process_message, 0));
   fail_add_rule(&running, EMERGENCY_STOP, fail_handle_killswitch);

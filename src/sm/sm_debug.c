@@ -2,6 +2,7 @@
 #include "sm_debug.h"
 
 const struct SMDebugConfig *config = NULL;
+static const struct StateMachine *current_sm = NULL;
 
 void sm_debug_init(const struct SMDebugConfig *debug) {
   config = debug;
@@ -25,10 +26,14 @@ static void prv_led_byte(uint8_t id) {
 void sm_debug_alert(const struct StateMachine *sm) {
   prv_led_byte(sm->id);
 
-  struct CANMessage msg = {
-    .id = CHAOS_STATE_CHANGE,
-    .data = sm->id
-  };
+  if (sm != current_sm) {
+    current_sm = sm;
 
-  can_transmit(config->can, &msg);
+    struct CANMessage msg = {
+      .id = CHAOS_STATE_CHANGE,
+      .data = sm->id
+    };
+
+    can_transmit(config->can, &msg);
+  }
 }

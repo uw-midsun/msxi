@@ -109,24 +109,26 @@ const struct MCConfig mc_config = {
 
 const struct IOMap plutus_heartbeat = { GPIO_PORT_P1, GPIO_PIN5 },
                    horn = { GPIO_PORT_P7, GPIO_PIN6 },
-                   enable_lv = { GPIO_PORT_P1, GPIO_PIN3 };
+                   enable_lv = { GPIO_PORT_P1, GPIO_PIN3 },
+                   mppt_enable = { GPIO_PORT_P2, GPIO_PIN1 };
 
 const struct SMDebugConfig sm_debug = {
   .can = &can,
   .leds = {
-    { GPIO_PORT_P8, GPIO_PIN0 },
-    { GPIO_PORT_P8, GPIO_PIN1 },
-    { GPIO_PORT_P8, GPIO_PIN2 },
-    { GPIO_PORT_P8, GPIO_PIN3 },
-    { GPIO_PORT_P8, GPIO_PIN4 },
-    { GPIO_PORT_P8, GPIO_PIN5 },
-    { GPIO_PORT_P8, GPIO_PIN6 },
-    { GPIO_PORT_P8, GPIO_PIN7 }
+    { GPIO_PORT_P2, GPIO_PIN4 },
+    { GPIO_PORT_P2, GPIO_PIN5 },
+    { GPIO_PORT_P2, GPIO_PIN6 },
+    { GPIO_PORT_P2, GPIO_PIN7 },
+    { GPIO_PORT_P3, GPIO_PIN1 },
+    { GPIO_PORT_P3, GPIO_PIN2 },
+    { GPIO_PORT_P3, GPIO_PIN3 },
+    { GPIO_PORT_P7, GPIO_PIN2 }
   }
 };
 
-const struct SwitchInput switches = {
-  .power = { GPIO_PORT_P2, GPIO_PIN0 },
-  .select = { GPIO_PORT_P2, GPIO_PIN1 },
-  .killswitch = { GPIO_PORT_P2, GPIO_PIN2 }
+struct InputConfig input = {
+  .power = { { GPIO_PORT_P2, GPIO_PIN0 } },
+  .killswitch = { { GPIO_PORT_P6, GPIO_PIN6 } },
+  .power_led = { GPIO_PORT_P11, GPIO_PIN1 },
+  .select = { GPIO_PORT_P6, GPIO_PIN7 },
 };

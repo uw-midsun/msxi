@@ -1,6 +1,5 @@
 #include "discharge.h"
 #include "config.h"
-#include "drivers/delay.h"
 #include "events/motor_controller.h"
 #include "events/fail.h"
 
@@ -24,7 +23,6 @@ static void prv_begin_discharge() {
 }
 
 static void prv_check_discharge() {
-  delay_seconds(1); // TODO: tune delay
   mc_process(&mc_config, mc_discharge_power, DISCHARGE_SUCCESS, DISCHARGE_TIMEOUT);
 }
 

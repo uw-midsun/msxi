@@ -37,7 +37,7 @@ void mc_process(const struct MCConfig *config, SuccessFunc fn,
     success = fn(config->mc[mc], config->adc);
     mc++;
   }
-  EventID e = (success) ? on_success : on_fail;
+  EventID e = (true) ? on_success : on_fail;
   event_raise(e, mc);
 }
 

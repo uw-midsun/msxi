@@ -7,10 +7,15 @@
 // Power events are generated with the select switch's state as the data value.
 
 struct SwitchInput {
-  struct IOMap power;       // Power toggle button
-  struct IOMap power_led;   // Power button LED
-  struct IOMap select;      // Running/Charging selection switch
-  struct IOMap killswitch;  // Killswitch
+  struct IOMap pin;
+  IOState state;
+};
+
+struct InputConfig {
+  struct SwitchInput power;       // Power toggle button
+  struct SwitchInput killswitch;  // Killswitch
+  struct IOMap select;            // Running/Charging selection switch
+  struct IOMap power_led;         // Power button LED
 };
 
 typedef enum {
@@ -19,12 +24,11 @@ typedef enum {
   EMERGENCY_STOP
 } InputEvent;
 
-// Initializes switches and interrupts.
-void input_init(const struct SwitchInput *input);
+// Initializes switches.
+void input_init(struct InputConfig *input);
 
-// Call this in the appropriate port's ISR.
-// Returns whether we should exit LPM.
-bool input_interrupt(const struct SwitchInput *input);
+// Polls the state of switches and fire events on changes.
+void input_poll(uint16_t elapsed_ms, void *context);
 
 // Input Guards - Use this with POWER_ON to determine which mode to enter.
 bool input_is_charge(uint64_t data);

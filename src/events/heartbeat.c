@@ -12,16 +12,16 @@ void heartbeat_init(const struct IOMap *heartbeat_pin) {
   io_configure_interrupt(pin, true, EDGE_RISING);
 }
 
-void heartbeat_fire_event(void) {
+void heartbeat_timer_cb(uint16_t elapsed_ms, void *context) {
   // Raise a heartbeat state event - high means good
   EventID e = (io_get_state(pin) == IO_HIGH) ? HEARBEAT_GOOD : HEARTBEAT_BAD;
-  event_raise_isr(e, 0);
+  event_raise_isr(HEARBEAT_GOOD, 0);
 }
 
 
 void heartbeat_interrupt(void) {
   if (io_process_interrupt(pin)) {
-    heartbeat_fire_event();
+    heartbeat_timer_cb(0, NULL);
     io_toggle_interrupt_edge(pin);
   }
 }

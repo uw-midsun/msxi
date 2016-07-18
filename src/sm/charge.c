@@ -1,14 +1,14 @@
 #include "charge.h"
 #include "config.h"
-#include "drivers/delay.h"
 #include "events/heartbeat.h"
 #include "events/protected_relay.h"
 #include "events/fail.h"
 #include "events/input.h"
 #include "events/power.h"
+#include "drivers/timer.h"
 
 static void prv_init_sm(void);
-static struct State enable, heartbeat, charging;
+static struct State enable, heartbeat, charging, disable;
 static struct StateMachine sm = {
   .default_state = &enable,
   .init = prv_init_sm,
@@ -19,19 +19,32 @@ static void prv_enable() {
   // Ensure that LV power is enabled - powers the rest of the boards
   // Note that LV power is generally enabled.
   power_set_lv(&enable_lv, LV_ENABLED);
-  protected_relay_set_state(&relay_solar, RELAY_CLOSED);
+  protected_relay_set_state(&relay_battery, RELAY_CLOSED);
 }
 
 static void prv_enable_heartbeat() {
   // Allow Plutus to initialize if it isn't already active
-  delay_seconds(1);
-  // Heartbeat check should already be active by now
-  heartbeat_fire_event();
+  timer_delay(1000, heartbeat_timer_cb, NULL);
 }
 
 static void prv_charge() {
   // We don't really care if we're powered off of DC-DC or not. Do we?
-  relay_set_state(&relay_battery, RELAY_CLOSED);
+  relay_set_state(&relay_solar, RELAY_CLOSED);
+}
+
+static void prv_disable() {
+  // Disable in specific order: MPPT -> Solar -> Battery
+  io_set_state(&mppt_enable, IO_LOW);
+
+  // TODO: replace with actual timer delay - used to disable the MPPTs before they're disconnected
+  // from the battery
+  __delay_cycles(400);
+
+  relay_set_state(&relay_solar, RELAY_OPEN);
+
+  relay_set_state(&relay_battery, RELAY_OPEN);
+
+  event_raise(CHARGING_COMPLETE, 0);
 }
 
 static void prv_init_sm() {
@@ -45,7 +58,10 @@ static void prv_init_sm() {
 
   state_init(&charging, prv_charge);
   fail_add_rule(&heartbeat, HEARTBEAT_BAD, fail_handle_heartbeat);
-  state_add_event_rule(&charging, POWER_OFF, CHARGING_COMPLETE);
+  state_add_state_transition(&charging, POWER_OFF, &disable);
+
+  state_init(&disable, prv_disable);
+  fail_add_rule(&heartbeat, HEARTBEAT_BAD, fail_handle_heartbeat);
 }
 
 

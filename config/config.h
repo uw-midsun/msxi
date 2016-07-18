@@ -18,8 +18,8 @@ extern const struct Relay relay_battery, relay_solar;
 
 extern const struct MCConfig mc_config;
 
-extern const struct IOMap plutus_heartbeat, horn, enable_lv;
+extern const struct IOMap plutus_heartbeat, horn, enable_lv, mppt_enable;
 
 extern const struct SMDebugConfig sm_debug;
 
-extern const struct SwitchInput switches;
+extern struct InputConfig input;

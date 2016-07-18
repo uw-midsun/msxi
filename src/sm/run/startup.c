@@ -1,12 +1,12 @@
 #include "startup.h"
 #include "precharge.h"
 #include "config.h"
+#include "drivers/timer.h"
 #include "events/heartbeat.h"
 #include "events/fail.h"
 #include "events/input.h"
 #include "events/power.h"
 #include "events/protected_relay.h"
-#include "drivers/delay.h"
 
 // Reset peripherals
 // Switch to DC-DC
@@ -31,19 +31,24 @@ static void prv_reset_peripherals() {
   relay_init(&relay_solar);
 
   // Protected relay switch will move us to the next state
-  protected_relay_set_state(&relay_solar, RELAY_CLOSED);
+  protected_relay_set_state(&relay_battery, RELAY_CLOSED);
 }
 
 static void prv_init_heartbeat() {
   // Allow Plutus to initialize if it isn't already active
-  delay_seconds(1);
-
-  heartbeat_fire_event();
+  timer_delay(1000, heartbeat_timer_cb, NULL);
 }
 
-static void prv_init_power() {
-  // Enable power to the car
-  protected_relay_set_state(&relay_battery, RELAY_CLOSED);
+static void prv_init_solar() {
+  // Attach solar array to the main circuit
+  protected_relay_set_state(&relay_solar, RELAY_CLOSED);
+
+  // TODO: replace with actual timer delay - used to enable the MPPTs only once they're attached
+  // to the battery
+  __delay_cycles(400);
+
+  // Enable MPPTs - active-high
+  io_set_state(&mppt_enable, IO_HIGH);
 }
 
 static void prv_init_sm() {
@@ -55,7 +60,7 @@ static void prv_init_sm() {
   state_add_state_transition(&heartbeat, HEARBEAT_GOOD, &power);
   fail_add_rule(&heartbeat, HEARTBEAT_BAD, fail_handle_heartbeat);
 
-  state_init(&power, prv_init_power);
+  state_init(&power, prv_init_solar);
   state_add_state_transition(&power, RELAY_SWITCHED, &precharge); // Could add DC-DC check here
   fail_add_rule(&power, RELAY_FAIL, fail_handle_relay);
 

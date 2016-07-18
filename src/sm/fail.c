@@ -12,9 +12,16 @@ static struct StateMachine sm = {
 };
 
 static void prv_kill() {
-  // Reset relays
-  relay_set_state(&relay_battery, RELAY_OPEN);
+  // Disable in specific order: MPPT -> Solar -> Battery
+  io_set_state(&mppt_enable, IO_LOW);
+
+  // TODO: replace with actual timer delay - used to disable the MPPTs before they're disconnected
+  // from the battery
+  __delay_cycles(400);
+
   relay_set_state(&relay_solar, RELAY_OPEN);
+
+  relay_set_state(&relay_battery, RELAY_OPEN);
 
   // Reset motor controllers - resets relays and transducer power
   mc_init(&mc_config);

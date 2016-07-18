@@ -1,5 +1,4 @@
 #include "power.h"
-#include "drivers/delay.h"
 #include "sm/event_queue.h"
 
 #define MAX_ATTEMPTS 1
@@ -31,7 +30,6 @@ void power_status_check(void *dcdc) {
       return;
     }
     tries++;
-    delay_seconds(WAIT_SECONDS);
   }
 
   // After waiting, it still isn't good - something must be wrong.
