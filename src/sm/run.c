@@ -31,6 +31,7 @@ static void prv_init_sm() {
   state_init_composite(&startup, startup_get_sm());
   fail_add_rule(&startup, EMERGENCY_STOP, fail_handle_killswitch);
   fail_add_rule(&startup, HEARTBEAT_BAD, fail_handle_heartbeat);
+  state_add_state_transition(&running, POWER_OFF, &shutdown);
   state_add_state_transition(&startup, startup_get_exit_event(), &running);
 
   state_init(&running, prv_debug);
