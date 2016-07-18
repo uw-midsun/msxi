@@ -28,7 +28,10 @@ static const struct GPIOMap GPIO[] = {
 #endif
 #if defined(__MSP430_HAS_PORTE_R__)
   { &P9DIR, &P9IN, &P9OUT, &P9SEL, &P9REN, NULL, NULL, NULL },
-  { &P10DIR, &P10IN, &P10OUT, &P10SEL, &P10REN, NULL, NULL, NULL }
+  { &P10DIR, &P10IN, &P10OUT, &P10SEL, &P10REN, NULL, NULL, NULL },
+#endif
+#if defined(__MSP430_HAS_PORT11_R__)
+  { &P11DIR, &P11IN, &P11OUT, &P11SEL, &P11REN, NULL, NULL, NULL },
 #endif
 };
 
