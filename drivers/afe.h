@@ -2,6 +2,7 @@
 #include "spi.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include "ad7280a.h"
 
 #define AFE_DEVADDR_MASTER                          0
 
@@ -34,15 +35,22 @@ struct Threshold {
 };
 
 struct TempThreshold {
-  int16_t high;
   int16_t low;
+  int16_t high;
 };
+
+typedef enum {
+  NO_AUX_INPUTS = CTRL_HB_CONV_RSLT_READ_6CELL | CTRL_HB_CONV_INPUT_6CELL,
+  THREE_AUX_INPUTS = CTRL_HB_CONV_RSLT_READ_6CELL_AUX1_3_5 | CTRL_HB_CONV_INPUT_6CELL_AUX1_3_5,
+  SIX_AUX_INPUTS = CTRL_HB_CONV_RSLT_READ_ALL | CTRL_HB_CONV_INPUT_ALL
+} AUXInput;
 
 struct AFEConfig {
   const struct SPIConfig *spi_config;     // spi configuration
   const int thermistor[4096];             // thermistor[adcval] = temp
   const struct IOMap *cnvst;              // conversion start
   const struct IOMap *pd;                 // power down pin
+  const AUXInput aux_input;               //
   uint8_t crc_table[256];                 // set by afe_init
   uint8_t devices;                        // set by afe_init
   struct TempThreshold d_temp;

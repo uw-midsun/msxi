@@ -132,7 +132,7 @@ static uint16_t prv_convert_voltage(uint32_t msg) {
 // return a temperature in C
 // note: 0 and 4095 aren't reliable due to the division by zero
 //  in the Steinhart-Hart and Voltage Divider equations
-static int prv_convert_temp(struct AFEConfig *afe, uint32_t msg) {
+static int16_t prv_convert_temp(struct AFEConfig *afe, uint32_t msg) {
   uint32_t adcval = (msg >> 11) & 0xFFF;
 
   return afe->thermistor[adcval];
@@ -250,8 +250,7 @@ uint32_t afe_read_all_conversions(struct AFEConfig *afe, struct ConversionResult
 
   // prv_transfer_32_bits(afe, 0x01A0131A);
   prv_write(afe, AFE_DEVADDR_MASTER, AFE_CONTROL_HB, true,
-            CTRL_HB_CONV_START_CNVST | CTRL_HB_CONV_RSLT_READ_6CELL_AUX1_3_5 |
-            CTRL_HB_CONV_INPUT_6CELL_AUX1_3_5);
+            CTRL_HB_CONV_START_CNVST | afe->aux_input);
 
   // prv_transfer_32_bits(afe, 0x03A0546A);
   prv_write(afe, AFE_DEVADDR_MASTER, AFE_CNVST_CONTROL, true, CNVST_IN_PULSE);
