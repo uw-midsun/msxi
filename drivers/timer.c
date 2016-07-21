@@ -25,7 +25,7 @@ static struct Timer timers[NUM_TIMERS];
 void timer_init() {
   TA1CCTL0 = CCIE;
   TA1CCR0 = CYCLES_IN_MS;
-  TA1CTL = TBSSEL_1 | MC_1 | TBCLR; // ACLK, Up mode
+  TA1CTL = TASSEL_1 | MC_1 | TACLR; // ACLK, Up mode
 }
 
 void timer_process() {
@@ -79,7 +79,7 @@ bool timer_delay_periodic(uint16_t ms, timer_delay_cb delay_cb, void *context) {
   return prv_register_timer(TIMER_PERIODIC, ms, delay_cb, context);
 }
 
-#pragma vector=TIMER0_A1_VECTOR
+#pragma vector=TIMER1_A0_VECTOR
 __interrupt void TIMERA1_ISR(void) {
   uint16_t i;
   for (i = 0; i < NUM_TIMERS; i++) {

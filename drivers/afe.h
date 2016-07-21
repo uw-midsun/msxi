@@ -52,7 +52,7 @@ struct AFEConfig {
   const struct IOMap *pd;                 // power down pin
   const AUXInput aux_input;               //
   uint8_t crc_table[256];                 // set by afe_init
-  uint8_t devices;                        // set by afe_init
+  uint8_t devices;                        // set by afe_init, number of devices (including master)
   struct TempThreshold d_temp;
   struct TempThreshold c_temp;
   bool crc_error;                         // crc read calculation status

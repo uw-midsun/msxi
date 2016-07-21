@@ -27,6 +27,7 @@ struct CANMessage {
     uint32_t data_u32[2];
     uint16_t data_u16[4];
     uint8_t data_u8[8];
+    int16_t data_16[4];
     float data_f[2];
   };
   uint16_t id;
