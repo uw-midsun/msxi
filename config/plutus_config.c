@@ -478,8 +478,8 @@ struct AFEConfig afe = {
     -69, -70, -71, -72, -73, -74, -76, -77, -79, -81,
     -83, -86, -91, -98, -1000
   },
-  .d_temp = { -20, 55 },
-  .c_temp = { 0, 55 }
+  .d_temp = { -20, 65 },
+  .c_temp = { 0, 45 }
 };
 
 const struct ADC12Config adc12 = {
@@ -509,4 +509,4 @@ const struct Threshold bal1 = {    0, 4000 };
 const struct Threshold bal2 = { 4000, 4150 };
 const struct Threshold bal3 = { 4150, 4200 };
 
-const struct Threshold danger_threshold = { 2700, 4225 };
+const struct Threshold danger_threshold = { 2700, 4200 };
