@@ -12,6 +12,7 @@ void current_sensor_init(const struct PWMConfig *pwm) {
 int32_t current_sensor_read(void) {
   int32_t dc = 0;
   dc = pwm_calculate_duty_cycle();
-  int32_t cc = ((dc - 50 * SCALING_FACTOR) * 243) / 100;
+  //int32_t cc = ((dc - 50 * SCALING_FACTOR) * 243) / 100;
+  int32_t cc = 2 * dc - 10000; // dc = xx.xx
   return cc;
 }
