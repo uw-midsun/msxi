@@ -6,10 +6,10 @@
 
 typedef enum {
   ADC12_MEM0 = 0,
-  ADC12_MEM1,
-  ADC12_MEM2,
-  ADC12_MEM3,
-  ADC12_MEM4,
+  ADC12_MEM1 = 1,
+  ADC12_MEM2 = 2,
+  ADC12_MEM3 = 3,
+  ADC12_MEM4 = 4,
   ADC12_MEM_MAX
 } ADC12Index;
 

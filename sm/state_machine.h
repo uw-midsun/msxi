@@ -26,6 +26,7 @@ struct State {
   EntryFunc enter;
   struct StateMachine *sub_sm;
   struct Transitions transitions;
+  uint8_t id;
 };
 
 struct StateMachine {
@@ -33,10 +34,11 @@ struct StateMachine {
   struct State *default_state;
   InitFunc init;
   uint8_t id;
+  uint8_t num_states;
   bool initialized;
 };
 
-typedef void(*SMDebugFunc)(const struct StateMachine *);
+typedef void(*SMDebugFunc)(const struct StateMachine *, const struct Event *e);
 
 // The debug function will be called when an event is processed. It is passed the state machine
 //  that handled the event.
@@ -45,10 +47,10 @@ void sm_framework_init(SMDebugFunc debug_fn);
 // Initializes a state machine by populating it and then switching it to its default state.
 void sm_init(struct StateMachine *sm);
 
-void state_init(struct State *state, EntryFunc entry_fn);
+void state_init(struct State *state, struct StateMachine *sm, EntryFunc entry_fn);
 
 // Initializes the state as a composite state with sm as its sub-state machine.
-void state_init_composite(struct State *state, struct StateMachine *sm);
+void state_init_composite(struct State *state, struct StateMachine *sm, struct StateMachine *sub_sm);
 
 void sm_process_event(struct StateMachine *sm, struct Event *e);
 

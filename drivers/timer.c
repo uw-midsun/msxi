@@ -4,7 +4,7 @@
 
 #define SMCLK_FREQ 1048574
 #define CYCLES_IN_MS ((SMCLK_FREQ) / 1000)
-#define NUM_TIMERS 4
+#define NUM_TIMERS 7
 
 typedef enum {
   TIMER_INACTIVE = 0,
@@ -30,6 +30,8 @@ void timer_init() {
 
 void timer_process() {
   uint16_t i;
+
+  __disable_interrupt();
   for (i = 0; i < NUM_TIMERS; i++) {
     struct Timer *timer = &timers[i];
     if (timer->elapsed_ms >= timer->target_ms) {
@@ -48,6 +50,7 @@ void timer_process() {
       }
     }
   }
+  __enable_interrupt();
 }
 
 static bool prv_register_timer(TimerType type, uint16_t ms,

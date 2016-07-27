@@ -53,7 +53,7 @@ uint16_t adc12_sample(const struct ADC12Config *adc, const ADC12Index pin) {
     ADC12CTL0 |= ADC12SC;
 
     // Enter LPM4 while waiting for interrupt
-    __bis_SR_register(LPM4_bits);
+    __bis_SR_register(LPM0_bits);
   }
 
   // TODO: do we really need to toggle interrupts? Seems to be the correct size for atomic access
@@ -73,7 +73,7 @@ __interrupt void ADC12ISR(void) {
       }
 
       // Exit LPM4 after interrupt processes
-      __bic_SR_register_on_exit(LPM4_bits);
+      __bic_SR_register_on_exit(LPM0_bits);
       break;
     default: break;
   }

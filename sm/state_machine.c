@@ -17,22 +17,28 @@ void sm_init(struct StateMachine *sm) {
   sm_change_state(sm, sm->default_state);
 }
 
-void state_init(struct State *state, EntryFunc entry_fn) {
+void state_init(struct State *state, struct StateMachine *sm, EntryFunc entry_fn) {
   state->enter = entry_fn;
   state->sub_sm = NULL;
   state->transitions = (struct Transitions) {
     .root = NULL,
     .last = NULL
   };
+
+  sm->num_states++;
+  state->id = sm->num_states;
 }
 
-void state_init_composite(struct State *state, struct StateMachine *sm) {
+void state_init_composite(struct State *state, struct StateMachine *sm, struct StateMachine *sub_sm) {
   state->enter = NULL;
-  state->sub_sm = sm;
+  state->sub_sm = sub_sm;
   state->transitions = (struct Transitions) {
     .root = NULL,
     .last = NULL
   };
+
+  sm->num_states++;
+  state->id = sm->num_states;
 }
 
 // Loops through the current state's transition rules
@@ -50,7 +56,7 @@ void sm_process_event(struct StateMachine *sm, struct Event *e) {
     _nop();
     if (sm_debug != NULL) {
       // Event processed - run debug function
-      sm_debug(sm);
+      sm_debug(sm, e);
     }
   } else if (current_state->sub_sm != NULL) {
     sm_process_event(current_state->sub_sm, e);
@@ -86,10 +92,10 @@ void state_add_event_rule(struct State *state, EventID e, EventID event) {
 //   and switches it to the default state.
 void sm_change_state(struct StateMachine *sm, void *next_state) {
   sm->current_state = next_state;
-  if(sm->current_state->sub_sm != NULL) {
+  if (sm->current_state->sub_sm != NULL) {
     sm_init(sm->current_state->sub_sm);
   }
-  if(sm->current_state->enter != NULL) {
+  if (sm->current_state->enter != NULL) {
     sm->current_state->enter();
   }
 }
