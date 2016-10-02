@@ -142,19 +142,20 @@ static void get_afe_results(uint16_t elapsed_ms, void* context) {
 static void prv_set_fault(bool faulted, uint16_t led) {
   static uint16_t faults = 0;
 
-  if (faulted) {
+  if (faulted && !((faults >> led) & 0x1)) {
     io_set_state(&heartbeat, IO_LOW);
-    io_set_state(&spst, IO_LOW);
+    io_set_state(&spst, IO_HIGH);
 
     led_set_state(&leds[led], LED_ON);
     prv_send_fault(led);
-  } else if (!faulted && ((faults >> led) & 0x1)) {
-    io_set_state(&heartbeat, IO_HIGH);
-    io_set_state(&spst, IO_HIGH);
-
-    led_set_state(&leds[led], LED_OFF);
   }
-
+//  } else if (!faulted && ((faults >> led) & 0x1)) {
+//    io_set_state(&heartbeat, IO_HIGH);
+//    io_set_state(&spst, IO_LOW);
+//
+//    led_set_state(&leds[led], LED_OFF);
+//  }
+//
   if (faulted) {
     faults |= (1 << led);
   } else {
@@ -203,7 +204,7 @@ int main() {
   io_set_state(&heartbeat, IO_HIGH);
 
   io_set_dir(&spst, PIN_OUT);
-  io_set_state(&spst, IO_HIGH);
+  io_set_state(&spst, IO_LOW);
 
   int k;
   for (k = 0; k < 8; ++k) {
