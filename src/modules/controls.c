@@ -13,7 +13,7 @@
 
 static void prv_init_sm(void);
 static void prv_init_run_sm(void);
-static struct State off, run, drive, cruise, brake;
+static struct State off, run, drive, cruise, brake, fault;
 static struct StateMachine sm = {
   .default_state = &off,
   .init = prv_init_sm
@@ -28,6 +28,7 @@ static void prv_drive_command(struct StateMachine *sm, uint64_t data) {
     .id = THEMIS_DRIVE,
     .data = data
   };
+
   can_transmit(&can, &msg);
 }
 
@@ -79,11 +80,22 @@ uint8_t controls_cruise_target() {
 // <- End cruise
 
 bool controls_cruise_active() {
-  return run_sm.current_state == &cruise;
+  return (sm.current_state == &run) && (run_sm.current_state == &cruise);
 }
+
+bool controls_faulted() {
+  return (sm.current_state == &fault);
+}
+
 
 // Run SM
 static void prv_init_run_sm() {
+  struct CANMessage reset = {
+    .id = THEMIS_RESET
+  };
+
+  can_transmit(&can, &reset);
+
   // Drive: Process throttle events
   // If brake is activated, switch to brake
   // If cruise control is activated, switch to cruise control
@@ -118,6 +130,7 @@ static void prv_init_sm() {
   // Off
   state_init(&off, NO_ENTRY_FN);
   state_add_guarded_state_transition(&off, IGNITION_TOGGLE, input_rising_edge, &run);
+  state_add_state_transition(&off, PLUTUS_CAN_FAULT, &fault);
 
   // On
   // Allow target cruise velocity to be modified whenever the car is on
@@ -126,7 +139,11 @@ static void prv_init_sm() {
                                                            prv_cruise_increment, NULL));
   state_add_transition(&run, transitions_make_pointer_rule(CRUISE_DIR_NEG, input_rising_edge,
                                                            prv_cruise_decrement, NULL));
+  state_add_state_transition(&run, PLUTUS_CAN_FAULT, &fault);
   state_add_guarded_state_transition(&run, IGNITION_TOGGLE, input_falling_edge, &off);
+
+  state_init(&fault, NO_ENTRY_FN);
+  state_add_guarded_state_transition(&fault, IGNITION_TOGGLE, input_falling_edge, &off);
 }
 
 struct StateMachine *controls_sm(void) {

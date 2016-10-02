@@ -1,14 +1,8 @@
 #include "mc_state.h"
 #include "can/config.h"
-#include "sm_config.h"
 
 void mc_state_update(struct MCStateConfig *state, EventID e) {
-//  if (e != CAN_INTERRUPT) {
-//    return;
-//  }
-
   struct CANMessage msg = { 0 };
-  struct CANError error = { 0 };
 
   // Not sure if we care about CAN errors, but this clears any that may have occurred.
 //  while (can_process_interrupt(state->can, &msg, &error)) {
@@ -25,6 +19,11 @@ void mc_state_update(struct MCStateConfig *state, EventID e) {
       }
     }
     _nop();
+
+    // Super hacky - please fix
+    if (msg.id == PLUTUS_FAULT) {
+      event_raise(PLUTUS_CAN_FAULT, msg.data);
+    }
   }
 }
 
@@ -36,9 +35,15 @@ float mc_state_value(struct MCStateConfig *state, MotorController mc, MCStateVal
     float total = 0.0f;
     uint8_t i;
     for (i = 0; i < MC_COUNT; i++) {
-      total += state->mc[i].packet[packet].data[data];
+      if (state->mc[i].reversed) {
+        total -= state->mc[i].packet[packet].data[data];
+      } else {
+        total += state->mc[i].packet[packet].data[data];
+      }
     }
     return total / MC_COUNT;
+  } else if (state->mc[mc].reversed) {
+    return -state->mc[mc].packet[packet].data[data];
   } else {
     return state->mc[mc].packet[packet].data[data];
   }

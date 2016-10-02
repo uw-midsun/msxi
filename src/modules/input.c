@@ -54,7 +54,8 @@ static Fraction prv_scale_gain(struct BrakeInput *brake) {
     numerator = 0;
   }
 
-  return fraction_from(numerator + 1, REGEN_GAIN_RESOLUTION);
+//  return fraction_from(numerator + 1, REGEN_GAIN_RESOLUTION);
+  return fraction_from_i(1);
 }
 
 // Handles both regen and mechanical braking
@@ -75,8 +76,10 @@ static void prv_handle_brake(struct InputConfig *input) {
   const Fraction regen_gain = prv_scale_gain(brake),
                  regen_percent = prv_scale_pot(input, &brake->regen, regen_gain);
 
+  const uint16_t pot_value = adc12_sample(input->adc, brake->regen.input);
+
   static char display_buffer[20];
-  snprintf(display_buffer, 20, "B: %.4f / %.4f", fraction_to(regen_percent), 0.0f);
+  snprintf(display_buffer, 20, "B: %.4f / %d", fraction_to(regen_percent), pot_value);
   lcd_println(display.lcd, LINE_2, display_buffer);
 
   event_raise(brake->regen.event, prv_build_payload(0, fraction_to(regen_percent)));
@@ -101,17 +104,19 @@ static void prv_handle_throttle(struct InputConfig *input) {
     current = fraction_to(prv_scale_pot(input, &throttle->pot, scale));
   }
 
-  static char display_buffer[20];
-  snprintf(display_buffer, 20, "T: %.4f / %.4f", current, dir_velocity[dir_index]);
-  lcd_println(display.lcd, LINE_1, display_buffer);
+  const uint16_t pot_value = adc12_sample(input->adc, throttle->pot.input);
+
+//  static char display_buffer[20];
+//  snprintf(display_buffer, 20, "T: %.4f / %d", current, pot_value);
+//  lcd_println(display.lcd, LINE_1, display_buffer);
 
   event_raise(throttle->pot.event, prv_build_payload(dir_velocity[dir_index], current));
 }
 
 static void prv_check_pot(struct InputConfig *input, struct PotInput *pot, PotHandler handle_fn) {
   uint16_t pot_value = adc12_sample(input->adc, pot->input);
-//  pot->state = (pot_value <= pot->calibration.high);
-  pot->state = 0;
+  pot->state = (pot_value <= pot->calibration.high - 50);
+//  pot->state = 0;
 
   handle_fn(input);
 }
@@ -159,9 +164,12 @@ void input_process(struct InputConfig *input) {
     struct Input *in = &input->isr[i];
     if (io_process_interrupt(&in->input)) {
       IOState state = io_get_state(&in->input);
-      io_toggle_interrupt_edge(&in->input);
-      // Active-high switches
-      event_raise_isr(in->event, state);
+      if (in->state != state) {
+        in->state = state;
+        io_toggle_interrupt_edge(&in->input);
+        // Active-high switches
+        event_raise_isr(in->event, state);
+      }
     }
   }
 }

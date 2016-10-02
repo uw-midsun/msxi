@@ -18,4 +18,4 @@ SpeedUnit speed_get_unit(void);
 uint8_t speed_convert(const float *speed_ms);
 
 // Returns the provided speed (in the specified unit) in m/s
-float speed_to(const uint8_t speed_unit);
+float speed_to(const uint8_t speed);

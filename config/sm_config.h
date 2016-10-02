@@ -9,4 +9,5 @@ typedef enum {
   POLLED_INPUT,
   ISR_INPUT,
   SPECIAL_INPUT,
+  PLUTUS_MESSAGE,
 } EventSource;

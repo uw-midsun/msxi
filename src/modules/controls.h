@@ -13,4 +13,6 @@ uint8_t controls_cruise_target(void);
 
 bool controls_cruise_active(void);
 
+bool controls_faulted(void);
+
 struct StateMachine *controls_sm(void);

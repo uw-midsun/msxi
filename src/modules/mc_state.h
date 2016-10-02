@@ -1,6 +1,7 @@
 #pragma once
 #include "drivers/can.h"
 #include "sm/event_queue.h"
+#include "sm_config.h"
 
 // Motor controller info struct
 
@@ -13,10 +14,14 @@ typedef enum {
 
 typedef enum {
   MC_LEFT,
-  //MC_RIGHT,
+  MC_RIGHT,
   MC_COUNT,
   MC_AVERAGE
 } MotorController;
+
+typedef enum {
+  PLUTUS_CAN_FAULT = SM_EVENT_OFFSET(PLUTUS_MESSAGE)
+} PlutusCANEvent;
 
 // packet[0] = Velocity, packet[1] = Power Info
 struct MCConfig {
@@ -27,6 +32,7 @@ struct MCConfig {
       float data[2];
     };
   } packet[2];
+  bool reversed;
 };
 
 struct MCStateConfig {

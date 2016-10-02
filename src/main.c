@@ -20,6 +20,10 @@ static void prv_display_update(uint16_t elapsed_ms, void *context) {
 int main(void) {
   WDTCTL = WDTPW | WDTHOLD; // Stop watchdog timer
 
+  DCOCTL = CALDCO_8MHZ;
+  BCSCTL1 = CALBC1_8MHZ;
+  BCSCTL2 |= DIVS_3; // Divide SMCLK by 8
+
   sm_framework_init(NULL);
 
   __enable_interrupt();
@@ -37,6 +41,22 @@ int main(void) {
   // Update the LCD every second at a minimum
   timer_delay_periodic(500, prv_display_update, NULL);
 
+  struct CANMessage reset = {
+    .id = THEMIS_RESET
+  };
+
+  can_transmit(&can, &reset);
+
+  struct CANMessage bus_current = {
+    .id = THEMIS_POWER,
+    .data_f = {
+      0.0f, // reserved
+      1.0f // bus current
+    }
+  };
+
+  can_transmit(&can, &bus_current);
+
   while (true) {
     timer_process();
 
@@ -49,6 +69,15 @@ int main(void) {
       sm_process_event(controls_sm(), &e);
 
       //display_update(&display);
+    }
+
+    if (io_get_state(&can.interrupt_pin) == IO_LOW) {
+      struct CANMessage msg;
+      can_receive(&can, &msg);
+
+      if (msg.id == PLUTUS_FAULT) {
+        event_raise(PLUTUS_CAN_FAULT, msg.data);
+      }
     }
   }
 }

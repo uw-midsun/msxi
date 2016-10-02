@@ -22,13 +22,16 @@ const struct CANConfig can = {
   .rxb0 = {
     .mask = CAN_FULL_MASK,
     .filter = {
-      0x43
+      LEFT_MC_VELOCITY,
+      RIGHT_MC_VELOCITY,
     }
   },
   .rxb1 = {
     .mask = CAN_FULL_MASK,
     .filter = {
-      0x42
+      LEFT_MC_BUS,
+      RIGHT_MC_BUS,
+      PLUTUS_FAULT
     }
   }
 };
@@ -97,8 +100,8 @@ struct InputConfig input = {
     .regen = {
       .event = BRAKE_CHANGE,
       .calibration = {
-        .high = 3250, // 3250 actual
-        .low = 2880 // 2849 actual // 2881 actual
+        .high = 3250, // 3255 actual
+        .low = 2780 // 2860 actual
       },
       .input = ADC12_MEM0
     }
@@ -107,8 +110,8 @@ struct InputConfig input = {
     .pot = {
       .event = THROTTLE_CHANGE,
       .calibration = {
-        .high = 3265, // 3240, // 3265 actual
-        .low = 2955 // 2930 // 2897 actual
+        .high = 3266, // 3260 actual
+        .low = 2844 // 2996 actual
       },
       .input = ADC12_MEM1
     },

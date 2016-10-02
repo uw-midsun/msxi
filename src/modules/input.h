@@ -36,6 +36,7 @@ typedef enum {
   BRAKE_CHANGE = SM_EVENT_OFFSET(SPECIAL_INPUT), // Regen (polled) and mechanical (polled)
   BRAKE_EDGE,
   THROTTLE_CHANGE,
+  THROTTLE_EDGE
 } SpecialInputEvent;
 
 struct Input {
