@@ -1,7 +1,6 @@
 #include "can.h"
 #include "mcp2515.h"
 #include <stdio.h>
-#include "can/config.h"
 
 struct TXBuffer {
   uint8_t id;
@@ -132,15 +131,7 @@ static void prv_transmit_buffer(const struct CANConfig *can,
   spi_select(can->spi);
   spi_transmit(can->spi, MCP_LOAD_TX | buffer->data);
 
-  // Fix endianness - Plutus was accidentally flashed with big-endian code
-  if ((msg->id & CAN_DEVICE_MASK) == DEVICE_PLUTUS) {
-    uint8_t i;
-    for (i = 7; i >= 0; i--) {
-      spi_transmit(can->spi, msg->data_u8[i]);
-    }
-  } else {
-    spi_transmit_array(can->spi, msg->data_u8, 8);
-  }
+  spi_transmit_array(can->spi, msg->data_u8, 8);
 
   spi_deselect(can->spi);
 
