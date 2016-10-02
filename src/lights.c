@@ -90,10 +90,10 @@ void lights_process_message(void) {
   // Check interrupt pin for active low to see if
   // if we have a message.
 
-  if (io_get_state(&config->can.interrupt_pin) == IO_LOW) {
+  if (!(P2IN & BIT7)) {
     struct CANMessage msg = {0};
-    struct CANError error = {0};
-    while (can_process_interrupt(&config->can, &msg, &error)) {
+    can_receive(&config->can, &msg);
+    if (msg.id != 0x00) {
       prv_handle_message(&msg);
     }
   }

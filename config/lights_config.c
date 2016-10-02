@@ -16,18 +16,18 @@ struct LightConfig light_config = {
     .interrupt_pin = { GPIO_PORT_P2, GPIO_PIN7 },
     .reset_pin = NO_RESET_PIN,
     .rxb0 = {
-      .mask = 0,
+      .mask = CAN_FULL_MASK,
       .filter = {
-        DEVICE_THEMIS,
-        CAN_FULL_MASK
+        THEMIS_SIG_LEFT,
+        THEMIS_SIG_RIGHT
       }
     },
     .rxb1 = {
       .mask = CAN_FULL_MASK,
       .filter = {
-        CAN_FULL_MASK,
-        CAN_FULL_MASK,
-        CAN_FULL_MASK,
+        THEMIS_SIG_HAZARD,
+        THEMIS_SIG_BRAKE,
+        THEMIS_SIG_RUNNING,
         CAN_FULL_MASK
       }
     }
@@ -58,9 +58,7 @@ struct LightConfig light_config = {
       .type = LIGHT_BRAKE,
       .signal_pins = {
         {GPIO_PORT_P1, GPIO_PIN0}, // Brake left
-        {GPIO_PORT_P1, GPIO_PIN1},
         {GPIO_PORT_P1, GPIO_PIN2}, // Brake right
-        {GPIO_PORT_P1, GPIO_PIN3},
         {GPIO_PORT_P1, GPIO_PIN4}, // Brake center
       },
     },
@@ -80,8 +78,7 @@ struct LightConfig light_config = {
           {GPIO_PORT_P1, GPIO_PIN1},
           {GPIO_PORT_P1, GPIO_PIN5}, // Front right
           {GPIO_PORT_P1, GPIO_PIN2}, // Brake right
-          {GPIO_PORT_P1, GPIO_PIN3},
-          {GPIO_PORT_P1, GPIO_PIN4}
+          {GPIO_PORT_P1, GPIO_PIN3}
       },
     },
   },
