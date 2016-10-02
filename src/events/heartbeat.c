@@ -3,25 +3,22 @@
 #include "timer_a.h"
 
 static const struct IOMap *pin = NULL;
+static IOState state;
 
 void heartbeat_init(const struct IOMap *heartbeat_pin) {
   pin = heartbeat_pin;
-  io_set_resistor_dir(pin, PIN_IN, RESISTOR_PULLDOWN);
+  io_set_resistor_dir(pin, PIN_IN, RESISTOR_PULLUP);
 
-  // Good heartbeat = high
-  io_configure_interrupt(pin, true, EDGE_RISING);
+  state = io_get_state(pin);
 }
 
 void heartbeat_timer_cb(uint16_t elapsed_ms, void *context) {
-  // Raise a heartbeat state event - high means good
-  EventID e = (io_get_state(pin) == IO_HIGH) ? HEARBEAT_GOOD : HEARTBEAT_BAD;
-  event_raise_isr(HEARBEAT_GOOD, 0);
-}
+  bool forced = context;
+  IOState heartbeat_state = io_get_state(pin);
 
-
-void heartbeat_interrupt(void) {
-  if (io_process_interrupt(pin)) {
-    heartbeat_timer_cb(0, NULL);
-    io_toggle_interrupt_edge(pin);
+  if (heartbeat_state != state || forced) {
+    // Raise a heartbeat state event - high means good
+    state = heartbeat_state;
+    event_raise((state == IO_LOW) ? HEARTBEAT_GOOD : HEARTBEAT_BAD, 0);
   }
 }

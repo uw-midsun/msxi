@@ -21,7 +21,7 @@ void horn_process_message(struct StateMachine *sm, uint16_t ignored) {
   struct CANError error = { 0 };
 
   // Not sure if we care about CAN errors, but this clears any that may have occurred.
-  while (can_process_interrupt(can_cfg, &msg, &error)) {
+  if (can_process_interrupt(can_cfg, &msg, &error)) {
     if (msg.id == THEMIS_HORN) {
       // We got a horn message
       // Horn messages carry a boolean value - on or off.

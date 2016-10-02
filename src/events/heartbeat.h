@@ -12,7 +12,7 @@
 
 typedef enum {
   HEARTBEAT_BAD = PROTECTED_EVENT_ID(EVENT_HEARTBEAT),
-  HEARBEAT_GOOD
+  HEARTBEAT_GOOD
 } HeartbeatEvent;
 
 // Initializes the heartbeat pin and interrupt.
@@ -20,6 +20,3 @@ void heartbeat_init(const struct IOMap *heartbeat_pin);
 
 // Callback to be executed after a timer delay. Forces a heartbeat event to be fired.
 void heartbeat_timer_cb(uint16_t elapsed_ms, void *context);
-
-// Call this in the appropriate port's ISR.
-void heartbeat_interrupt(void);

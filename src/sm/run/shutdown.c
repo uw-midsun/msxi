@@ -25,17 +25,17 @@ static void prv_kill() {
   relay_set_state(&relay_battery, RELAY_OPEN);
 
   // Kill LV power
-  power_set_lv(&enable_lv, LV_DISABLED);
+//  power_set_lv(&enable_lv, LV_DISABLED);
   event_raise(SHUTDOWN_COMPLETE, 0);
 }
 
 static void prv_init_sm() {
   // Handled by DISCHARGE sub-SM
-  state_init_composite(&discharge, discharge_get_sm());
+  state_init_composite(&discharge, &sm, discharge_get_sm());
   state_add_state_transition(&discharge, discharge_get_exit_event(), &kill);
 
   // Kill HV + LV power
-  state_init(&kill, prv_kill);
+  state_init(&kill, &sm, prv_kill);
 }
 
 struct StateMachine *shutdown_get_sm(void) {

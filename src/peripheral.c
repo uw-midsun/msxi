@@ -14,7 +14,7 @@
 #include "events/motor_controller.h"
 
 void peripheral_init(void) {
-  power_set_lv(&enable_lv, LV_DISABLED);
+  power_set_lv(&enable_lv, LV_ENABLED);
 
   can_init(&can);
 
@@ -34,11 +34,11 @@ void peripheral_init(void) {
   timer_init();
 
   timer_delay_periodic(40, input_poll, &input);
+  timer_delay_periodic(10, heartbeat_timer_cb, (void *)false);
 }
 
 #pragma vector = PORT1_VECTOR
 __interrupt void PORT1_ISR(void) {
   // Process horn (CAN) messages
   horn_interrupt();
-  heartbeat_interrupt();
 }

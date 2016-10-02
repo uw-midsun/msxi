@@ -2,13 +2,13 @@
 
 // State Machine ID mapping
 // State machines are given IDs for debugging and to act as offsets for their events.
-// SM event IDs should follow the pattern xyyzz where
-// - x is reserved for non-SM events
-// - y is the SM ID
-// - z is the event offset
+// The event ID is a bitmask of xyyyyyzzzzzzzzzz where
+// - x: Protected (bool)
+// - y: SM/Protected ID (5 bits)
+// - z: Event ID (10 bits
 
-#define STATEMACHINE_ID(offset) ((offset) * 100)
-#define PROTECTED_EVENT_ID(offset) ((offset) * 10000)
+#define STATEMACHINE_ID(offset) ((uint16_t)(offset & 0x1F) << 10)
+#define PROTECTED_EVENT_ID(offset) ((uint16_t)(offset & 0x1F) << 10 | ((uint16_t)1 << 15))
 
 typedef enum {
   SM_MAIN = 1,
@@ -19,7 +19,6 @@ typedef enum {
   SM_DISCHARGE,
   SM_CHARGING,
   SM_FAILURE,
-  FORCE_SM_ID_SIZE = 65535 // Forces it to be a uint16_t
 } StateMachineID;
 
 typedef enum {
@@ -29,5 +28,4 @@ typedef enum {
   EVENT_POWER,
   EVENT_RELAY,
   EVENT_FAILURE,
-  FORCE_EVENT_ID_SIZE = 65535 // Forces it to be a uint16_t
 } ProtectedEventID;

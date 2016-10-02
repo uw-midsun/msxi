@@ -28,20 +28,22 @@ static void prv_debug(void) {
 }
 
 static void prv_init_sm() {
-  state_init_composite(&startup, startup_get_sm());
+  state_init_composite(&startup, &sm, startup_get_sm());
   fail_add_rule(&startup, EMERGENCY_STOP, fail_handle_killswitch);
   fail_add_rule(&startup, HEARTBEAT_BAD, fail_handle_heartbeat);
-  state_add_state_transition(&running, POWER_OFF, &shutdown);
+  state_add_state_transition(&startup, POWER_TOGGLE, &shutdown);
   state_add_state_transition(&startup, startup_get_exit_event(), &running);
 
-  state_init(&running, prv_debug);
+  state_init(&running, &sm, prv_debug);
   state_add_transition(&running, transitions_make_data_rule(CAN_INTERRUPT, NO_GUARD,
                                                             horn_process_message, 0));
   fail_add_rule(&running, EMERGENCY_STOP, fail_handle_killswitch);
   fail_add_rule(&running, HEARTBEAT_BAD, fail_handle_heartbeat);
-  state_add_state_transition(&running, POWER_OFF, &shutdown);
+  state_add_state_transition(&running, POWER_TOGGLE, &shutdown);
 
-  state_init_composite(&shutdown, shutdown_get_sm());
+  state_init_composite(&shutdown, &sm, shutdown_get_sm());
+  fail_add_rule(&running, EMERGENCY_STOP, fail_handle_killswitch);
+  fail_add_rule(&running, HEARTBEAT_BAD, fail_handle_heartbeat);
 }
 
 struct StateMachine *run_get_sm(void) {

@@ -3,7 +3,7 @@
 
 // Around 90% charged - TODO: verify value
 // LV25-P in: ~9.02mA; out: ~22.56mA -> 120V => 2100mV
-#define SAFE_PRECHARGE_THRESHOLD 1741
+#define SAFE_PRECHARGE_THRESHOLD 24
 // ~5 volts?
 #define SAFE_DISCHARGE_THRESHOLD 24
 
@@ -37,7 +37,7 @@ void mc_process(const struct MCConfig *config, SuccessFunc fn,
     success = fn(config->mc[mc], config->adc);
     mc++;
   }
-  EventID e = (true) ? on_success : on_fail;
+  EventID e = (success) ? on_success : on_fail;
   event_raise(e, mc);
 }
 
@@ -48,7 +48,8 @@ bool mc_precharge_begin(const struct MotorController *mc, const struct ADC12Conf
 }
 
 bool mc_precharge_power(const struct MotorController *mc, const struct ADC12Config *adc) {
-  return (adc12_sample(adc, mc->charge_index) >= SAFE_PRECHARGE_THRESHOLD);
+  volatile uint16_t voltage = adc12_sample(adc, mc->charge_index);
+  return (voltage <= SAFE_PRECHARGE_THRESHOLD);
 }
 
 bool mc_precharge_end(const struct MotorController *mc, const struct ADC12Config *adc) {
@@ -63,7 +64,8 @@ bool mc_discharge_begin(const struct MotorController *mc, const struct ADC12Conf
 }
 
 bool mc_discharge_power(const struct MotorController *mc, const struct ADC12Config *adc) {
-  return adc12_sample(adc, mc->discharge_index) <= SAFE_DISCHARGE_THRESHOLD;
+  volatile uint16_t voltage = adc12_sample(adc, mc->discharge_index);
+  return voltage <= SAFE_DISCHARGE_THRESHOLD;
 }
 
 bool mc_discharge_end(const struct MotorController *mc, const struct ADC12Config *adc) {

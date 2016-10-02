@@ -19,8 +19,7 @@ struct InputConfig {
 };
 
 typedef enum {
-  POWER_ON = PROTECTED_EVENT_ID(EVENT_INPUT),
-  POWER_OFF,
+  POWER_TOGGLE = PROTECTED_EVENT_ID(EVENT_INPUT),
   EMERGENCY_STOP
 } InputEvent;
 

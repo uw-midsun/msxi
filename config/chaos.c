@@ -17,14 +17,14 @@ const struct CANConfig can = {
   .interrupt_pin = { GPIO_PORT_P1, GPIO_PIN1 },
   .reset_pin = { GPIO_PORT_P1, GPIO_PIN2 },
   .rxb0 = {
-    .mask = CAN_DEVICE_MASK,
+    .mask = CAN_FULL_MASK,
     .filter = {
-      DEVICE_THEMIS,
+      THEMIS_HORN,
       CAN_FULL_MASK
     }
   },
   .rxb1 = {
-    .mask = CAN_IGNORE_ALL,
+    .mask = CAN_FULL_MASK,
     .filter = { }
   }
 };
@@ -58,10 +58,10 @@ const struct ADC12Config adc12_a = {
 
 const struct Relay relay_battery = {
   .relay = { GPIO_PORT_P3, GPIO_PIN6 },
-  .status = { GPIO_PORT_P3, GPIO_PIN7 }
+  .status = NO_STATUS_PIN
 }, relay_solar = {
   .relay = { GPIO_PORT_P4, GPIO_PIN0 },
-  .status = { GPIO_PORT_P4, GPIO_PIN1 }
+  .status = NO_STATUS_PIN
 };
 
 const struct MotorController mc_left = {
@@ -101,7 +101,7 @@ const struct MotorController mc_right = {
 const struct MCConfig mc_config = {
   .adc = &adc12_a,
   .enable_measure = { GPIO_PORT_P5, GPIO_PIN1 },
-  .num_mc = 2,
+  .num_mc = 2 ,
   .mc = {
     &mc_left,
     &mc_right
@@ -115,7 +115,7 @@ const struct IOMap plutus_heartbeat = { GPIO_PORT_P1, GPIO_PIN5 },
 
 const struct SMDebugConfig sm_debug = {
   .can = &can,
-  .leds = {
+  .state_leds = {
     { GPIO_PORT_P2, GPIO_PIN4 },
     { GPIO_PORT_P2, GPIO_PIN5 },
     { GPIO_PORT_P2, GPIO_PIN6 },
@@ -123,13 +123,29 @@ const struct SMDebugConfig sm_debug = {
     { GPIO_PORT_P3, GPIO_PIN1 },
     { GPIO_PORT_P3, GPIO_PIN2 },
     { GPIO_PORT_P3, GPIO_PIN3 },
-    { GPIO_PORT_P7, GPIO_PIN2 }
+    { GPIO_PORT_P7, GPIO_PIN2 },
+    { GPIO_PORT_P7, GPIO_PIN3 },
+    { GPIO_PORT_P8, GPIO_PIN0 },
+  },
+  .event_leds = {
+    { GPIO_PORT_P8, GPIO_PIN1 },
+    { GPIO_PORT_P8, GPIO_PIN2 },
+    { GPIO_PORT_P8, GPIO_PIN3 },
+    { GPIO_PORT_P8, GPIO_PIN4 },
+    { GPIO_PORT_P8, GPIO_PIN5 },
+  },
+  .fault_leds = {
+    { GPIO_PORT_P8, GPIO_PIN6 },
+    { GPIO_PORT_P8, GPIO_PIN7 },
+    { GPIO_PORT_P9, GPIO_PIN0 },
+    { GPIO_PORT_P9, GPIO_PIN1 },
+    { GPIO_PORT_P9, GPIO_PIN4 },
   }
 };
 
 struct InputConfig input = {
-  .power = { { GPIO_PORT_P2, GPIO_PIN0 } },
-  .killswitch = { { GPIO_PORT_P6, GPIO_PIN6 } },
+  .power = { { GPIO_PORT_P6, GPIO_PIN7 } },
+  .killswitch = { { GPIO_PORT_P6, GPIO_PIN5 } },
   .power_led = { GPIO_PORT_P11, GPIO_PIN1 },
-  .select = { GPIO_PORT_P6, GPIO_PIN7 },
+  .select = { GPIO_PORT_P6, GPIO_PIN4 },
 };
