@@ -75,7 +75,7 @@ void lights_init(struct LightConfig *light_config) {
   // Initalize all inital light states
   for (i = 0; i < MAX_SIGNALS; ++i) {
     for (j = 0; j < MAX_LIGHTS; ++j) {
-    	io_set_state(&config->signals[i].signal_pins[j], IO_LOW);
+    	io_set_state(&config->signals[i].signal_pins[j], IO_HIGH);
     	io_set_dir(&config->signals[i].signal_pins[j], PIN_OUT);
     }
   }
